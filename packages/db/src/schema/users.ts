@@ -1,8 +1,7 @@
-import { enumToPgEnum } from "@/utils";
 import { relations } from "drizzle-orm";
 import { timestamp } from "drizzle-orm/pg-core";
 import { boolean } from "drizzle-orm/pg-core";
-import { varchar, integer, pgEnum, uuid, pgTable } from "drizzle-orm/pg-core";
+import { varchar, integer, uuid, pgTable } from "drizzle-orm/pg-core";
 import { sessions } from "./sessions";
 import { deposits } from "./deposits";
 import { balanceMutations } from "./balance_mutations";

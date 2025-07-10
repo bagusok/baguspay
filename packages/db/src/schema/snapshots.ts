@@ -2,7 +2,6 @@ import { text, uuid } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 import {
   PaymentMethodAllowAccess,
-  paymentMethodAllowAccessEnum,
   PaymentMethodFeeType,
   paymentMethodFeeTypeEnum,
   PaymentMethodProvider,
@@ -12,7 +11,7 @@ import { integer } from "drizzle-orm/pg-core";
 import { numeric } from "drizzle-orm/pg-core";
 import { varchar } from "drizzle-orm/pg-core";
 import { timestamp } from "drizzle-orm/pg-core";
-import { or, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   ProductBillingType,
   productBillingTypeEnum,
@@ -33,7 +32,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
     {
       onDelete: "set null",
       onUpdate: "cascade",
-    }
+    },
   ),
   provider_ref_id: varchar("provider_ref_id").notNull(),
   fee_static: integer("fee_static").notNull().default(0),
@@ -45,7 +44,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
     .notNull()
     .default(0),
   fee_type: paymentMethodFeeTypeEnum("fee_type").default(
-    PaymentMethodFeeType.MERCHANT
+    PaymentMethodFeeType.MERCHANT,
   ),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: paymentMethodProviderEnum("provider_name")
@@ -61,7 +60,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
 
   created_at: timestamp("created_at", { withTimezone: true }),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -73,7 +72,7 @@ export const paymentSnapshotRelations = relations(
       references: [paymentMethods.id],
     }),
     order: one(orders),
-  })
+  }),
 );
 
 export const productSnapshots = pgTable("product_snapshots", {
@@ -98,7 +97,7 @@ export const productSnapshots = pgTable("product_snapshots", {
   total_price: integer("total_price").notNull(),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: productProviderEnum("provider_name").default(
-    ProductProvider.ATLANTICH2H
+    ProductProvider.ATLANTICH2H,
   ),
   provider_price: integer("provider_price").notNull(),
   provider_max_price: integer("provider_max_price").notNull(),
@@ -107,14 +106,14 @@ export const productSnapshots = pgTable("product_snapshots", {
     .default(""),
   notes: text("notes"),
   billing_type: productBillingTypeEnum("billing_type").default(
-    ProductBillingType.PREPAID
+    ProductBillingType.PREPAID,
   ),
   fullfillment_type: productFullfillmentTypeEnum("fullfillment_type").default(
-    ProductFullfillmentType.AUTOMATIC_DIRECT
+    ProductFullfillmentType.AUTOMATIC_DIRECT,
   ),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -126,5 +125,5 @@ export const productSnapshotRelations = relations(
       references: [products.id],
     }),
     order: one(orders),
-  })
+  }),
 );

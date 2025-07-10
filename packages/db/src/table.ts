@@ -3,6 +3,7 @@ import {
   products,
   productCategories,
   productSubCategories,
+  articles,
 } from "./schema";
 
 export const tb = {
@@ -10,4 +11,5 @@ export const tb = {
   products,
   productCategories,
   productSubCategories,
+  articles,
 };

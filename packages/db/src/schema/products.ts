@@ -1,4 +1,4 @@
-import { desc, relations } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import { varchar } from "drizzle-orm/pg-core";
 import { text } from "drizzle-orm/pg-core";
 import { integer } from "drizzle-orm/pg-core";
@@ -41,7 +41,7 @@ export const productCategories = pgTable("product_categories", {
     .defaultNow()
     .notNull(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -51,7 +51,7 @@ export const productCategoryRelations = relations(
     product_sub_categories: many(productSubCategories),
     input_on_product_category: many(inputOnProductCategory),
     articles: many(articles),
-  })
+  }),
 );
 
 export const productSubCategories = pgTable("product_sub_categories", {
@@ -68,7 +68,7 @@ export const productSubCategories = pgTable("product_sub_categories", {
     .notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -79,7 +79,7 @@ export const productSubCategoryRelations = relations(
       fields: [productSubCategories.product_category_id],
       references: [productCategories.id],
     }),
-  })
+  }),
 );
 
 export const products = pgTable("products", {
@@ -107,7 +107,7 @@ export const products = pgTable("products", {
   stock: integer("stock").notNull().default(0),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: productProviderEnum("provider_name").default(
-    ProductProvider.ATLANTICH2H
+    ProductProvider.ATLANTICH2H,
   ),
   provider_price: integer("provider_price").notNull(),
   provider_max_price: integer("provider_max_price").notNull(),
@@ -116,14 +116,14 @@ export const products = pgTable("products", {
     .default(""),
   notes: text("notes"),
   billing_type: productBillingTypeEnum("billing_type").default(
-    ProductBillingType.PREPAID
+    ProductBillingType.PREPAID,
   ),
   fullfillment_type: productFullfillmentTypeEnum("fullfillment_type").default(
-    ProductFullfillmentType.AUTOMATIC_DIRECT
+    ProductFullfillmentType.AUTOMATIC_DIRECT,
   ),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
