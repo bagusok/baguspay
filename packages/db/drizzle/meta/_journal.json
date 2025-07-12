@@ -15,6 +15,13 @@
       "when": 1752300331087,
       "tag": "0001_mysterious_junta",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752300768035,
+      "tag": "0002_cloudy_ogun",
+      "breakpoints": true
     }
   ]
 }
