@@ -1,12 +1,9 @@
-import { Button } from '@repo/ui/components/ui/button'
-import { Label } from '@repo/ui/components/ui/label'
+import AdminLayout from '~/components/layout/admin-layout'
 
 export default function Home() {
   return (
-    <>
-      <Button>Halo</Button>
-      <Label>ssss</Label>
-      <p className="text-sm text-red-400"></p>
-    </>
+    <AdminLayout>
+      <p>Test From AdminLayout</p>
+    </AdminLayout>
   )
 }

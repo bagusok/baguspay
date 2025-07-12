@@ -1,3 +1,5 @@
+/// <reference path="../config/inertia.ts" />
+
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
 import { Secret } from '@adonisjs/core/helpers'
