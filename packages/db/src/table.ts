@@ -1,15 +1,3 @@
-import {
-  users,
-  products,
-  productCategories,
-  productSubCategories,
-  articles,
-} from "./schema";
+import * as dbSchema from "./schema";
 
-export const tb = {
-  users,
-  products,
-  productCategories,
-  productSubCategories,
-  articles,
-};
+export const tb = dbSchema;

@@ -10,3 +10,4 @@ export * from "./snapshots";
 export * from "./deposits";
 export * from "./offers";
 export * from "./orders";
+export * from "./file_manager";
