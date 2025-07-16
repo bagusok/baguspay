@@ -17,13 +17,14 @@ import {
   PaymentMethodType,
   paymentMethodTypeEnum,
 } from "./pg-enums";
+import { time } from "drizzle-orm/pg-core";
 
 export const paymentMethodCategories = pgTable("payment_categories", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -31,7 +32,7 @@ export const paymentMethodCategoryRelations = relations(
   paymentMethodCategories,
   ({ many }) => ({
     payment_methods: many(paymentMethods),
-  })
+  }),
 );
 
 export const paymentMethods = pgTable("payment_methods", {
@@ -50,25 +51,40 @@ export const paymentMethods = pgTable("payment_methods", {
     .notNull()
     .default(0),
   fee_type: paymentMethodFeeTypeEnum("fee_type").default(
-    PaymentMethodFeeType.MERCHANT
+    PaymentMethodFeeType.MERCHANT,
   ),
+
   is_available: boolean("is_available").notNull().default(true),
   is_featured: boolean("is_featured").notNull().default(false),
   label: varchar("label", { length: 20 }),
   provider_name: paymentMethodProviderEnum("provider_name").default(
-    PaymentMethodProvider.TRIPAY
+    PaymentMethodProvider.TRIPAY,
   ),
+  provider_code: varchar("provider_code", { length: 50 }).notNull(),
   min_amount: integer("min_amount").notNull().default(0),
   max_amount: integer("max_amount").notNull().default(0),
   type: paymentMethodTypeEnum("type").default(PaymentMethodType.BANK_TRANSFER),
+  is_need_phone_number: boolean("is_need_phone_number")
+    .notNull()
+    .default(false),
+  is_need_email: boolean("is_need_email").notNull().default(false),
   allow_access: text("allow_access")
     .array()
     .$type<PaymentMethodAllowAccess[]>()
     .default([PaymentMethodAllowAccess.ORDER]),
+  expired_in: integer("expired_in").notNull().default(0),
   is_deleted: boolean("is_deleted").notNull().default(false),
-  created_at: timestamp("created_at", { withTimezone: true }),
+
+  phone_number: varchar("phone_number", { length: 20 }),
+  email: varchar("email"),
+  pay_code: varchar("pay_code", { length: 100 }),
+  pay_url: varchar("pay_url"),
+
+  cut_off_start: time("cut_off_start", { withTimezone: true }),
+  cut_off_end: time("cut_off_end", { withTimezone: true }),
+  created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
   deleted_at: timestamp("deleted_at", { withTimezone: true }),
 });
@@ -82,5 +98,5 @@ export const paymentMethodRelations = relations(
     }),
     deposits: many(deposits),
     payment_snapshots: many(paymentSnapshots),
-  })
+  }),
 );

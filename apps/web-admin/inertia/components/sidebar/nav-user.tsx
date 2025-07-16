@@ -18,6 +18,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@repo/ui/components/ui/sidebar'
+import { useAtom } from 'jotai'
+import { userAtom } from '~/store/user'
 
 export function NavUser({
   user,
@@ -29,6 +31,30 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+
+  const [data] = useAtom(userAtom)
+
+  if (data.isLoading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton className="w-full justify-center">Loading...</SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
+  }
+
+  if (data.isError) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton className="w-full justify-center">
+            Error loading user
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
+  }
 
   return (
     <SidebarMenu>
@@ -44,8 +70,8 @@ export function NavUser({
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-medium">{data.data?.name}</span>
+                <span className="truncate text-xs">{data.data?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>

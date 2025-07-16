@@ -17,6 +17,7 @@ import {
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   oauth_id: varchar("oauth_id"),
+  image_url: varchar("image_url"),
   registered_type: userRegisteredTypeEnum("registered_type")
     .notNull()
     .default(UserRegisteredType.LOCAL),

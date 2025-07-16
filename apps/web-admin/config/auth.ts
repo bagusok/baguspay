@@ -9,10 +9,10 @@ const authConfig = defineConfig({
     web: sessionGuard({
       useRememberMeTokens: false,
       provider: configProvider.create(async () => {
-        const { SessionPrismaUserProvider } = await import(
+        const { SessionDrizzleUserProvider } = await import(
           '../app/providers/drizzle_auth_provider.js'
         )
-        return new SessionPrismaUserProvider()
+        return new SessionDrizzleUserProvider()
       }),
     }),
   },

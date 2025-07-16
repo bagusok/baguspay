@@ -30,6 +30,41 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    const { request, response, session, inertia } = ctx
+
+    if (this.isDrizzleError(error)) {
+      console.error('[DRIZZLE ERROR]', error)
+
+      let status = 500
+      let message = 'A database error occurred.'
+
+      if (this.isConstraintViolation(error)) {
+        status = 409
+        message = 'Cannot delete or update because related data exists.'
+      }
+
+      if (!app.inProduction) {
+        message = (error as any).message || message
+      }
+
+      if (request.accepts(['json'])) {
+        return response.status(status).send({
+          error: message,
+        })
+      }
+
+      session.flashErrors({
+        error: message,
+      })
+      inertia.share({
+        errors: {
+          error: message,
+        },
+      })
+
+      return response.redirect().back()
+    }
+
     return super.handle(error, ctx)
   }
 
@@ -41,5 +76,22 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    */
   async report(error: unknown, ctx: HttpContext) {
     return super.report(error, ctx)
+  }
+
+  private isDrizzleError(error: any): boolean {
+    return (
+      error?.name === 'PostgresError' || // node-postgres
+      error?.constructor?.name === 'PostgresError' ||
+      error?.message?.includes('Failed query') ||
+      error?.code // Postgres error codes like 23503, etc
+    )
+  }
+
+  private isConstraintViolation(error: any): boolean {
+    return (
+      error?.code === '23503' || // foreign key violation
+      error?.code === '23505' || // unique violation
+      error?.code === '23502' // not null violation
+    )
   }
 }

@@ -15,7 +15,7 @@ export enum UserRegisteredType {
 export const userRoleEnum = pgEnum("user_role", enumToPgEnum(UserRole));
 export const userRegisteredTypeEnum = pgEnum(
   "user_registered_type",
-  enumToPgEnum(UserRegisteredType)
+  enumToPgEnum(UserRegisteredType),
 );
 
 export enum BalanceMutationType {
@@ -31,12 +31,12 @@ export enum BalanceMutationRefType {
 
 export const balanceMutationTypeEnum = pgEnum(
   "balance_mutation_type",
-  enumToPgEnum(BalanceMutationType)
+  enumToPgEnum(BalanceMutationType),
 );
 
 export const balanceMutationRefTypeEnum = pgEnum(
   "balance_mutation_ref_type",
-  enumToPgEnum(BalanceMutationRefType)
+  enumToPgEnum(BalanceMutationRefType),
 );
 
 export enum DepositStatus {
@@ -48,7 +48,7 @@ export enum DepositStatus {
 
 export const depositStatusEnum = pgEnum(
   "deposit_status",
-  enumToPgEnum(DepositStatus)
+  enumToPgEnum(DepositStatus),
 );
 export enum InputFieldType {
   TEXT = "text",
@@ -68,7 +68,7 @@ export type InputFieldOption = {
 
 export const inputFieldTypeEnum = pgEnum(
   "input_field_type",
-  enumToPgEnum(InputFieldType)
+  enumToPgEnum(InputFieldType),
 );
 
 export enum PaymentStatus {
@@ -96,17 +96,17 @@ export enum RefundStatus {
 
 export const paymentStatusEnum = pgEnum(
   "payment_status",
-  enumToPgEnum(PaymentStatus)
+  enumToPgEnum(PaymentStatus),
 );
 
 export const orderStatusEnum = pgEnum(
   "order_status",
-  enumToPgEnum(OrderStatus)
+  enumToPgEnum(OrderStatus),
 );
 
 export const refundStatusEnum = pgEnum(
   "refund_status",
-  enumToPgEnum(RefundStatus)
+  enumToPgEnum(RefundStatus),
 );
 
 export enum PaymentMethodFeeType {
@@ -136,6 +136,7 @@ export enum PaymentMethodType {
   CREDIT_CARD = "credit_card",
   VOUCHER = "voucher",
   BALANCE = "balance",
+  LINK_PAYMENT = "link_payment",
   MANUAL = "manual",
 }
 
@@ -146,22 +147,22 @@ export enum PaymentMethodAllowAccess {
 
 export const paymentMethodFeeTypeEnum = pgEnum(
   "payment_method_fee_type",
-  enumToPgEnum(PaymentMethodFeeType)
+  enumToPgEnum(PaymentMethodFeeType),
 );
 
 export const paymentMethodProviderEnum = pgEnum(
   "payment_method_provider",
-  enumToPgEnum(PaymentMethodProvider)
+  enumToPgEnum(PaymentMethodProvider),
 );
 
 export const paymentMethodTypeEnum = pgEnum(
   "payment_method_type",
-  enumToPgEnum(PaymentMethodType)
+  enumToPgEnum(PaymentMethodType),
 );
 
 export const paymentMethodAllowAccessEnum = pgEnum(
   "payment_method_allow_access",
-  enumToPgEnum(PaymentMethodAllowAccess)
+  enumToPgEnum(PaymentMethodAllowAccess),
 );
 
 export enum LoginIsFrom {
@@ -172,7 +173,7 @@ export enum LoginIsFrom {
 
 export const loginIsFromEnum = pgEnum(
   "login_is_from",
-  enumToPgEnum(LoginIsFrom)
+  enumToPgEnum(LoginIsFrom),
 );
 
 export enum ProductProvider {
@@ -197,15 +198,15 @@ export enum ProductFullfillmentType {
 
 export const productProviderEnum = pgEnum(
   "product_provider",
-  enumToPgEnum(ProductProvider)
+  enumToPgEnum(ProductProvider),
 );
 
 export const productBillingTypeEnum = pgEnum(
   "product_billing_type",
-  enumToPgEnum(ProductBillingType)
+  enumToPgEnum(ProductBillingType),
 );
 
 export const productFullfillmentTypeEnum = pgEnum(
   "product_fullfillment_type",
-  enumToPgEnum(ProductFullfillmentType)
+  enumToPgEnum(ProductFullfillmentType),
 );

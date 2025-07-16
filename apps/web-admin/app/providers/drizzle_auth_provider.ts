@@ -1,11 +1,12 @@
 // app/auth/session_prisma_user_provider.ts
 import { symbols } from '@adonisjs/auth'
 import type { SessionGuardUser, SessionUserProviderContract } from '@adonisjs/auth/types/session'
-import { db, eq, InferSelectModel, tb } from '@repo/db'
+import { db, eq, InferSelectModel } from '@repo/db'
+import { tb } from '@repo/db/types'
 
 type User = InferSelectModel<typeof tb.users>
 
-export class SessionPrismaUserProvider implements SessionUserProviderContract<User> {
+export class SessionDrizzleUserProvider implements SessionUserProviderContract<User> {
   declare [symbols.PROVIDER_REAL_USER]: User
 
   async createUserForGuard(user: User): Promise<SessionGuardUser<User>> {

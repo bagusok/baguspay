@@ -18,7 +18,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       toast.success(props.success)
     }
 
-    console
+    if (props.errors) {
+      if (props.errors.error) {
+        // Show error message using toast
+        toast.error(props.errors.error)
+      }
+    }
   }, [props])
 
   return (
@@ -29,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="flex flex-1">
             <AppSidebar />
             <SidebarInset>
-              <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+              <div className="flex flex-1 flex-col gap-4 p-6 lg:p-12">{children}</div>
             </SidebarInset>
           </div>
         </SidebarProvider>

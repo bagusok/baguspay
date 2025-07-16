@@ -58,6 +58,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
   min_amount: integer("min_amount").notNull().default(0),
   max_amount: integer("max_amount").notNull().default(0),
 
+  expired_at: timestamp("expired_at", { withTimezone: true }).notNull(),
   created_at: timestamp("created_at", { withTimezone: true }),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),

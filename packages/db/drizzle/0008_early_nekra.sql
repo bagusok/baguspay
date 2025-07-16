@@ -1,0 +1,2 @@
+ALTER TABLE "products" ALTER COLUMN "product_sub_category_id" SET NOT NULL;--> statement-breakpoint
+ALTER TABLE "products" ADD CONSTRAINT "products_product_sub_category_id_product_sub_categories_id_fk" FOREIGN KEY ("product_sub_category_id") REFERENCES "public"."product_sub_categories"("id") ON DELETE no action ON UPDATE no action;

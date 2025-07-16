@@ -1,5 +1,4 @@
-export * from "./schema";
+// Hanya untuk backend! Untuk frontend, import dari './types'.
 export * from "./database";
 export * from "./utils";
-export * from "./table";
 export * from "drizzle-orm";

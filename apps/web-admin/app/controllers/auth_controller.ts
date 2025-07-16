@@ -1,8 +1,9 @@
 import { loginValidator, registerValidator } from '#validators/auth'
 import type { HttpContext } from '@adonisjs/core/http'
-import { db, eq, or, tb, UserRegisteredType, UserRole } from '@repo/db'
+import { db, eq, or } from '@repo/db'
+import { tb, UserRegisteredType, UserRole } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { compare, hash } from 'bcrypt-ts'
+import hash from '@adonisjs/core/services/hash'
 
 export default class AuthController {
   public async register({ inertia }: HttpContext) {
@@ -26,7 +27,8 @@ export default class AuthController {
       return ctx.response.redirect().back()
     }
 
-    const hashedPassword = await hash(data.password, 10)
+    // const hashedPassword = await hash(data.password, 10)
+    const hashedPassword = await hash.make(data.password)
 
     const newUser = await db
       .insert(tb.users)
@@ -72,7 +74,8 @@ export default class AuthController {
       return ctx.response.redirect().back()
     }
 
-    const isPasswordValid = await compare(data.password, user.password)
+    const isPasswordValid = await hash.verify(user.password, data.password)
+
     if (!isPasswordValid) {
       ctx.session.flashErrors({
         error: 'Invalid email or password.',
@@ -80,7 +83,10 @@ export default class AuthController {
       return ctx.response.redirect().back()
     }
 
-    ctx.auth.use('web').login(user)
+    await ctx.auth.use('web').login(user)
+
+    const a = await ctx.auth.use('web').authenticate()
+    console.log('Authenticated User:', a)
 
     ctx.session.flashMessages.set('success', 'You have been logged in successfully.')
     return ctx.response.redirect().toRoute('home.index')

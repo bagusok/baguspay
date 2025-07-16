@@ -17,6 +17,7 @@ import {
   ProductProvider,
   productProviderEnum,
 } from "./pg-enums";
+import { time } from "drizzle-orm/pg-core";
 
 export const productCategories = pgTable("product_categories", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -27,7 +28,7 @@ export const productCategories = pgTable("product_categories", {
   image_url: varchar("image_url", { length: 255 }).notNull(),
   banner_url: varchar("banner_url", { length: 255 }).notNull(),
   publisher: varchar("publisher", { length: 100 }).notNull(),
-  is_available: boolean("is_active").notNull().default(true),
+  is_available: boolean("is_available").notNull().default(true),
   is_featured: boolean("is_featured").notNull().default(false),
   label: varchar("label", { length: 50 }),
   delivery_type: varchar("delivery_type", { length: 50 }).notNull(),
@@ -60,7 +61,7 @@ export const productSubCategories = pgTable("product_sub_categories", {
   sub_name: varchar("sub_name", { length: 100 }),
   description: text("description"),
   image_url: varchar("image_url", { length: 255 }).notNull(),
-  is_available: boolean("is_active").notNull().default(true),
+  is_available: boolean("is_available").notNull().default(true),
   is_featured: boolean("is_featured").notNull().default(false),
   label: varchar("label", { length: 50 }),
   product_category_id: uuid("product_category_id")
@@ -74,17 +75,20 @@ export const productSubCategories = pgTable("product_sub_categories", {
 
 export const productSubCategoryRelations = relations(
   productSubCategories,
-  ({ one }) => ({
+  ({ one, many }) => ({
     product_category: one(productCategories, {
       fields: [productSubCategories.product_category_id],
       references: [productCategories.id],
     }),
+    products: many(products),
   }),
 );
 
 export const products = pgTable("products", {
   id: uuid("id").primaryKey().defaultRandom(),
-  product_sub_category_id: uuid("product_sub_category_id"),
+  product_sub_category_id: uuid("product_sub_category_id")
+    .references(() => productSubCategories.id)
+    .notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   sub_name: varchar("sub_name", { length: 100 }),
   description: varchar("description", { length: 100 }),
@@ -103,7 +107,6 @@ export const products = pgTable("products", {
   })
     .notNull()
     .default(0),
-  total_price: integer("total_price").notNull(),
   stock: integer("stock").notNull().default(0),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: productProviderEnum("provider_name").default(
@@ -121,6 +124,10 @@ export const products = pgTable("products", {
   fullfillment_type: productFullfillmentTypeEnum("fullfillment_type").default(
     ProductFullfillmentType.AUTOMATIC_DIRECT,
   ),
+
+  cut_off_start: time("cut_off_start", { withTimezone: true }),
+  cut_off_end: time("cut_off_end", { withTimezone: true }),
+
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),

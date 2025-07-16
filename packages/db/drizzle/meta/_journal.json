@@ -22,6 +22,48 @@
       "when": 1752300768035,
       "tag": "0002_cloudy_ogun",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1752572144283,
+      "tag": "0003_furry_sharon_ventura",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1752639569112,
+      "tag": "0004_ordinary_black_panther",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1752639707754,
+      "tag": "0005_breezy_anthem",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1752646982346,
+      "tag": "0006_violet_chimera",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1752647879851,
+      "tag": "0007_safe_tana_nile",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1752650238531,
+      "tag": "0008_early_nekra",
+      "breakpoints": true
     }
   ]
 }

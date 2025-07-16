@@ -10,6 +10,11 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.mjs",
       "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.mjs",
+      "require": "./dist/types.cjs",
+      "types": "./dist/types.d.ts"
     }
   },
   "scripts": {

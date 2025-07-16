@@ -17,7 +17,8 @@ export default function Login() {
         }
       },
       onSuccess: (data) => {
-        console.log(data.props.success)
+        toast.success('Login successful!')
+        console.log(data)
       },
     })
   }

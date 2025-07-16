@@ -47,60 +47,26 @@ const data = {
       url: '/admin/product-categories',
       icon: ShoppingBagIcon,
       isActive: true,
-      items: [
-        {
-          title: 'Product Categories',
-          url: '/admin/product-categories',
-        },
-        {
-          title: 'Add Product Category',
-          url: '/admin/product-categories/create',
-        },
-        {
-          title: 'Product Sub Categories',
-          url: '/admin/product-sub-categories',
-        },
-        {
-          title: 'Add Product Sub Category',
-          url: '/admin/product-sub-categories/create',
-        },
-        {
-          title: 'Products',
-          url: '/admin/products',
-        },
-        {
-          title: 'Add Product',
-          url: '/admin/products/create',
-        },
-      ],
+      items: [],
     },
     {
       title: 'Inputs',
-      url: '#',
+      url: '/admin/input-fields',
       icon: PenIcon,
-      items: [
-        {
-          title: 'List Inputs',
-          url: '/admin/inputs',
-        },
-        {
-          title: 'Add Input',
-          url: '/admin/inputs/create',
-        },
-      ],
+      items: [],
     },
     {
-      title: 'Payment Methods',
-      url: '/admin/payment-methods',
+      title: 'Payments',
+      url: '#',
       icon: DollarSignIcon,
       items: [
         {
-          title: 'List Payment Methods',
-          url: '/admin/payment-methods',
+          title: 'Categories',
+          url: '/admin/payments/categories',
         },
         {
-          title: 'Add Payment Method',
-          url: '/admin/payment-methods/create',
+          title: 'Payment Methods',
+          url: '/admin/payments/methods',
         },
       ],
     },
@@ -108,69 +74,32 @@ const data = {
       title: 'Deposits',
       url: '/admin/deposits',
       icon: BanknoteArrowDown,
-      items: [
-        {
-          title: 'List Deposits',
-          url: '/admin/deposits',
-        },
-        {
-          title: 'Add Deposit',
-          url: '/admin/deposits/create',
-        },
-      ],
+      items: [],
     },
     {
       title: 'Orders',
       url: '/admin/orders',
       icon: ArrowLeftRight,
-      items: [
-        {
-          title: 'List Orders',
-          url: '/admin/orders',
-        },
-        {
-          title: 'Add Order',
-          url: '/admin/orders/create',
-        },
-      ],
+      items: [],
     },
     {
       title: 'Balance Mutations',
       url: '/admin/balance-mutations',
       icon: RefreshCcwIcon,
-      items: [
-        {
-          title: 'List Orders',
-          url: '/admin/balance-mutations',
-        },
-      ],
+      items: [],
     },
     {
       title: 'User Managements',
       url: '/admin/users',
       icon: UserIcon,
-      items: [
-        {
-          title: 'List Users',
-          url: '/admin/users',
-        },
-        {
-          title: 'Add User',
-          url: '/admin/users/create',
-        },
-      ],
+      items: [],
     },
   ],
   navSecondary: [
     {
-      title: 'Support',
+      title: 'Settings',
       url: '#',
       icon: LifeBuoy,
-    },
-    {
-      title: 'Feedback',
-      url: '#',
-      icon: Send,
     },
   ],
   projects: [
@@ -204,8 +133,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-medium">Baguspay</span>
+                  <span className="truncate text-xs">Admin Page</span>
                 </div>
               </a>
             </SidebarMenuButton>
