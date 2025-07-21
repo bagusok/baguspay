@@ -7,13 +7,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 import * as crypto from 'crypto';
+import { SendResponse } from 'src/common/utils/response';
 import {
   Data,
   TripayApiErrorResponse,
   TripayCreateClosedPaymentRequest,
   TripayCreateClosedPaymentResponse,
 } from './tripay.type';
-import { SendResponse } from 'src/common/utils/response';
 
 @Injectable()
 export class TripayService {
@@ -86,7 +86,7 @@ export class TripayService {
 
       return SendResponse.success<Data>(data.data);
     } catch (error) {
-      this.logger.error('Error creating closed payment', error.message);
+      this.logger.error('Error creating closed payment', error);
       if (axios.isAxiosError<TripayApiErrorResponse>(error)) {
         throw new BadRequestException(
           error.response?.data.message || 'Tripay API Error',

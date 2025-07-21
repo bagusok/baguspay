@@ -10,7 +10,7 @@ export class CallbackController {
   async handleTripayCallback(
     @Body() data: TripayCallbackData,
     @Headers('X-Callback-Signature') callbackSignature,
-  ): Promise<void> {
+  ) {
     return this.callbackService.handleTripayCallback(data, callbackSignature);
   }
 }

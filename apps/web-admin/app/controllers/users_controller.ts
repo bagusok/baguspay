@@ -5,7 +5,7 @@ import {
   userQueryValidator,
 } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, eq, ilike, or, SQL } from '@repo/db'
+import { and, count, db, eq, ilike, or } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { hash } from 'bcrypt-ts'

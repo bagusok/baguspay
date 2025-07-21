@@ -1,5 +1,5 @@
+import { ExceptionHandler, HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
-import { HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 import { DrizzleError } from '@repo/db'
 
@@ -79,14 +79,14 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     return super.report(error, ctx)
   }
 
-  private isDrizzleError(error: any): boolean {
-    return (
-      error?.name === 'PostgresError' || // node-postgres
-      error?.constructor?.name === 'PostgresError' ||
-      error?.message?.includes('Failed query') ||
-      error?.code // Postgres error codes like 23503, etc
-    )
-  }
+  // private isDrizzleError(error: any): boolean {
+  //   return (
+  //     error?.name === 'PostgresError' || // node-postgres
+  //     error?.constructor?.name === 'PostgresError' ||
+  //     error?.message?.includes('Failed query') ||
+  //     error?.code // Postgres error codes like 23503, etc
+  //   )
+  // }
 
   private isConstraintViolation(error: any): boolean {
     return (

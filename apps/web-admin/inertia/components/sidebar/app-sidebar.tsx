@@ -1,26 +1,21 @@
 'use client'
 
-import * as React from 'react'
 import {
-  BookOpen,
-  Bot,
+  ArrowLeftRight,
+  BanknoteArrowDown,
   Command,
+  DollarSignIcon,
   Frame,
   LifeBuoy,
   Map,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
-  ShoppingBagIcon,
   PenIcon,
-  DollarSignIcon,
-  BanknoteArrowDown,
-  ArrowLeftRight,
+  PieChart,
   RefreshCcwIcon,
-  UserIcon,
+  ShoppingBagIcon,
   TicketIcon,
+  UserIcon,
 } from 'lucide-react'
+import * as React from 'react'
 
 import {
   Sidebar,

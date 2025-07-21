@@ -10,7 +10,7 @@ import { MetaPaginated } from 'src/common/types/meta.type';
 export class UserService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async getUserById(id: string): Promise<any> {
+  async getUserById(id: string) {
     const user = await this.databaseService.db.query.users.findFirst({
       where: eq(tb.users.id, id),
       columns: {

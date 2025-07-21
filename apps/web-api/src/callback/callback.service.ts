@@ -25,7 +25,7 @@ export class CallbackService {
   async handleTripayCallback(
     data: TripayCallbackData,
     callbackSignature: string,
-  ): Promise<any> {
+  ) {
     this.logger.log('Handling Tripay callback', JSON.stringify(data));
     const signature = this.tripayService.generateCallbackSignature(data);
 
@@ -90,7 +90,13 @@ export class CallbackService {
       );
     } else {
       this.logger.warn('Unsupported merchant_ref format', data.merchant_ref);
-      return SendResponse.success({}, 'Unsupported merchant_ref format');
+      return SendResponse.success<any>(
+        {
+          merchant_ref: data.merchant_ref,
+          status: 'UNSUPPORTED',
+        },
+        'Unsupported merchant_ref format',
+      );
     }
   }
 }

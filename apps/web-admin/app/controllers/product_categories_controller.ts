@@ -1,14 +1,14 @@
 import {
   createProductCategoryValidator,
+  productCategoriesQueryValidator,
   productCategoryIdValidator,
   updateProductCategoryValidator,
-  productCategoriesQueryValidator,
 } from '#validators/product'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, desc, eq, ilike, inArray, InferSelectModel, or } from '@repo/db'
+import { and, count, db, desc, eq, ilike, inArray, InferSelectModel } from '@repo/db'
 import { tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 import slugify from '@sindresorhus/slugify'
+import vine from '@vinejs/vine'
 
 export default class ProductsCategoriesController {
   public async index(ctx: HttpContext) {

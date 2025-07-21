@@ -17,6 +17,8 @@ import { SendResponse } from 'src/common/utils/response';
 
 @Injectable()
 export class PaymentGatewayService {
+  private readonly logger = new Logger(PaymentGatewayService.name);
+
   constructor(private readonly tripayService: TripayService) {}
 
   async createPayment(data: CreatePaymentGatewayRequest) {
@@ -46,6 +48,10 @@ export class PaymentGatewayService {
         };
 
         const tripay = await this.tripayService.createClosedPayment(_data);
+
+        this.logger.log(
+          `Tripay payment created with ID: ${tripay.data.reference}`,
+        );
 
         return SendResponse.success<CreatePaymentGatewayResponse>({
           amount: tripay.data.amount,

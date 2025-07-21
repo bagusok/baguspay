@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, arrayContains, eq, gte, lte } from '@repo/db';
 import { PaymentMethodAllowAccess, tb } from '@repo/db/types';
 
-import { TUser } from 'src/common/types/global';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
 
@@ -10,7 +9,7 @@ import { DatabaseService } from 'src/database/database.service';
 export class OrderService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async getPriceBy(productId: string, user?: TUser) {
+  async getPriceBy(productId: string) {
     const product = await this.databaseService.db.query.products.findFirst({
       where: and(
         eq(tb.products.id, productId),
