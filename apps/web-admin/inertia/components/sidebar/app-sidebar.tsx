@@ -19,6 +19,7 @@ import {
   ArrowLeftRight,
   RefreshCcwIcon,
   UserIcon,
+  TicketIcon,
 } from 'lucide-react'
 
 import {
@@ -67,6 +68,21 @@ const data = {
         {
           title: 'Payment Methods',
           url: '/admin/payments/methods',
+        },
+      ],
+    },
+    {
+      title: 'Offers',
+      url: '#',
+      icon: TicketIcon,
+      items: [
+        {
+          title: 'Manage Offers',
+          url: '/admin/offers',
+        },
+        {
+          title: 'Offers History',
+          url: '/admin/offers/history',
         },
       ],
     },

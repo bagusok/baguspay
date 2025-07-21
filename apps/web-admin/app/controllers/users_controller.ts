@@ -5,7 +5,7 @@ import {
   userQueryValidator,
 } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, eq, ilike, or } from '@repo/db'
+import { and, count, db, eq, ilike, or, SQL } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { hash } from 'bcrypt-ts'
@@ -166,5 +166,66 @@ export default class UsersController {
     const { password, ...rest } = user
 
     return ctx.response.json(rest)
+  }
+
+  public async getUsersJson(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy,
+      searchQuery,
+    } = await ctx.request.validateUsing(vine.compile(userQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const where: any = [eq(tb.users.is_deleted, false), eq(tb.users.is_banned, false)]
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        where.push(ilike(tb.users.name, `%${searchQuery}%`))
+      } else if (searchBy === 'email') {
+        where.push(ilike(tb.users.email, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        where.push(eq(tb.users.id, searchQuery))
+      } else {
+        where.push(
+          or(ilike(tb.users.name, `%${searchQuery}%`), ilike(tb.users.email, `%${searchQuery}%`))
+        )
+      }
+    }
+
+    const offset = (page - 1) * limit
+    const users = await db.query.users.findMany({
+      where: where.length ? and(...where) : undefined,
+      limit,
+      offset,
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        role: true,
+        is_banned: true,
+        is_email_verified: true,
+        registered_type: true,
+        created_at: true,
+        updated_at: true,
+      },
+    })
+
+    const [total] = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.users)
+      .where(where.length ? and(...where) : undefined)
+    return ctx.response.json({
+      data: users,
+      meta: {
+        page: page,
+        limit,
+        total: total.count,
+        totalPages: Math.ceil(total.count / limit),
+      },
+    })
   }
 }

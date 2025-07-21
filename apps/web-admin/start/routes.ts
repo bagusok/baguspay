@@ -16,6 +16,7 @@ const InputFieldController = () => import('#controllers/input_fields_controller'
 const ProductSubCategoryController = () => import('#controllers/product_sub_categories_controller')
 const ProductController = () => import('#controllers/products_controller')
 const PaymentController = () => import('#controllers/payments_controller')
+const OfferController = () => import('#controllers/offer_controller')
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
@@ -47,6 +48,9 @@ router
     router.get('/me', [UserController, 'me']).as('users.me')
     router.get('/', [UserController, 'index']).as('users.index')
     router.post('/', [UserController, 'postCreate']).as('users.store')
+
+    router.get('/get-json', [UserController, 'getUsersJson']).as('users.getJson')
+
     router.delete('/:id', [UserController, 'postDelete']).as('users.delete')
     router.patch('/:id', [UserController, 'postUpdate']).as('users.update')
   })
@@ -60,6 +64,10 @@ router
     router
       .post('/create', [ProductCategoryController, 'postCreate'])
       .as('productCategories.postCreate')
+
+    router
+      .get('/get-json', [ProductCategoryController, 'getProductByCategoryNameJson'])
+      .as('productCategories.getProductByCategoryNameJson')
 
     router.get('/:id', [ProductCategoryController, 'detail']).as('productCategories.detail')
     router.get('/:id/edit', [ProductCategoryController, 'edit'])
@@ -147,7 +155,11 @@ router
     router
       .post('/', [PaymentController, 'postCreatePaymentMethod'])
       .as('payments.methods.postCreate')
+
     router
+      .get('/get-json', [PaymentController, 'getPaymentMethodJson'])
+      .as('payments.methods.getJson')
+
     router
       .get('/:id', [PaymentController, 'detailPaymentMethod'])
       .as('payments.methods.detailPaymentMethod')
@@ -159,4 +171,40 @@ router
       .as('payments.methods.delete')
   })
   .prefix('/admin/payments/methods')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router.get('/', [OfferController, 'index']).as('offers.index')
+    router.get('/create', [OfferController, 'create']).as('offers.create')
+    router.post('/create', [OfferController, 'postCreate']).as('offers.postCreate')
+    router.get('/:id/edit', [OfferController, 'edit']).as('offers.edit')
+    router.patch('/:id/edit', [OfferController, 'postUpdate']).as('offers.postUpdate')
+    router.delete('/:id', [OfferController, 'postDelete']).as('offers.delete')
+
+    router.post('/:id/connect/user', [OfferController, 'connectUser']).as('offers.connectUser')
+    router
+      .post('/:id/disconnect/user', [OfferController, 'disconnectUser'])
+      .as('offers.disconnectUser')
+    router
+      .post('/:id/connect/product', [OfferController, 'connectProduct'])
+      .as('offers.connectProduct')
+    router
+      .post('/:id/disconnect/product', [OfferController, 'disconnectProduct'])
+      .as('offers.disconnectProduct')
+    router
+      .post('/:id/connect/payment-method', [OfferController, 'connectPaymentMethod'])
+      .as('offers.connectPaymentMethod')
+    router
+      .post('/:id/disconnect/payment-method', [OfferController, 'disconnectPaymentMethod'])
+      .as('offers.disconnectPaymentMethod')
+
+    router.get('/:id/users', [OfferController, 'getOfferUsers']).as('offers.getOfferUsers')
+    router.get('/:id/products', [OfferController, 'getOfferProducts']).as('offers.getOfferProducts')
+
+    router
+      .get('/:id/payment-methods', [OfferController, 'getOfferPaymentMethods'])
+      .as('offers.getOfferPaymentMethods')
+  })
+  .prefix('/admin/offers')
   .middleware(middleware.role(UserRole.ADMIN))

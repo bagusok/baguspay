@@ -157,3 +157,22 @@ export const getAllProductsQueryValidator = vine.object({
 })
 
 export type GetAllProductsQueryValidator = Infer<typeof getAllProductsQueryValidator>
+
+const searchSchema = vine.group([
+  vine.group.if((data) => data.searchBy === 'id', {
+    searchQuery: vine.string().uuid().optional(),
+  }),
+  vine.group.else({
+    searchQuery: vine.string().maxLength(100).optional(),
+  }),
+])
+
+export const productCategoryQueryValidator = vine
+  .object({
+    page: vine.number().min(1).optional(),
+    limit: vine.number().min(10).optional(),
+    searchBy: vine.enum(['name', 'id']).optional(),
+  })
+  .merge(searchSchema)
+
+export type ProductCategoryQueryValidator = Infer<typeof productCategoryQueryValidator>

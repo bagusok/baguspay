@@ -5,7 +5,7 @@ import {
   productCategoriesQueryValidator,
 } from '#validators/product'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, desc, eq, ilike, inArray, InferSelectModel } from '@repo/db'
+import { and, count, db, desc, eq, ilike, inArray, InferSelectModel, or } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import slugify from '@sindresorhus/slugify'
@@ -326,5 +326,71 @@ export default class ProductsCategoriesController {
 
     session.flash('success', 'Product category deleted successfully')
     return response.redirect().toRoute('productCategories.index')
+  }
+
+  public async getProductByCategoryNameJson(ctx: HttpContext) {
+    const {
+      limit = 100,
+      page = 1,
+      searchBy,
+      searchQuery,
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const where: any = []
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        where.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        where.push(eq(tb.products.id, searchQuery))
+      }
+    }
+
+    const offset = (page - 1) * limit
+    const products = await db
+      .select({
+        product_category_id: tb.productCategories.id,
+        product_category_name: tb.productCategories.name,
+        product_sub_category_id: tb.productSubCategories.id,
+        product_sub_category_name: tb.productSubCategories.name,
+        product_id: tb.products.id,
+        product_name: tb.products.name,
+        product_price: tb.products.price,
+        is_product_available: tb.products.is_available,
+        is_product_sub_category_available: tb.productSubCategories.is_available,
+        is_product_category_available: tb.productCategories.is_available,
+      })
+      .from(tb.productCategories)
+      .innerJoin(
+        tb.productSubCategories,
+        eq(tb.productCategories.id, tb.productSubCategories.product_category_id)
+      )
+      .innerJoin(tb.products, eq(tb.productSubCategories.id, tb.products.product_sub_category_id))
+      .where(where.length ? and(...where) : undefined)
+      .limit(limit)
+      .offset(offset)
+
+    const [total] = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .innerJoin(
+        tb.productSubCategories,
+        eq(tb.productCategories.id, tb.productSubCategories.product_category_id)
+      )
+      .innerJoin(tb.products, eq(tb.productSubCategories.id, tb.products.product_sub_category_id))
+      .where(where.length ? and(...where) : undefined)
+
+    return ctx.response.json({
+      data: products,
+      meta: {
+        page: page,
+        limit,
+        total: total.count,
+        totalPages: Math.ceil(total.count / limit),
+      },
+    })
   }
 }

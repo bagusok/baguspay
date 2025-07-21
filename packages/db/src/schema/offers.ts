@@ -34,6 +34,8 @@ export const offers = pgTable("offers", {
   end_date: timestamp("end_date", { withTimezone: true }).notNull(),
 
   is_available: boolean("is_available").notNull().default(false),
+  is_need_reedem: boolean("is_need_redeem").notNull().default(false),
+  is_new_user: boolean("is_new_user").notNull().default(false),
   is_featured: boolean("is_featured").notNull().default(false),
   label: varchar("label", { length: 20 }),
 
@@ -47,7 +49,7 @@ export const offers = pgTable("offers", {
 
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
   deleted_at: timestamp("deleted_at", { withTimezone: true }),
 });
@@ -68,7 +70,7 @@ export const offerUsers = pgTable("offer_users", {
     .notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -93,7 +95,7 @@ export const offer_products = pgTable("offer_products", {
     .notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -118,7 +120,7 @@ export const offerPaymentMethods = pgTable("offer_payment_methods", {
     .notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -133,7 +135,7 @@ export const offerPaymentMethodRelations = relations(
       fields: [offerPaymentMethods.payment_method_id],
       references: [paymentMethods.id],
     }),
-  })
+  }),
 );
 
 export const offerOnOrders = pgTable("offer_on_orders", {
@@ -147,7 +149,7 @@ export const offerOnOrders = pgTable("offer_on_orders", {
     .references(() => users.id),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 

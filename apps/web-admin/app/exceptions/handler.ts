@@ -1,6 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import { HttpContext, ExceptionHandler } from '@adonisjs/core/http'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
+import { DrizzleError } from '@repo/db'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
@@ -32,7 +33,7 @@ export default class HttpExceptionHandler extends ExceptionHandler {
   async handle(error: unknown, ctx: HttpContext) {
     const { request, response, session, inertia } = ctx
 
-    if (this.isDrizzleError(error)) {
+    if (error instanceof DrizzleError) {
       console.error('[DRIZZLE ERROR]', error)
 
       let status = 500

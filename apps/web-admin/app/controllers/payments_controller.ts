@@ -7,7 +7,7 @@ import {
   updatePaymentMethodsValidator,
 } from '#validators/payments'
 import type { HttpContext } from '@adonisjs/core/http'
-import { db, desc, eq, ilike, and, count } from '@repo/db'
+import { db, desc, eq, ilike, and, count, SQL } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 
@@ -276,6 +276,54 @@ export default class PaymentsController {
         image_id: image?.id || null,
       },
       categories,
+    })
+  }
+
+  async getPaymentMethodJson(ctx: HttpContext) {
+    const {
+      page = 1,
+      limit = 10,
+      searchQuery = '',
+      searchBy = 'name',
+    } = await ctx.request.validateUsing(vine.compile(paymentMethodsQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter: SQL[] = []
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.paymentMethods.name, `%${searchQuery}%`))
+      } else if (searchBy === 'provider_name') {
+        whereFilter.push(ilike(tb.paymentMethods.provider_name, `%${searchQuery}%`))
+      } else if (searchBy === 'provider_code') {
+        whereFilter.push(ilike(tb.paymentMethods.provider_code, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.paymentMethods.id, searchQuery))
+      }
+    }
+
+    const paymentMethods = await db.query.paymentMethods.findMany({
+      where: and(...whereFilter),
+      orderBy: [desc(tb.paymentMethods.created_at)],
+      limit,
+      offset,
+    })
+
+    const [total] = await db
+      .select({ count: count() })
+      .from(tb.paymentMethods)
+      .where(and(...whereFilter))
+
+    return ctx.response.json({
+      data: paymentMethods,
+      meta: {
+        page,
+        limit,
+        total: total.count || 0,
+        totalPages: Math.ceil((total.count || 0) / limit),
+      },
     })
   }
 }
