@@ -2,3 +2,4 @@
 export * from "./database";
 export * from "./utils";
 export * from "drizzle-orm";
+export * from "drizzle-orm/node-postgres";

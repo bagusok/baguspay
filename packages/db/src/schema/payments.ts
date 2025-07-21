@@ -75,11 +75,6 @@ export const paymentMethods = pgTable("payment_methods", {
   expired_in: integer("expired_in").notNull().default(0),
   is_deleted: boolean("is_deleted").notNull().default(false),
 
-  phone_number: varchar("phone_number", { length: 20 }),
-  email: varchar("email"),
-  pay_code: varchar("pay_code", { length: 100 }),
-  pay_url: varchar("pay_url"),
-
   cut_off_start: time("cut_off_start", { withTimezone: true }),
   cut_off_end: time("cut_off_end", { withTimezone: true }),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),

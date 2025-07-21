@@ -55,8 +55,11 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
     .$type<PaymentMethodAllowAccess[]>()
     .default([PaymentMethodAllowAccess.ORDER]),
 
-  min_amount: integer("min_amount").notNull().default(0),
-  max_amount: integer("max_amount").notNull().default(0),
+  phone_number: varchar("phone_number", { length: 20 }),
+  email: varchar("email"),
+  pay_code: varchar("pay_code", { length: 100 }),
+  pay_url: varchar("pay_url"),
+  qr_code: varchar("qr_code"),
 
   expired_at: timestamp("expired_at", { withTimezone: true }).notNull(),
   created_at: timestamp("created_at", { withTimezone: true }),

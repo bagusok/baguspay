@@ -14,15 +14,23 @@ export const deposits = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom(),
     deposit_id: varchar("deposit_id", { length: 100 }).notNull().unique(),
+    ref_id: varchar("ref_id", { length: 100 }).notNull(),
     user_id: uuid("user_id")
       .references(() => users.id)
       .notNull(),
     payment_method_id: uuid("payment_method_id")
-      .references(() => users.id)
+      .references(() => paymentMethods.id)
       .notNull(),
     amount_pay: integer("amount_pay").notNull(),
     amount_received: integer("amount_received").notNull(),
     amount_fee: integer("amount_fee").notNull().default(0),
+
+    phone_number: varchar("phone_number", { length: 20 }),
+    email: varchar("email"),
+    pay_code: varchar("pay_code", { length: 100 }),
+    pay_url: varchar("pay_url"),
+    qr_code: varchar("qr_code"),
+
     status: depositStatusEnum("status")
       .notNull()
       .default(DepositStatus.PENDING),
@@ -30,6 +38,7 @@ export const deposits = pgTable(
     updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),
     ),
+    expired_at: timestamp("expired_at", { withTimezone: true }).notNull(),
   },
   (table) => [index("deposits_deposit_id_index").on(table.deposit_id)],
 );

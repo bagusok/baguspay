@@ -44,6 +44,7 @@ export enum DepositStatus {
   COMPLETED = "completed",
   FAILED = "failed",
   CANCELED = "cancelled",
+  EXPIRED = "expired",
 }
 
 export const depositStatusEnum = pgEnum(

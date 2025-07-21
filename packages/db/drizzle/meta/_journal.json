@@ -64,6 +64,48 @@
       "when": 1752650238531,
       "tag": "0008_early_nekra",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1752899369761,
+      "tag": "0009_premium_vulture",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1752902961513,
+      "tag": "0010_mighty_the_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1752910422182,
+      "tag": "0011_first_rhino",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1752910601530,
+      "tag": "0012_famous_manta",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1752920336135,
+      "tag": "0013_steep_nitro",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1752987969256,
+      "tag": "0014_thin_peter_parker",
+      "breakpoints": true
     }
   ]
 }

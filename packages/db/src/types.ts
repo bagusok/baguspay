@@ -1,3 +1,2 @@
-export * from "./schema";
-export * from "./table";
-// Export type helpers if needed
+export { tb } from "./table";
+export * from "./schema/pg-enums";
