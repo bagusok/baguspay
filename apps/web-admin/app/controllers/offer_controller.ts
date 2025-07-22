@@ -28,7 +28,7 @@ export default class OfferController {
     })
 
     const offset = (page - 1) * limit
-    const whereFilter: SQL[] = []
+    const whereFilter: SQL[] = [eq(tb.offers.is_deleted, false)]
 
     if (searchQuery) {
       if (searchBy === 'code') {
@@ -212,19 +212,29 @@ export default class OfferController {
       data: ctx.request.params(),
     })
 
-    const deletedOffer = await db.delete(tb.offers).where(eq(tb.offers.id, id)).returning({
-      id: tb.offers.id,
-    })
+    const deletedOffer = await db
+      .update(tb.offers)
+      .set({
+        is_deleted: true,
+      })
+      .where(eq(tb.offers.id, id))
+      .returning({
+        id: tb.offers.id,
+      })
 
     if (deletedOffer.length === 0) {
       ctx.session.flashErrors({
         error: 'Offer not found or delete failed',
       })
-      return ctx.response.notFound('Offer not found')
+
+      ctx.session.flashErrors({
+        error: 'Offer not found or delete failed',
+      })
+      return ctx.response.redirect().back()
     }
 
     ctx.session.flash('success', 'Offer deleted successfully')
-    return ctx.response.redirect().toRoute('offer.index')
+    return ctx.response.redirect().back()
   }
 
   async connectUser(ctx: HttpContext) {

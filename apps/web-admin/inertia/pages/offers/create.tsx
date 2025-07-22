@@ -1,14 +1,14 @@
-import { useForm } from '@inertiajs/react'
 import { InsertOfferValidator } from '#validators/offer'
-import AdminLayout from '~/components/layout/admin-layout'
+import { useForm } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
 import { Textarea } from '@repo/ui/components/ui/textarea'
-import { FormEvent } from 'react'
-import FileManager from '~/components/file-manager'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
+import { FormEvent } from 'react'
+import FileManager from '~/components/file-manager'
+import AdminLayout from '~/components/layout/admin-layout'
 
 dayjs.extend(utc)
 
@@ -39,6 +39,7 @@ export default function CreateOffer() {
     is_deleted: false,
     is_need_redeem: false,
     is_new_user: false,
+    min_amount: 0,
   })
 
   const handleSubmit = (e: FormEvent) => {
@@ -81,17 +82,6 @@ export default function CreateOffer() {
               />
               {errors.sub_name && <p className="text-red-500 text-sm">{errors.sub_name}</p>}
             </div>
-          </div>
-          <div>
-            <Label htmlFor="description">
-              Description <span className="text-red-500">*</span>
-            </Label>
-            <Textarea
-              id="description"
-              value={data.description}
-              onChange={(e) => setData('description', e.target.value)}
-            />
-            {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
           </div>
           <div className="flex gap-4">
             <div className="w-full">
@@ -274,14 +264,39 @@ export default function CreateOffer() {
               <Label htmlFor="is_new_user">New User</Label>
             </div>
           </div>
+          <div className="flex gap-4">
+            <div className="w-full">
+              <Label htmlFor="min-amount">
+                Minimum Amount <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="min_amount"
+                type="number"
+                value={data.min_amount}
+                onChange={(e) => setData('min_amount', Number(e.target.value))}
+              />
+              {errors.min_amount && <p className="text-red-500 text-sm">{errors.min_amount}</p>}
+            </div>
+            <div className="w-full">
+              <Label htmlFor="label">Label</Label>
+              <Input
+                id="label"
+                value={data.label}
+                onChange={(e) => setData('label', e.target.value)}
+              />
+              {errors.label && <p className="text-red-500 text-sm">{errors.label}</p>}
+            </div>
+          </div>
           <div>
-            <Label htmlFor="label">Label</Label>
-            <Input
-              id="label"
-              value={data.label}
-              onChange={(e) => setData('label', e.target.value)}
+            <Label htmlFor="description">
+              Description <span className="text-red-500">*</span>
+            </Label>
+            <Textarea
+              id="description"
+              value={data.description}
+              onChange={(e) => setData('description', e.target.value)}
             />
-            {errors.label && <p className="text-red-500 text-sm">{errors.label}</p>}
+            {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
           </div>
           <Button type="submit" disabled={processing}>
             {processing ? 'Creating...' : 'Create Offer'}

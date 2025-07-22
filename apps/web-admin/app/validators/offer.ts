@@ -25,6 +25,8 @@ export const insertOfferValidator = vine.object({
   is_all_products: vine.boolean(),
   is_deleted: vine.boolean(),
 
+  min_amount: vine.number(),
+
   is_need_redeem: vine.boolean(),
   is_new_user: vine.boolean(),
 })
@@ -57,6 +59,8 @@ export const updateOfferValidator = vine.object({
   is_all_users: vine.boolean().optional(),
   is_all_payment_methods: vine.boolean().optional(),
   is_all_products: vine.boolean().optional(),
+
+  min_amount: vine.number().optional(),
 
   is_deleted: vine.boolean().optional(),
   is_new_user: vine.boolean().optional(),

@@ -1,15 +1,18 @@
 import { relations } from "drizzle-orm";
-import { numeric, varchar } from "drizzle-orm/pg-core";
-import { integer } from "drizzle-orm/pg-core";
-import { boolean } from "drizzle-orm/pg-core";
-import { timestamp } from "drizzle-orm/pg-core";
-import { text } from "drizzle-orm/pg-core";
-import { uuid } from "drizzle-orm/pg-core";
-import { pgTable } from "drizzle-orm/pg-core";
-import { users } from "./users";
-import { products } from "./products";
-import { paymentMethods } from "./payments";
+import {
+  boolean,
+  integer,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { orders } from "./orders";
+import { paymentMethods } from "./payments";
+import { products } from "./products";
+import { users } from "./users";
 
 export const offers = pgTable("offers", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -29,6 +32,8 @@ export const offers = pgTable("offers", {
     .notNull()
     .default(0),
   discount_maximum: integer("discount_maximum").notNull().default(0),
+
+  min_amount: integer("min_amount").notNull().default(0),
 
   start_date: timestamp("start_date", { withTimezone: true }).notNull(),
   end_date: timestamp("end_date", { withTimezone: true }).notNull(),
