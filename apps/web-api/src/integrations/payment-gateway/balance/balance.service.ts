@@ -17,113 +17,126 @@ export class BalanceService {
   private readonly logger = new Logger(BalanceService.name);
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async addBalance(data: AddBalanceRequest) {
-    const [, addMutation, updatedUser] =
-      await this.databaseService.db.transaction(
-        async (tx) => {
-          const [user] = await tx
-            .select()
-            .from(tb.users)
-            .where(eq(tb.users.id, data.userId))
-            .for('update');
+  async addBalance(
+    data: AddBalanceRequest,
+    dbInstance?: Parameters<
+      Parameters<(typeof this.databaseService.db)['transaction']>[0]
+    >[0],
+  ) {
+    const db = dbInstance || this.databaseService.db;
 
-          if (!user) {
-            throw new UnprocessableEntityException(
-              `User with ID ${data.userId} not found`,
-            );
-          }
+    const [, addMutation, updatedUser] = await db.transaction(
+      async (tx) => {
+        const [user] = await tx
+          .select()
+          .from(tb.users)
+          .where(eq(tb.users.id, data.userId))
+          .for('update');
 
-          const [addMutation] = await tx
-            .insert(tb.balanceMutations)
-            .values({
-              name: data.name,
-              user_id: data.userId,
-              amount: data.amount,
-              ref_type: data.ref_type,
-              ref_id: data.ref_id || '',
-              type: data.type,
-              notes: data.notes || '',
-              balance_after: sql`${user.balance}::int + ${data.amount}::int`,
-              balance_before: user.balance,
-            })
-            .returning();
+        if (!user) {
+          throw new UnprocessableEntityException(
+            `User with ID ${data.userId} not found`,
+          );
+        }
 
-          const [updatedUser] = await tx
-            .update(tb.users)
-            .set({
-              balance: sql`${user.balance}::int + ${data.amount}::int`,
-            })
-            .where(eq(tb.users.id, data.userId))
-            .returning();
+        const [addMutation] = await tx
+          .insert(tb.balanceMutations)
+          .values({
+            name: data.name,
+            user_id: data.userId,
+            amount: data.amount,
+            ref_type: data.ref_type,
+            ref_id: data.ref_id || '',
+            type: data.type,
+            notes: data.notes || '',
+            balance_after: sql`${user.balance}::int + ${data.amount}::int`,
+            balance_before: user.balance,
+          })
+          .returning();
 
-          return [user, addMutation, updatedUser];
-        },
-        {
-          isolationLevel: 'read committed',
-          accessMode: 'read write',
-        },
-      );
+        const [updatedUser] = await tx
+          .update(tb.users)
+          .set({
+            balance: sql`${user.balance}::int + ${data.amount}::int`,
+          })
+          .where(eq(tb.users.id, data.userId))
+          .returning();
+
+        return [user, addMutation, updatedUser];
+      },
+      {
+        isolationLevel: 'read committed',
+        accessMode: 'read write',
+      },
+    );
 
     return SendResponse.success({
-      user: updatedUser,
+      updatedUser: updatedUser,
       mutation: addMutation,
     });
   }
 
-  async deductBalance(data: AddBalanceRequest) {
-    const [, deductMutation, updatedUser] =
-      await this.databaseService.db.transaction(
-        async (tx) => {
-          const [user] = await tx
-            .select()
-            .from(tb.users)
-            .where(eq(tb.users.id, data.userId))
-            .for('update');
+  async deductBalance(
+    data: AddBalanceRequest,
+    dbInstance?: Parameters<
+      Parameters<(typeof this.databaseService.db)['transaction']>[0]
+    >[0],
+  ) {
+    const db = dbInstance || this.databaseService.db;
 
-          if (!user) {
-            throw new UnprocessableEntityException(
-              `User with ID ${data.userId} not found`,
-            );
-          }
+    const [, deductMutation, updatedUser] = await db.transaction(
+      async (tx) => {
+        const [user] = await tx
+          .select()
+          .from(tb.users)
+          .where(eq(tb.users.id, data.userId))
+          .for('update');
 
-          if (user.balance < data.amount) {
-            throw new UnprocessableEntityException(
-              `Insufficient balance for user with ID ${data.userId}`,
-            );
-          }
+        if (!user) {
+          throw new UnprocessableEntityException(
+            `User with ID ${data.userId} not found`,
+          );
+        }
 
-          const [deductMutation] = await tx
-            .insert(tb.balanceMutations)
-            .values({
-              name: data.name,
-              user_id: data.userId,
-              amount: -data.amount,
-              ref_type: data.ref_type,
-              ref_id: data.ref_id || '',
-              type: data.type,
-              notes: data.notes || '',
-              balance_after: sql`${user.balance} - ${data.amount}`,
-              balance_before: user.balance,
-            })
-            .returning();
+        if (user.balance < data.amount) {
+          throw new UnprocessableEntityException(
+            `Insufficient balance for user with ID ${data.userId}`,
+          );
+        }
 
-          const [updatedUser] = await tx
-            .update(tb.users)
-            .set({
-              balance: sql`${user.balance} - ${data.amount}`,
-            })
-            .where(eq(tb.users.id, data.userId));
+        const [deductMutation] = await tx
+          .insert(tb.balanceMutations)
+          .values({
+            name: data.name,
+            user_id: data.userId,
+            amount: -data.amount,
+            ref_type: data.ref_type,
+            ref_id: data.ref_id || '',
+            type: data.type,
+            notes: data.notes || '',
+            balance_after: sql`${user.balance}::int - ${data.amount}::int`,
+            balance_before: user.balance,
+          })
+          .returning();
 
-          return [user, deductMutation, updatedUser];
-        },
-        {
-          isolationLevel: 'read committed',
-          accessMode: 'read write',
-        },
-      );
+        const [updatedUser] = await tx
+          .update(tb.users)
+          .set({
+            balance: sql`${user.balance}::int - ${data.amount}::int`,
+          })
+          .where(eq(tb.users.id, data.userId))
+          .returning();
+
+        return [user, deductMutation, updatedUser];
+      },
+      {
+        isolationLevel: 'read committed',
+        accessMode: 'read write',
+      },
+    );
 
     return SendResponse.success({
-      user: updatedUser,
+      updatedUser: updatedUser,
       mutation: deductMutation,
     });
   }

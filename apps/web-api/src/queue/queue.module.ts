@@ -1,13 +1,19 @@
-import { Module } from '@nestjs/common';
-import { QueueService } from './queue.service';
-import { BullModule } from '@nestjs/bullmq';
-import { DepositQueueConsumer } from './deposit-queue.consumer';
-import { DatabaseService } from 'src/database/database.service';
-import { BullBoardModule } from '@bull-board/nestjs';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { BullModule } from '@nestjs/bullmq';
+import { Module } from '@nestjs/common';
+import { DatabaseModule } from 'src/database/database.module';
+import { DigiflazzModule } from 'src/integrations/h2h/digiflazz/digiflazz.module';
+import { BalanceModule } from 'src/integrations/payment-gateway/balance/balance.module';
+import { DepositQueueConsumer } from './deposit-queue.consumer';
+import { OrderQueueConsumer } from './order-queue.consumer ';
+import { QueueService } from './queue.service';
 
 @Module({
   imports: [
+    DatabaseModule,
+    DigiflazzModule,
+    BalanceModule,
     BullModule.registerQueue({
       name: 'deposits-queue',
     }),
@@ -23,7 +29,8 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
       name: 'orders-queue',
     }),
   ],
-  providers: [QueueService, DepositQueueConsumer, DatabaseService],
+
+  providers: [QueueService, DepositQueueConsumer, OrderQueueConsumer],
   exports: [QueueService],
 })
 export class QueueModule {}

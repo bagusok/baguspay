@@ -41,6 +41,7 @@ export interface TripayOrderItem {
   product_id: string;
   price: number;
   quantity: number;
+  [key: string]: any; // Allow additional properties
 }
 export interface TripayApiErrorResponse {
   success: boolean;

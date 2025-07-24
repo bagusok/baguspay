@@ -2,7 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   Equals,
   IsEmail,
-  IsNotEmpty,
   IsPhoneNumber,
   IsString,
   IsStrongPassword,
@@ -67,15 +66,6 @@ export class RegisterDto {
   @IsString()
   @MinLength(3)
   name: string;
-}
-
-export class LoginHeaderDto {
-  @ApiProperty({
-    description: 'Device ID from the client',
-  })
-  @IsString()
-  @IsNotEmpty()
-  'x-device-id': string;
 }
 
 export class GoogleLoginDto {

@@ -86,7 +86,8 @@ export class TripayService {
 
       return SendResponse.success<Data>(data.data);
     } catch (error) {
-      this.logger.error('Error creating closed payment', error);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      this.logger.error('Error creating closed payment', error.message);
       if (axios.isAxiosError<TripayApiErrorResponse>(error)) {
         throw new BadRequestException(
           error.response?.data.message || 'Tripay API Error',

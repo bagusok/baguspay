@@ -1,12 +1,21 @@
 import { Module } from '@nestjs/common';
-import { CallbackService } from './callback.service';
+import { DatabaseModule } from 'src/database/database.module';
+import { DigiflazzModule } from 'src/integrations/h2h/digiflazz/digiflazz.module';
+import { BalanceModule } from 'src/integrations/payment-gateway/balance/balance.module';
+import { TripayModule } from 'src/integrations/payment-gateway/tripay/tripay.module';
+import { QueueModule } from 'src/queue/queue.module';
 import { CallbackController } from './callback.controller';
-import { DatabaseService } from 'src/database/database.service';
-import { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service';
-import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service';
+import { CallbackService } from './callback.service';
 
 @Module({
+  imports: [
+    DatabaseModule,
+    TripayModule,
+    BalanceModule,
+    DigiflazzModule,
+    QueueModule,
+  ],
   controllers: [CallbackController],
-  providers: [CallbackService, DatabaseService, TripayService, BalanceService],
+  providers: [CallbackService],
 })
 export class CallbackModule {}

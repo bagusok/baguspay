@@ -16,6 +16,8 @@ import { BullModule } from '@nestjs/bullmq';
 import { QueueModule } from './queue/queue.module';
 import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
+import { DigiflazzModule } from './integrations/h2h/digiflazz/digiflazz.module';
+import { AtlanticModule } from './integrations/h2h/atlantic/atlantic.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { ExpressAdapter } from '@bull-board/express';
     PaymentGatewayModule,
     CallbackModule,
     QueueModule,
+    DigiflazzModule,
+    AtlanticModule,
   ],
   controllers: [AppController],
   providers: [AppService],

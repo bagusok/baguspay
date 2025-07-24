@@ -3,5 +3,6 @@ import { TripayService } from './tripay.service';
 
 @Module({
   providers: [TripayService],
+  exports: [TripayService],
 })
 export class TripayModule {}

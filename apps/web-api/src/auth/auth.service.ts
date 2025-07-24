@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DatabaseService } from 'src/database/database.service';
-import { LoginDto, LoginHeaderDto, RegisterDto } from './auth.dto';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { and, eq, or } from '@repo/db';
 import { tb, UserRegisteredType, UserRole } from '@repo/db/types';
-import { hash, compare } from 'bcrypt';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { compare, hash } from 'bcrypt';
+import { DatabaseService } from 'src/database/database.service';
+import { LoginDto, RegisterDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -41,7 +41,8 @@ export class AuthService {
 
   async login(
     data: LoginDto,
-    headers: LoginHeaderDto & {
+    headers: {
+      deviceId: string;
       ip: string;
       userAgent: string;
     },
@@ -83,7 +84,7 @@ export class AuthService {
         where: and(
           eq(tb.sessions.user_id, user.id),
           or(
-            eq(tb.sessions.device_id, headers['x-device-id']),
+            eq(tb.sessions.device_id, headers.deviceId),
             eq(tb.sessions.ip_address, headers.ip),
             eq(tb.sessions.user_agent, headers.userAgent),
           ),

@@ -1,6 +1,6 @@
 import {
-  PaymentMethodProvider,
   PaymentMethodFeeType,
+  PaymentMethodProvider,
   PaymentStatus,
 } from '@repo/db/types';
 import { TripayOrderItem } from './tripay/tripay.type';
@@ -19,6 +19,7 @@ export interface CreatePaymentGatewayRequest {
   callback_url?: string;
   return_url?: string;
   expired_in: number; // in seconds
+  user_id: string | null;
 }
 
 export interface CreatePaymentGatewayResponse {
@@ -44,5 +45,5 @@ export interface CreatePaymentGatewayResponse {
   qr_code?: string;
   qr_url?: string;
   checkout_url?: string;
-  status?: PaymentStatus;
+  status: PaymentStatus;
 }

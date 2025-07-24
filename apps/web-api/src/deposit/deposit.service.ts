@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, arrayContains, desc, eq, gte, lte, SQL, ne, or } from '@repo/db';
+import { and, arrayContains, desc, eq, gte, lte, ne, or, SQL } from '@repo/db';
 import {
   DepositStatus,
   PaymentMethodAllowAccess,
@@ -12,13 +12,13 @@ import {
   PaymentMethodType,
   tb,
 } from '@repo/db/types';
+import crypto from 'crypto';
+import { TUser } from 'src/common/types/global';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
-import { CreateDeposit, DepositHistoryQuery } from './deposit.dto';
 import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service';
-import { TUser } from 'src/common/types/global';
-import crypto from 'crypto';
 import { QueueService } from 'src/queue/queue.service';
+import { CreateDeposit, DepositHistoryQuery } from './deposit.dto';
 
 @Injectable()
 export class DepositService {
@@ -182,6 +182,7 @@ export class DepositService {
           const depositId = this.generateDepositId(user.id);
 
           const pg = await this.pgService.createPayment({
+            user_id: user.id,
             amount: data.amount,
             provider_code: payment.provider_code,
             provider_name: payment.provider_name,

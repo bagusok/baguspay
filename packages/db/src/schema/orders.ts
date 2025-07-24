@@ -1,11 +1,12 @@
-import { uuid } from "drizzle-orm/pg-core";
-import { pgTable } from "drizzle-orm/pg-core";
-import { users } from "./users";
-import { productSnapshots } from "./snapshots";
-import { integer } from "drizzle-orm/pg-core";
-import { varchar } from "drizzle-orm/pg-core";
-import { timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import {
+  index,
+  integer,
+  pgTable,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { offerOnOrders } from "./offers";
 import {
   OrderStatus,
@@ -15,13 +16,14 @@ import {
   RefundStatus,
   refundStatusEnum,
 } from "./pg-enums";
-import { index } from "drizzle-orm/pg-core";
+import { paymentSnapshots, productSnapshots } from "./snapshots";
+import { users } from "./users";
 
 export const orders = pgTable(
   "orders",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    order_id: uuid("order_id").notNull().defaultRandom(),
+    order_id: varchar("order_id").notNull().unique(),
 
     user_id: uuid("user_id")
       .notNull()
@@ -34,12 +36,13 @@ export const orders = pgTable(
       .references(() => productSnapshots.id),
     payment_snapshot_id: uuid("payment_snapshot_id")
       .notNull()
-      .references(() => productSnapshots.id),
+      .references(() => paymentSnapshots.id),
 
     total_price: integer("total_price").notNull(),
     profit: integer("profit").notNull().default(0),
     cost_price: integer("cost_price").notNull().default(0),
     discount_price: integer("discount_price").notNull().default(0),
+    fee: integer("fee").notNull().default(0),
 
     sn_number: varchar("sn_number", { length: 150 }).notNull(),
     notes: varchar("notes"),
@@ -53,6 +56,8 @@ export const orders = pgTable(
     refund_status: refundStatusEnum("refund_status")
       .notNull()
       .default(RefundStatus.NONE),
+
+    customer_input: varchar("customer_input"),
 
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
@@ -71,9 +76,9 @@ export const orderRelations = relations(orders, ({ one }) => ({
     fields: [orders.product_snapshot_id],
     references: [productSnapshots.id],
   }),
-  payment_snapshot: one(productSnapshots, {
+  payment_snapshot: one(paymentSnapshots, {
     fields: [orders.payment_snapshot_id],
-    references: [productSnapshots.id],
+    references: [paymentSnapshots.id],
   }),
   offer_on_order: one(offerOnOrders, {
     fields: [orders.offer_on_order_id],

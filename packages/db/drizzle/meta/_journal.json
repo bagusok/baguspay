@@ -120,6 +120,34 @@
       "when": 1753160218398,
       "tag": "0016_freezing_zemo",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1753173031327,
+      "tag": "0017_dizzy_chronomancer",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1753173549054,
+      "tag": "0018_cute_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1753173657665,
+      "tag": "0019_strong_dreadnoughts",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1753270479762,
+      "tag": "0020_shiny_turbo",
+      "breakpoints": true
     }
   ]
 }

@@ -1,8 +1,8 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
-import { ValidationPipe } from '@nestjs/common';
+import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/custom.exception';
 
 async function bootstrap() {
@@ -30,6 +30,48 @@ async function bootstrap() {
         name: 'Authorization',
       },
       'access-token',
+    )
+    .addGlobalParameters(
+      {
+        name: 'X-Time',
+        in: 'header',
+        required: false,
+        schema: {
+          type: 'timestamp',
+          format: 'timestamp',
+          example: new Date().getTime().toString(),
+        },
+      },
+      {
+        name: 'X-Request-ID',
+        in: 'header',
+        required: false,
+        schema: {
+          type: 'string',
+          format: 'uuid',
+          example: '550e8400-e29b-41d4-a716-446655440000',
+        },
+      },
+      {
+        name: 'X-Device-ID',
+        in: 'header',
+        required: false,
+        schema: {
+          type: 'string',
+          format: 'Device ID (UUID)',
+          example: '550e8400-e29b-41d4-a716-446655440001',
+        },
+      },
+      {
+        name: 'X-Version',
+        in: 'header',
+        required: false,
+        schema: {
+          type: 'string',
+          format: 'Version',
+          example: '1.0.0',
+        },
+      },
     )
     .build();
 
