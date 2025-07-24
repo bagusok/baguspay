@@ -36,9 +36,23 @@ export class OrderQueueConsumer extends WorkerHost {
 
           const { orderId } = job.data;
           const order = await this.databaseService.db.query.orders.findFirst({
-            where: eq(tb.orders.order_id, orderId),
+            where: and(
+              eq(tb.orders.order_id, orderId),
+              eq(tb.orders.payment_status, PaymentStatus.SUCCESS),
+            ),
             with: {
-              product_snapshot: true,
+              product_snapshot: {
+                with: {
+                  product: {
+                    columns: {
+                      id: true,
+                      name: true,
+                      sku_code: true,
+                      stock: true,
+                    },
+                  },
+                },
+              },
               payment_snapshot: true,
               user: {
                 columns: {
@@ -87,30 +101,38 @@ export class OrderQueueConsumer extends WorkerHost {
                     .where(eq(tb.orders.id, order.id));
 
                   //  Refund process Jika User gagal topup
-                  if (
-                    topup.data.status === OrderStatus.FAILED &&
-                    order.user_id
-                  ) {
-                    const refund = await this.balanceService.addBalance({
-                      amount: order.total_price - order.fee,
-                      name: `Refund Order #${order.order_id}`,
-                      ref_type: BalanceMutationRefType.ORDER,
-                      ref_id: order.id,
-                      type: BalanceMutationType.CREDIT,
-                      userId: order.user_id,
-                      notes: `Refund for order ${order.order_id} due to failed topup`,
-                    });
+                  if (topup.data.status === OrderStatus.FAILED) {
+                    if (order.user_id) {
+                      const refund = await this.balanceService.addBalance({
+                        amount: order.total_price - order.fee,
+                        name: `Refund Order #${order.order_id}`,
+                        ref_type: BalanceMutationRefType.ORDER,
+                        ref_id: order.id,
+                        type: BalanceMutationType.CREDIT,
+                        userId: order.user_id,
+                        notes: `Refund for order ${order.order_id} due to failed topup`,
+                      });
 
-                    this.logger.log(
-                      `Refunded ${refund.data.mutation.amount} to user ${order.user.name} for order #${order.order_id}`,
-                    );
+                      this.logger.log(
+                        `Refunded ${refund.data.mutation.amount} to user ${order.user.name} for order #${order.order_id}`,
+                      );
+
+                      await this.databaseService.db
+                        .update(tb.orders)
+                        .set({
+                          refund_status: RefundStatus.COMPLETED,
+                        })
+                        .where(eq(tb.orders.id, order.id));
+                    }
 
                     await this.databaseService.db
-                      .update(tb.orders)
+                      .update(tb.products)
                       .set({
-                        refund_status: RefundStatus.COMPLETED,
+                        stock: order.product_snapshot.product.stock + 1,
                       })
-                      .where(eq(tb.orders.id, order.id));
+                      .where(
+                        eq(tb.products.id, order.product_snapshot.product_id),
+                      );
                   }
 
                   return `Topup failed or pending, order status updated. ${topup.data.status}, order ID: ${orderId}`;
@@ -124,7 +146,10 @@ export class OrderQueueConsumer extends WorkerHost {
                     .set({
                       order_status: topup.data.status,
                       cost_price: topup.data.provider_price,
-                      profit: order.total_price - topup.data.provider_price,
+                      profit:
+                        order.total_price -
+                        topup.data.provider_price -
+                        order.fee,
                       sn_number: topup.data.sn || null,
                       notes: `
                       Topup successful. SN: ${topup.data.sn}
@@ -158,6 +183,14 @@ export class OrderQueueConsumer extends WorkerHost {
             eq(tb.orders.order_id, orderId),
             eq(tb.orders.payment_status, PaymentStatus.PENDING),
           ),
+          with: {
+            product_snapshot: {
+              columns: {},
+              with: {
+                product: { columns: { id: true, stock: true } },
+              },
+            },
+          },
         });
 
         if (!order) {
@@ -176,6 +209,13 @@ export class OrderQueueConsumer extends WorkerHost {
               eq(tb.orders.payment_status, PaymentStatus.PENDING),
             ),
           );
+
+        await this.databaseService.db
+          .update(tb.products)
+          .set({
+            stock: order.product_snapshot.product.stock + 1,
+          })
+          .where(eq(tb.products.id, order.product_snapshot.product.id));
 
         this.logger.log(`Order with ID ${orderId} has been marked as expired.`);
         return `Order with ID ${orderId} has been marked as expired.`;

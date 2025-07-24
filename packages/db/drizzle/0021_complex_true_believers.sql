@@ -1,0 +1,1 @@
+ALTER TABLE "payment_snapshots" ADD COLUMN "type" payment_method_type NOT NULL DEFAULT 'bank_transfer';

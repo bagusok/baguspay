@@ -115,6 +115,12 @@ export class CallbackService {
               expired_at: true,
             },
           },
+          product_snapshot: {
+            columns: {},
+            with: {
+              product: { columns: { id: true, stock: true } },
+            },
+          },
         },
       });
 
@@ -142,9 +148,19 @@ export class CallbackService {
 
         await this.queueService.addOrderJob(order.order_id);
       } else {
-        await this.databaseService.db.update(tb.orders).set({
-          payment_status: PaymentStatus.FAILED,
-        });
+        await this.databaseService.db
+          .update(tb.orders)
+          .set({
+            payment_status: PaymentStatus.FAILED,
+          })
+          .where(eq(tb.orders.order_id, data.merchant_ref));
+
+        await this.databaseService.db
+          .update(tb.products)
+          .set({
+            stock: order.product_snapshot.product.stock + 1,
+          })
+          .where(eq(tb.products.id, order.product_snapshot.product.id));
       }
 
       return SendResponse.success(
@@ -189,6 +205,14 @@ export class CallbackService {
             provider_code: true,
             provider_name: true,
           },
+          with: {
+            product: {
+              columns: {
+                id: true,
+                stock: true,
+              },
+            },
+          },
         },
       },
     });
@@ -210,7 +234,7 @@ export class CallbackService {
           order_status: OrderStatus.COMPLETED,
           sn_number: data.data.sn || null,
           cost_price: data.data.price,
-          profit: order.total_price - data.data.price,
+          profit: order.total_price - data.data.price - order.fee,
           notes: `Topup successful. SN: ${data.data.sn}
         wa: ${data.data.wa}
         tele: ${data.data.tele}`,
@@ -246,6 +270,13 @@ export class CallbackService {
       this.logger.warn(
         `Order ${data.data.ref_id} topup failed: ${data.data.message}`,
       );
+
+      await this.databaseService.db
+        .update(tb.products)
+        .set({
+          stock: order.product_snapshot.product.stock + 1,
+        })
+        .where(eq(tb.products.id, order.product_snapshot.product.id));
 
       // refund
       if (order.user_id) {

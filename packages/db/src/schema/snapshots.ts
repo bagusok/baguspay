@@ -1,18 +1,23 @@
-import { text, uuid } from "drizzle-orm/pg-core";
-import { pgTable } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import {
+  integer,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
+import { orders } from "./orders";
+import { paymentMethods } from "./payments";
 import {
   PaymentMethodAllowAccess,
   PaymentMethodFeeType,
   paymentMethodFeeTypeEnum,
   PaymentMethodProvider,
   paymentMethodProviderEnum,
-} from "./pg-enums";
-import { integer } from "drizzle-orm/pg-core";
-import { numeric } from "drizzle-orm/pg-core";
-import { varchar } from "drizzle-orm/pg-core";
-import { timestamp } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
-import {
+  PaymentMethodType,
+  paymentMethodTypeEnum,
   ProductBillingType,
   productBillingTypeEnum,
   ProductFullfillmentType,
@@ -20,8 +25,6 @@ import {
   ProductProvider,
   productProviderEnum,
 } from "./pg-enums";
-import { orders } from "./orders";
-import { paymentMethods } from "./payments";
 import { products } from "./products";
 
 export const paymentSnapshots = pgTable("payment_snapshots", {
@@ -34,6 +37,9 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
       onUpdate: "cascade",
     },
   ),
+  type: paymentMethodTypeEnum("type")
+    .default(PaymentMethodType.BANK_TRANSFER)
+    .notNull(),
   provider_ref_id: varchar("provider_ref_id").notNull(),
   fee_static: integer("fee_static").notNull().default(0),
   fee_percentage: numeric("fee_percentage", {
@@ -87,7 +93,8 @@ export const productSnapshots = pgTable("product_snapshots", {
   }),
   provider_ref_id: varchar("provider_ref_id", { length: 100 }).notNull(),
   name: varchar("name", { length: 100 }).notNull(),
-  sub_name: varchar("sub_name", { length: 100 }),
+  category_name: varchar("category_name", { length: 100 }).default(""),
+  sub_category_name: varchar("sub_category_name", { length: 100 }).default(""),
   sku_code: varchar("sku_code", { length: 15 }).notNull(),
   price: integer("price").notNull(),
   profit_static: integer("profit_static").notNull().default(0),
