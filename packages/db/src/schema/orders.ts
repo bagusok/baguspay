@@ -59,6 +59,14 @@ export const orders = pgTable(
 
     customer_input: varchar("customer_input"),
 
+    customer_email: varchar("customer_email", { length: 150 }),
+    customer_phone: varchar("customer_phone", { length: 50 }),
+    customer_ip: varchar("customer_ip", { length: 50 }),
+    customer_ua: varchar("customer_ua", { length: 500 }),
+
+    voucher_code: varchar("voucher_code", { length: 100 }),
+    raw_response: varchar("raw_response"),
+
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
       () => new Date(),

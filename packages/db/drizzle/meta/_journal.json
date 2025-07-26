@@ -162,6 +162,20 @@
       "when": 1753345046705,
       "tag": "0022_next_trauma",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1753503974933,
+      "tag": "0023_lean_slipstream",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1753513308506,
+      "tag": "0024_large_lester",
+      "breakpoints": true
     }
   ]
 }

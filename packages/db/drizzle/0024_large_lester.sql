@@ -1,0 +1,1 @@
+ALTER TYPE "public"."balance_mutation_ref_type" ADD VALUE 'other';

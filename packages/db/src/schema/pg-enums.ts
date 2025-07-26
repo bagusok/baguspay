@@ -27,6 +27,7 @@ export enum BalanceMutationRefType {
   ORDER = "order",
   DEPOSIT = "deposit",
   WITHDRAWAL = "withdrawal",
+  OTHER = "other",
 }
 
 export const balanceMutationTypeEnum = pgEnum(

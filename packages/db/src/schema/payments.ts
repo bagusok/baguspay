@@ -1,13 +1,16 @@
 import { relations } from "drizzle-orm";
-import { boolean, varchar } from "drizzle-orm/pg-core";
-import { timestamp } from "drizzle-orm/pg-core";
-import { numeric } from "drizzle-orm/pg-core";
-import { integer } from "drizzle-orm/pg-core";
-import { uuid } from "drizzle-orm/pg-core";
-import { pgTable } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  numeric,
+  pgTable,
+  text,
+  time,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { deposits } from "./deposits";
-import { text } from "drizzle-orm/pg-core";
-import { paymentSnapshots } from "./snapshots";
 import {
   PaymentMethodAllowAccess,
   PaymentMethodFeeType,
@@ -17,7 +20,7 @@ import {
   PaymentMethodType,
   paymentMethodTypeEnum,
 } from "./pg-enums";
-import { time } from "drizzle-orm/pg-core";
+import { paymentSnapshots } from "./snapshots";
 
 export const paymentMethodCategories = pgTable("payment_categories", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -74,6 +77,8 @@ export const paymentMethods = pgTable("payment_methods", {
     .default([PaymentMethodAllowAccess.ORDER]),
   expired_in: integer("expired_in").notNull().default(0),
   is_deleted: boolean("is_deleted").notNull().default(false),
+
+  instruction: text("instruction").notNull().default(""),
 
   cut_off_start: time("cut_off_start", { withTimezone: true }),
   cut_off_end: time("cut_off_end", { withTimezone: true }),
