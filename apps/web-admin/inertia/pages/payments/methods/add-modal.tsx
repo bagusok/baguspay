@@ -1,16 +1,24 @@
+import PaymentsController from '#controllers/payments_controller'
+import { CreatePaymentMethodsValidator } from '#validators/payments'
+import { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
-import { useState, FormEvent } from 'react'
+import {
+  PaymentMethodAllowAccess,
+  PaymentMethodFeeType,
+  PaymentMethodProvider,
+  PaymentMethodType,
+} from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -18,16 +26,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { CreatePaymentMethodsValidator } from '#validators/payments'
-import {
-  PaymentMethodAllowAccess,
-  PaymentMethodFeeType,
-  PaymentMethodProvider,
-  PaymentMethodType,
-} from '@repo/db/types'
-import { InferPageProps } from '@adonisjs/inertia/types'
-import PaymentsController from '#controllers/payments_controller'
+import { FormEvent, useState } from 'react'
 import FileManager from '~/components/file-manager'
+import { SimpleEditor } from '~/components/tiptap/tiptap-templates/simple/simple-editor'
 
 type Props = {
   categories: InferPageProps<PaymentsController, 'indexPaymentMethod'>['categories']
@@ -56,6 +57,7 @@ export function AddPaymentMethodModal({ categories }: Props) {
     cut_off_end: '00:00',
     is_need_phone_number: false,
     is_need_email: false,
+    instruction: '',
   })
 
   const handleSubmit = (e: FormEvent) => {
@@ -73,7 +75,7 @@ export function AddPaymentMethodModal({ categories }: Props) {
       <DialogTrigger asChild>
         <Button size="sm">Add New</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="lg:min-w-3/5 ">
         <DialogHeader>
           <DialogTitle>Add Payment Method</DialogTitle>
         </DialogHeader>
@@ -428,6 +430,21 @@ export function AddPaymentMethodModal({ categories }: Props) {
               />
               {form.errors.cut_off_end && (
                 <div className="text-red-500 text-xs mt-1">{form.errors.cut_off_end}</div>
+              )}
+            </div>
+          </div>
+          {/* Instruction */}
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label htmlFor="instruction" className="mb-2">
+                Instruction
+              </Label>
+              <SimpleEditor
+                value={form.data.instruction}
+                onChange={(val) => form.setData('instruction', val)}
+              />
+              {form.errors.instruction && (
+                <div className="text-red-500 text-xs mt-1">{form.errors.instruction}</div>
               )}
             </div>
           </div>

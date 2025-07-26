@@ -91,7 +91,16 @@ const data = {
       title: 'Orders',
       url: '/admin/orders',
       icon: ArrowLeftRight,
-      items: [],
+      items: [
+        {
+          title: 'Prepaid',
+          url: '/admin/orders/prepaid',
+        },
+        {
+          title: 'Postpaid',
+          url: '/admin/orders/postpaid',
+        },
+      ],
     },
     {
       title: 'Balance Mutations',

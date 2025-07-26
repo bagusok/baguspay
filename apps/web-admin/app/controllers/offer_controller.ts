@@ -5,6 +5,7 @@ import {
   deleteOfferPaymentMethodValidator,
   deleteOfferProductValidator,
   deleteOfferUserValidator,
+  getUsedOfferQueryValidator,
   insertOfferValidator,
   offerIdValidator,
   offerQueryValidator,
@@ -12,7 +13,7 @@ import {
   updateOfferValidator,
 } from '#validators/offer'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, desc, eq, ilike, inArray, SQL } from '@repo/db'
+import { and, asc, count, db, desc, eq, gte, ilike, inArray, lte, SQL } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 
@@ -711,6 +712,119 @@ export default class OfferController {
         limit,
         total: total.count,
         totalPages: Math.ceil(total.count / limit),
+      },
+    })
+  }
+
+  async getUsedOffers(ctx: HttpContext) {
+    const {
+      page = 1,
+      limit = 10,
+      sortColumn = 'created_at',
+      sortBy = 'desc',
+      userId,
+      offerId,
+      endDate,
+      startDate,
+    } = await ctx.request.validateUsing(vine.compile(getUsedOfferQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const where = []
+
+    if (userId) {
+      where.push(eq(tb.offerOnOrders.user_id, userId))
+    }
+
+    if (offerId) {
+      where.push(eq(tb.offerOnOrders.offer_id, offerId))
+    }
+
+    if (startDate) {
+      where.push(lte(tb.offerOnOrders.created_at, startDate))
+    }
+
+    if (endDate) {
+      where.push(gte(tb.offerOnOrders.created_at, endDate))
+    }
+
+    const orderBy =
+      sortBy === 'asc' ? asc(tb.offerOnOrders[sortColumn]) : desc(tb.offerOnOrders[sortColumn])
+
+    const usedOffer = await db.query.offerOnOrders.findMany({
+      columns: {
+        id: true,
+        created_at: true,
+      },
+      with: {
+        offer: {
+          columns: {
+            name: true,
+            code: true,
+            discount_maximum: true,
+            discount_percentage: true,
+            discount_static: true,
+          },
+        },
+        order: {
+          columns: {
+            order_id: true,
+            payment_status: true,
+            order_status: true,
+            refund_status: true,
+            discount_price: true,
+            total_price: true,
+            fee: true,
+            profit: true,
+            cost_price: true,
+          },
+          with: {
+            product_snapshot: {
+              columns: {
+                name: true,
+                sub_category_name: true,
+                category_name: true,
+                price: true,
+              },
+            },
+          },
+        },
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      where: and(...where),
+      orderBy,
+      limit,
+      offset: (page - 1) * limit,
+    })
+
+    const [total] = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.offerOnOrders)
+      .where(and(...where))
+
+    return ctx.inertia.render('offers/used-offers', {
+      usedOffer,
+      pagination: {
+        page: page,
+        limit,
+        total,
+        totalPages: Math.ceil(total.count / limit),
+      },
+      filters: {
+        userId,
+        offerId,
+        startDate,
+        endDate,
+        sortColumn,
+        sortBy,
       },
     })
   }

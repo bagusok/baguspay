@@ -173,3 +173,16 @@ export type DeleteOfferPaymentMethodValidator = Infer<typeof deleteOfferPaymentM
 export const offerUserIdValidator = vine.object({
   user_id: vine.string().uuid(),
 })
+
+export const getUsedOfferQueryValidator = vine.object({
+  page: vine.number().optional(),
+  limit: vine.number().optional(),
+  sortBy: vine.enum(['asc', 'desc']).optional(),
+  sortColumn: vine.enum(['created_at', 'updated_at']).optional(),
+  userId: vine.string().uuid().optional(),
+
+  offerId: vine.string().uuid().optional(),
+
+  startDate: vine.date().optional(),
+  endDate: vine.date().optional(),
+})

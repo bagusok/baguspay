@@ -1,14 +1,8 @@
 import PaymentsController from '#controllers/payments_controller'
-import { AddPaymentMethodModal } from './add-modal'
 import { InferPageProps } from '@adonisjs/inertia/types'
-import AdminLayout from '~/components/layout/admin-layout'
 import { router, usePage } from '@inertiajs/react'
-import { ColumnDef } from '@tanstack/react-table'
-import { useState } from 'react'
-import { Input } from '@repo/ui/components/ui/input'
-import { Button } from '@repo/ui/components/ui/button'
 import { DataTable } from '@repo/ui/components/data-table'
-import { formatDate, formatPrice } from '~/utils/index'
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -18,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
+import { Input } from '@repo/ui/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -25,6 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
+import { ColumnDef } from '@tanstack/react-table'
+import { useState } from 'react'
+import AdminLayout from '~/components/layout/admin-layout'
+import { formatDate, formatPrice } from '~/utils/index'
+import { AddPaymentMethodModal } from './add-modal'
 import { EditPaymentMethodModal } from './edit-modal'
 import IsAvailableSwicthPaymentMethods from './is-available-switch'
 
@@ -33,7 +33,6 @@ type Props = InferPageProps<PaymentsController, 'indexPaymentMethod'>
 const columns: ColumnDef<Props['paymentMethods'][number]>[] = [
   { accessorKey: 'id', header: 'ID' },
   {
-    accessorKey: 'is_available',
     header: 'Available',
     cell: ({ row }) => (
       <IsAvailableSwicthPaymentMethods

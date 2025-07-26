@@ -1,11 +1,14 @@
 /// <reference path="../../adonisrc.ts" />
 /// <reference path="../../config/inertia.ts" />
 
-import '../css/app.css'
-import { hydrateRoot } from 'react-dom/client'
-import { createInertiaApp } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
+import { createInertiaApp } from '@inertiajs/react'
+import { hydrateRoot } from 'react-dom/client'
 import { Toaster } from 'react-hot-toast'
+import '../css/_keyframe-animations.scss'
+import '../css/_variables.scss'
+import '../css/app.css'
+import '../css/tiptap.scss'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 

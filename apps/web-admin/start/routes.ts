@@ -17,10 +17,13 @@ const ProductSubCategoryController = () => import('#controllers/product_sub_cate
 const ProductController = () => import('#controllers/products_controller')
 const PaymentController = () => import('#controllers/payments_controller')
 const OfferController = () => import('#controllers/offer_controller')
+const DepositController = () => import('#controllers/deposits_controller')
+const OrderController = () => import('#controllers/orders_controller')
+const BalanceMutationController = () => import('#controllers/balance_mutations_controller')
 
 import router from '@adonisjs/core/services/router'
-import { middleware } from './kernel.js'
 import { UserRole } from '@repo/db/types'
+import { middleware } from './kernel.js'
 router.get('/', async ({ response }) => {
   return response.send('Hmm, sepertinya ada yang salah.')
 })
@@ -53,6 +56,8 @@ router
 
     router.delete('/:id', [UserController, 'postDelete']).as('users.delete')
     router.patch('/:id', [UserController, 'postUpdate']).as('users.update')
+    router.post('/:id/add-balance', [UserController, 'addBalance']).as('users.addBalance')
+    router.post('/:id/deduct-balance', [UserController, 'deductBalance']).as('users.deductBalance')
   })
   .prefix('/admin/users')
   .middleware(middleware.role(UserRole.ADMIN))
@@ -176,6 +181,7 @@ router
 router
   .group(() => {
     router.get('/', [OfferController, 'index']).as('offers.index')
+    router.get('/history', [OfferController, 'getUsedOffers']).as('offers.used')
     router.get('/create', [OfferController, 'create']).as('offers.create')
     router.post('/create', [OfferController, 'postCreate']).as('offers.postCreate')
     router.get('/:id/edit', [OfferController, 'edit']).as('offers.edit')
@@ -207,4 +213,38 @@ router
       .as('offers.getOfferPaymentMethods')
   })
   .prefix('/admin/offers')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router.get('/', [DepositController, 'index']).as('deposits.index')
+    router.get('/:id', [DepositController, 'getById']).as('deposits.getById')
+    router.patch('/:id', [DepositController, 'changeStatus']).as('deposits.changeStatus')
+  })
+  .prefix('/admin/deposits')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router.get('/prepaid', [OrderController, 'indexPrepaid']).as('order.indexPrepaid')
+    router.get('/:id', [OrderController, 'getById']).as('order.getById')
+    router
+      .patch('/:id/change-payment-status', [OrderController, 'changePaymentStatus'])
+      .as('order.changePaymentStatus')
+    router
+      .patch('/:id/change-order-status', [OrderController, 'changeOrderStatus'])
+      .as('order.changeOrderStatus')
+    router
+      .patch('/:id/change-refund-status', [OrderController, 'changeRefundStatus'])
+      .as('order.changeRefundStatus')
+    router.post('/:id/refund', [OrderController, 'refundToBalance']).as('order.refundOrder')
+  })
+  .prefix('/admin/orders')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router.get('/', [BalanceMutationController, 'index']).as('balanceMutations.index')
+  })
+  .prefix('/admin/balance-mutations')
   .middleware(middleware.role(UserRole.ADMIN))

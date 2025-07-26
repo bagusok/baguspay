@@ -1,13 +1,8 @@
 import UsersController from '#controllers/users_controller'
 import { InferPageProps } from '@adonisjs/inertia/types'
-import AdminLayout from '~/components/layout/admin-layout'
-import { router, useForm, usePage } from '@inertiajs/react'
-import { ColumnDef } from '@tanstack/react-table'
-import { useState } from 'react'
-import { Input } from '@repo/ui/components/ui/input'
-import { Button } from '@repo/ui/components/ui/button'
+import { router, usePage } from '@inertiajs/react'
 import { DataTable } from '@repo/ui/components/data-table'
-import { formatDate, formatPrice } from '~/utils/index'
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -17,8 +12,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
-import AddUserModal from './add-user'
-import EditUserModal from './edit-user'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@repo/ui/components/ui/dropdown-menu'
+import { Input } from '@repo/ui/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -26,6 +27,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
+import { ColumnDef } from '@tanstack/react-table'
+import { MoreHorizontal, Trash2Icon } from 'lucide-react'
+import { useState } from 'react'
+import AdminLayout from '~/components/layout/admin-layout'
+import { formatDate, formatPrice } from '~/utils/index'
+import AddBalanceModal from './add-balance-modal'
+import AddUserModal from './add-user'
+import DeductAddBalanceModal from './deduct-balance-modal'
+import EditUserModal from './edit-user'
 
 type Props = InferPageProps<UsersController, 'index'>
 
@@ -72,42 +82,65 @@ const columns: ColumnDef<Props['users'][number]>[] = [
     id: 'actions',
     header: 'Actions',
     cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <EditUserModal user={row.original} />
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="destructive" size="sm">
-              Delete
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Are you absolutely sure?</DialogTitle>
-              <DialogDescription>
-                This action cannot be undone. This will permanently delete your account and remove
-                your data from our servers.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  const userId = row.getValue('id')
-                  router.delete(`/admin/users/${userId}`, {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                      router.get('/admin/users')
-                    },
-                  })
-                }}
-              >
-                Yes, delete account
-              </Button>
-              <Button variant="outline">Cancel</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <EditUserModal user={row.original} />
+          <Dialog>
+            <DialogTrigger asChild>
+              <button className="flex justify-start items-center text-sm p-2 hover:bg-red-100 w-full rounded">
+                <Trash2Icon className="h-4 w-4 mr-2" />
+                Delete
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete your account and remove
+                  your data from our servers.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    const userId = row.getValue('id')
+                    router.delete(`/admin/users/${userId}`, {
+                      preserveScroll: true,
+                      onSuccess: () => {
+                        router.get('/admin/users')
+                      },
+                    })
+                  }}
+                >
+                  Yes, delete account
+                </Button>
+                <Button variant="outline">Cancel</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <DropdownMenuSeparator />
+          <AddBalanceModal
+            userId={row.original.id}
+            userName={row.original.name}
+            userEmail={row.original.email}
+            currentBalance={row.original.balance}
+          />
+          <DeductAddBalanceModal
+            userId={row.original.id}
+            userName={row.original.name}
+            userEmail={row.original.email}
+            currentBalance={row.original.balance}
+          />
+        </DropdownMenuContent>
+      </DropdownMenu>
     ),
   },
 ]

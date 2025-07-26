@@ -1,12 +1,14 @@
 import {
+  addBalanceValidator,
   createUserValidator,
+  deductBalanceValidator,
   deleteUserParamsValidator,
   updateUserValidator,
   userQueryValidator,
 } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
 import { and, count, db, eq, ilike, or } from '@repo/db'
-import { tb } from '@repo/db/types'
+import { BalanceMutationRefType, BalanceMutationType, tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { hash } from 'bcrypt-ts'
 
@@ -227,5 +229,106 @@ export default class UsersController {
         totalPages: Math.ceil(total.count / limit),
       },
     })
+  }
+
+  public async addBalance(ctx: HttpContext) {
+    const { amount, message } = await ctx.request.validateUsing(vine.compile(addBalanceValidator), {
+      data: ctx.request.body(),
+    })
+
+    const { id } = await ctx.request.validateUsing(vine.compile(deleteUserParamsValidator), {
+      data: ctx.request.params(),
+    })
+
+    await db.transaction(async (trx) => {
+      const [user] = await trx
+        .select()
+        .from(tb.users)
+        .where(eq(tb.users.id, id))
+        .for('update')
+        .limit(1)
+
+      if (!user) {
+        ctx.session.flashErrors({
+          error: 'User not found.',
+        })
+        trx.rollback()
+        return ctx.response.redirect().back()
+      }
+
+      await trx
+        .update(tb.users)
+        .set({
+          balance: user.balance + amount,
+        })
+        .where(eq(tb.users.id, id))
+      await trx.insert(tb.balanceMutations).values({
+        amount,
+        name: message,
+        type: BalanceMutationType.CREDIT,
+        ref_type: BalanceMutationRefType.OTHER,
+        ref_id: '',
+        user_id: user.id,
+        balance_after: user.balance + amount,
+        balance_before: user.balance,
+      })
+
+      return [user]
+    })
+
+    ctx.session.flash('success', 'Balance added successfully.')
+    return ctx.response.redirect().withQs().back()
+  }
+
+  public async deductBalance(ctx: HttpContext) {
+    const { amount, message } = await ctx.request.validateUsing(
+      vine.compile(deductBalanceValidator),
+      {
+        data: ctx.request.body(),
+      }
+    )
+
+    const { id } = await ctx.request.validateUsing(vine.compile(deleteUserParamsValidator), {
+      data: ctx.request.params(),
+    })
+
+    await db.transaction(async (trx) => {
+      const [user] = await trx
+        .select()
+        .from(tb.users)
+        .where(eq(tb.users.id, id))
+        .for('update')
+        .limit(1)
+
+      if (!user) {
+        ctx.session.flashErrors({
+          error: 'User not found.',
+        })
+        trx.rollback()
+        return ctx.response.redirect().back()
+      }
+
+      await trx
+        .update(tb.users)
+        .set({
+          balance: user.balance - amount,
+        })
+        .where(eq(tb.users.id, id))
+      await trx.insert(tb.balanceMutations).values({
+        amount: -amount,
+        name: message,
+        type: BalanceMutationType.DEBIT,
+        ref_type: BalanceMutationRefType.OTHER,
+        ref_id: '',
+        user_id: user.id,
+        balance_after: user.balance - amount,
+        balance_before: user.balance,
+      })
+
+      return [user]
+    })
+
+    ctx.session.flash('success', 'Balance deducted successfully.')
+    return ctx.response.redirect().withQs().back()
   }
 }

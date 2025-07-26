@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react'
 import { Switch } from '@repo/ui/components/ui/switch'
-import { useState } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
+import { useState } from 'react'
 
 type Props = {
   paymentMethodId: string

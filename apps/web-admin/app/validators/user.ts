@@ -111,3 +111,17 @@ export const updateUserValidator = vine.object({
 })
 
 export type UpdateUserValidator = Infer<typeof updateUserValidator>
+
+export const addBalanceValidator = vine.object({
+  amount: vine.number().min(1),
+  message: vine.string().maxLength(255),
+})
+
+export type AddBalanceValidator = Infer<typeof addBalanceValidator>
+
+export const deductBalanceValidator = vine.object({
+  amount: vine.number().min(1),
+  message: vine.string().maxLength(255),
+})
+
+export type DeductBalanceValidator = Infer<typeof deductBalanceValidator>

@@ -48,6 +48,7 @@ export const createPaymentMethodsValidator = vine.object({
   expired_in: vine.number().min(0),
   cut_off_start: vine.string().optional(),
   cut_off_end: vine.string().optional(),
+  instruction: vine.string(),
 })
 
 export type CreatePaymentMethodsValidator = Infer<typeof createPaymentMethodsValidator>
@@ -73,6 +74,7 @@ export const updatePaymentMethodsValidator = vine.object({
   expired_in: vine.number().min(0).optional(),
   cut_off_start: vine.string().optional(),
   cut_off_end: vine.string().optional(),
+  instruction: vine.string().optional(),
 })
 
 export type UpdatePaymentMethodsValidator = Infer<typeof updatePaymentMethodsValidator>

@@ -1,4 +1,4 @@
-import { CreateUserValidator, UpdateUserValidator } from '#validators/user'
+import { UpdateUserValidator } from '#validators/user'
 import { useForm } from '@inertiajs/react'
 import { UserRegisteredType, UserRole } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -21,9 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { useState } from 'react'
 import { Switch } from '@repo/ui/components/ui/switch'
-import toast from 'react-hot-toast'
+import { PencilIcon } from 'lucide-react'
+import { useState } from 'react'
 
 type Props = {
   user: UpdateUserValidator & {
@@ -59,13 +59,14 @@ export default function EditUserModal({ user }: Props) {
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button type="button" size="sm">
+        <button className="flex justify-start items-center text-sm p-2 hover:bg-primary/10 w-full rounded">
+          <PencilIcon className="h-4 w-4 mr-2" />
           Edit
-        </Button>
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="text-start">Add User</DialogTitle>
+          <DialogTitle className="text-start">Edit User {user.id}</DialogTitle>
           <DialogDescription></DialogDescription>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
