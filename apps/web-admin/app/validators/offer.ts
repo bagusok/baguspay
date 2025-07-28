@@ -1,3 +1,4 @@
+import { OfferType } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/types'
 
@@ -29,6 +30,12 @@ export const insertOfferValidator = vine.object({
 
   is_need_redeem: vine.boolean(),
   is_new_user: vine.boolean(),
+  is_allow_guest: vine.boolean().optional(),
+  is_unlimited_date: vine.boolean().optional(),
+  is_unlimited_quota: vine.boolean().optional(),
+  usage_limit: vine.number().optional(),
+  is_combinable_with_voucher: vine.boolean().optional(),
+  type: vine.enum(OfferType),
 })
 
 export type InsertOfferValidator = Infer<typeof insertOfferValidator>
@@ -65,6 +72,13 @@ export const updateOfferValidator = vine.object({
   is_deleted: vine.boolean().optional(),
   is_new_user: vine.boolean().optional(),
   is_need_redeem: vine.boolean().optional(),
+
+  is_allow_guest: vine.boolean().optional(),
+  is_unlimited_date: vine.boolean().optional(),
+  is_unlimited_quota: vine.boolean().optional(),
+  usage_limit: vine.number().optional(),
+  is_combinable_with_voucher: vine.boolean().optional(),
+  type: vine.enum(OfferType).optional(),
 })
 
 export type UpdateOfferValidator = Infer<typeof updateOfferValidator>
@@ -119,6 +133,7 @@ export const offerQueryValidator = vine
     page: vine.number().min(1).optional(),
     limit: vine.number().min(10).optional(),
     searchBy: vine.enum(['code', 'id', 'name']).optional(),
+    type: vine.enum(OfferType).optional(),
   })
   .merge(searchSchema)
 

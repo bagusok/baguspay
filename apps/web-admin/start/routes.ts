@@ -180,11 +180,24 @@ router
 
 router
   .group(() => {
-    router.get('/', [OfferController, 'index']).as('offers.index')
+    router.get('/voucher', [OfferController, 'indexVoucher']).as('offers.indexVoucher')
+    router.get('/voucher/create', [OfferController, 'createVoucher']).as('offers.createVoucher')
+    router.get('/voucher/:id/edit', [OfferController, 'editVoucher']).as('offers.editVoucher')
+
+    router.get('/discount', [OfferController, 'indexDiscount']).as('offers.indexDiscount')
+    router.get('/discount/create', [OfferController, 'createDiscount']).as('offers.createDiscount')
+    router.get('/discount/:id/edit', [OfferController, 'editDiscount']).as('offers.editDiscount')
+
+    router.get('/flash-sale', [OfferController, 'indexFlashSale']).as('offers.indexFlashSale')
+    router
+      .get('/flash-sale/create', [OfferController, 'createFlashSale'])
+      .as('offers.createFlashSale')
+    router
+      .get('/flash-sale/:id/edit', [OfferController, 'editFlashSale'])
+      .as('offers.editFlashSale')
+
     router.get('/history', [OfferController, 'getUsedOffers']).as('offers.used')
-    router.get('/create', [OfferController, 'create']).as('offers.create')
     router.post('/create', [OfferController, 'postCreate']).as('offers.postCreate')
-    router.get('/:id/edit', [OfferController, 'edit']).as('offers.edit')
     router.patch('/:id/edit', [OfferController, 'postUpdate']).as('offers.postUpdate')
     router.delete('/:id', [OfferController, 'postDelete']).as('offers.delete')
 

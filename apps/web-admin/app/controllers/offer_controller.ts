@@ -14,11 +14,11 @@ import {
 } from '#validators/offer'
 import type { HttpContext } from '@adonisjs/core/http'
 import { and, asc, count, db, desc, eq, gte, ilike, inArray, lte, SQL } from '@repo/db'
-import { tb } from '@repo/db/types'
+import { OfferType, tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 
 export default class OfferController {
-  async index(ctx: HttpContext) {
+  async indexVoucher(ctx: HttpContext) {
     const {
       limit = 10,
       page = 1,
@@ -29,7 +29,10 @@ export default class OfferController {
     })
 
     const offset = (page - 1) * limit
-    const whereFilter: SQL[] = [eq(tb.offers.is_deleted, false)]
+    const whereFilter: SQL[] = [
+      eq(tb.offers.is_deleted, false),
+      eq(tb.offers.type, OfferType.VOUCHER),
+    ]
 
     if (searchQuery) {
       if (searchBy === 'code') {
@@ -75,7 +78,7 @@ export default class OfferController {
       .from(tb.offers)
       .where(and(...whereFilter))
 
-    return ctx.inertia.render('offers/index', {
+    return ctx.inertia.render('offers/voucher/index', {
       offers,
       pagination: {
         page: page,
@@ -90,8 +93,253 @@ export default class OfferController {
     })
   }
 
-  async create(ctx: HttpContext) {
-    return ctx.inertia.render('offers/create')
+  async createVoucher(ctx: HttpContext) {
+    return ctx.inertia.render('offers/voucher/create')
+  }
+
+  async editVoucher(ctx: HttpContext) {
+    const { id } = await ctx.request.validateUsing(vine.compile(offerIdValidator), {
+      data: ctx.request.params(),
+    })
+
+    const offer = await db.query.offers.findFirst({
+      where: and(eq(tb.offers.id, id), eq(tb.offers.type, OfferType.VOUCHER)),
+    })
+
+    if (!offer) {
+      ctx.session.flashErrors({
+        error: 'Offer not found',
+      })
+      return ctx.response.notFound('Offer not found')
+    }
+
+    const image = await db.query.fileManager.findFirst({
+      where: eq(tb.fileManager.url, offer.image_url),
+    })
+
+    ctx.session.flash('success', 'Offer loaded successfully')
+    return ctx.inertia.render('offers/voucher/edit', {
+      offer: {
+        ...offer,
+        image_id: image ? image.id : null,
+      },
+    })
+  }
+
+  async indexDiscount(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy,
+      searchQuery,
+    } = await ctx.request.validateUsing(vine.compile(offerQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter: SQL[] = [
+      eq(tb.offers.is_deleted, false),
+      eq(tb.offers.type, OfferType.DISCOUNT),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'code') {
+        whereFilter.push(ilike(tb.offers.code, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.offers.id, searchQuery))
+      } else if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.offers.name, `%${searchQuery}%`))
+      }
+    }
+
+    const offers = await db.query.offers.findMany({
+      where: and(...whereFilter),
+      orderBy: desc(tb.offers.created_at),
+      limit,
+      offset,
+      columns: {
+        id: true,
+        name: true,
+        sub_name: true,
+        image_url: true,
+        description: true,
+        code: true,
+        quota: true,
+        discount_static: true,
+        discount_percentage: true,
+        discount_maximum: true,
+        start_date: true,
+        end_date: true,
+        is_available: true,
+        is_featured: true,
+        label: true,
+        is_all_users: true,
+        is_all_payment_methods: true,
+        is_all_products: true,
+      },
+    })
+
+    const [total] = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.offers)
+      .where(and(...whereFilter))
+
+    return ctx.inertia.render('offers/discount/index', {
+      offers,
+      pagination: {
+        page: page,
+        limit,
+        total,
+        totalPages: Math.ceil(total.count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  async createDiscount(ctx: HttpContext) {
+    return ctx.inertia.render('offers/discount/create')
+  }
+
+  async editDiscount(ctx: HttpContext) {
+    const { id } = await ctx.request.validateUsing(vine.compile(offerIdValidator), {
+      data: ctx.request.params(),
+    })
+
+    const offer = await db.query.offers.findFirst({
+      where: and(eq(tb.offers.id, id), eq(tb.offers.type, OfferType.DISCOUNT)),
+    })
+
+    if (!offer) {
+      ctx.session.flashErrors({
+        error: 'Offer not found',
+      })
+      return ctx.response.notFound('Offer not found')
+    }
+
+    const image = await db.query.fileManager.findFirst({
+      where: eq(tb.fileManager.url, offer.image_url),
+    })
+
+    ctx.session.flash('success', 'Offer loaded successfully')
+    return ctx.inertia.render('offers/discount/edit', {
+      offer: {
+        ...offer,
+        image_id: image ? image.id : null,
+      },
+    })
+  }
+
+  async indexFlashSale(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy,
+      searchQuery,
+    } = await ctx.request.validateUsing(vine.compile(offerQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter: SQL[] = [
+      eq(tb.offers.is_deleted, false),
+      eq(tb.offers.type, OfferType.FLASH_SALE),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'code') {
+        whereFilter.push(ilike(tb.offers.code, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.offers.id, searchQuery))
+      } else if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.offers.name, `%${searchQuery}%`))
+      }
+    }
+
+    const offers = await db.query.offers.findMany({
+      where: and(...whereFilter),
+      orderBy: desc(tb.offers.created_at),
+      limit,
+      offset,
+      columns: {
+        id: true,
+        name: true,
+        sub_name: true,
+        image_url: true,
+        description: true,
+        code: true,
+        quota: true,
+        discount_static: true,
+        discount_percentage: true,
+        discount_maximum: true,
+        start_date: true,
+        end_date: true,
+        is_available: true,
+        is_featured: true,
+        label: true,
+        is_all_users: true,
+        is_all_payment_methods: true,
+        is_all_products: true,
+      },
+    })
+
+    const [total] = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.offers)
+      .where(and(...whereFilter))
+
+    return ctx.inertia.render('offers/flash-sale/index', {
+      offers,
+      pagination: {
+        page: page,
+        limit,
+        total,
+        totalPages: Math.ceil(total.count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  async createFlashSale(ctx: HttpContext) {
+    return ctx.inertia.render('offers/flash-sale/create')
+  }
+
+  async editFlashSale(ctx: HttpContext) {
+    const { id } = await ctx.request.validateUsing(vine.compile(offerIdValidator), {
+      data: ctx.request.params(),
+    })
+
+    const offer = await db.query.offers.findFirst({
+      where: and(eq(tb.offers.id, id), eq(tb.offers.type, OfferType.FLASH_SALE)),
+    })
+
+    if (!offer) {
+      ctx.session.flashErrors({
+        error: 'Offer not found',
+      })
+      return ctx.response.notFound('Offer not found')
+    }
+
+    const image = await db.query.fileManager.findFirst({
+      where: eq(tb.fileManager.url, offer.image_url),
+    })
+
+    ctx.session.flash('success', 'Offer loaded successfully')
+    return ctx.inertia.render('offers/flash-sale/edit', {
+      offer: {
+        ...offer,
+        image_id: image ? image.id : null,
+      },
+    })
   }
 
   async postCreate(ctx: HttpContext) {
@@ -123,38 +371,7 @@ export default class OfferController {
         id: tb.offers.id,
       })
 
-    return ctx.response.redirect().toRoute('offers.edit', {
-      id: newOffer.id,
-    })
-  }
-
-  async edit(ctx: HttpContext) {
-    const { id } = await ctx.request.validateUsing(vine.compile(offerIdValidator), {
-      data: ctx.request.params(),
-    })
-
-    const offer = await db.query.offers.findFirst({
-      where: eq(tb.offers.id, id),
-    })
-
-    if (!offer) {
-      ctx.session.flashErrors({
-        error: 'Offer not found',
-      })
-      return ctx.response.notFound('Offer not found')
-    }
-
-    const image = await db.query.fileManager.findFirst({
-      where: eq(tb.fileManager.url, offer.image_url),
-    })
-
-    ctx.session.flash('success', 'Offer loaded successfully')
-    return ctx.inertia.render('offers/edit', {
-      offer: {
-        ...offer,
-        image_id: image ? image.id : null,
-      },
-    })
+    return ctx.response.redirect().withQs().back()
   }
 
   async postUpdate(ctx: HttpContext) {

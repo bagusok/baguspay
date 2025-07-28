@@ -31,6 +31,9 @@ export const orders = pgTable(
     offer_on_order_id: uuid("offer_on_order_id").references(
       () => offerOnOrders.id,
     ),
+    offer_voucher_id: uuid("offer_voucher_id").references(
+      () => offerOnOrders.id,
+    ),
     product_snapshot_id: uuid("product_snapshot_id")
       .notNull()
       .references(() => productSnapshots.id),
@@ -90,6 +93,10 @@ export const orderRelations = relations(orders, ({ one }) => ({
   }),
   offer_on_order: one(offerOnOrders, {
     fields: [orders.offer_on_order_id],
+    references: [offerOnOrders.id],
+  }),
+  offer_voucher: one(offerOnOrders, {
+    fields: [orders.offer_voucher_id],
     references: [offerOnOrders.id],
   }),
 }));

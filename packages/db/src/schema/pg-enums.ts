@@ -212,3 +212,12 @@ export const productFullfillmentTypeEnum = pgEnum(
   "product_fullfillment_type",
   enumToPgEnum(ProductFullfillmentType),
 );
+
+export enum OfferType {
+  DISCOUNT = "discount",
+  FLASH_SALE = "flash_sale",
+  CASHBACK = "cashback",
+  VOUCHER = "voucher",
+}
+
+export const offerTypeEnum = pgEnum("offer_type", enumToPgEnum(OfferType));

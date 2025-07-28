@@ -1,14 +1,17 @@
 import { relations } from "drizzle-orm";
-import { varchar } from "drizzle-orm/pg-core";
-import { text } from "drizzle-orm/pg-core";
-import { integer } from "drizzle-orm/pg-core";
-import { boolean } from "drizzle-orm/pg-core";
-import { timestamp } from "drizzle-orm/pg-core";
-import { uuid } from "drizzle-orm/pg-core";
-import { pgTable } from "drizzle-orm/pg-core";
-import { inputOnProductCategory } from "./input_fields";
-import { numeric } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  numeric,
+  pgTable,
+  text,
+  time,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { articles } from "./articles";
+import { inputOnProductCategory } from "./input_fields";
 import {
   ProductBillingType,
   productBillingTypeEnum,
@@ -17,7 +20,6 @@ import {
   ProductProvider,
   productProviderEnum,
 } from "./pg-enums";
-import { time } from "drizzle-orm/pg-core";
 
 export const productCategories = pgTable("product_categories", {
   id: uuid("id").primaryKey().defaultRandom(),

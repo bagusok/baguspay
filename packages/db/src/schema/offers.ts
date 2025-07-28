@@ -11,6 +11,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { orders } from "./orders";
 import { paymentMethods } from "./payments";
+import { OfferType, offerTypeEnum } from "./pg-enums";
 import { products } from "./products";
 import { users } from "./users";
 
@@ -22,6 +23,8 @@ export const offers = pgTable("offers", {
   description: text("description").notNull(),
   code: varchar("code", { length: 50 }).notNull().unique(),
   quota: integer("quota").notNull().default(0),
+
+  type: offerTypeEnum("type").default(OfferType.VOUCHER).notNull(),
 
   discount_static: integer("discount_static").notNull().default(0),
   discount_percentage: numeric("discount_percentage", {
@@ -45,10 +48,18 @@ export const offers = pgTable("offers", {
   label: varchar("label", { length: 20 }),
 
   is_all_users: boolean("is_all_users").notNull().default(false),
+  is_allow_guest: boolean("is_allow_guest").notNull().default(false),
   is_all_payment_methods: boolean("is_all_payment_methods")
     .notNull()
     .default(false),
   is_all_products: boolean("is_all_products").notNull().default(false),
+
+  is_unlimited_date: boolean("is_unlimited_date").notNull().default(false),
+  is_unlimited_quota: boolean("is_unlimited_quota").notNull().default(false),
+  usage_limit: integer("usage_limit").notNull().default(0),
+  is_combinable_with_voucher: boolean("is_combinable_with_voucher")
+    .notNull()
+    .default(false),
 
   is_deleted: boolean("is_deleted").notNull().default(false),
 
@@ -148,7 +159,7 @@ export const offerOnOrders = pgTable("offer_on_orders", {
   offer_id: uuid("offer_id")
     .references(() => offers.id)
     .notNull(),
-  discount_total: integer("discount_static").notNull().default(0),
+  discount_total: integer("discount_total").notNull().default(0),
   user_id: uuid("user_id")
     .notNull()
     .references(() => users.id),
@@ -163,7 +174,17 @@ export const offerOnOrderRelations = relations(offerOnOrders, ({ one }) => ({
     fields: [offerOnOrders.offer_id],
     references: [offers.id],
   }),
-  order: one(orders),
+  order: one(orders, {
+    fields: [offerOnOrders.id],
+    references: [orders.offer_on_order_id],
+    relationName: "orderWithOffer",
+  }),
+
+  order_voucher: one(orders, {
+    fields: [offerOnOrders.id],
+    references: [orders.offer_voucher_id],
+    relationName: "orderWithOfferVoucher",
+  }),
   user: one(users, {
     fields: [offerOnOrders.user_id],
     references: [users.id],

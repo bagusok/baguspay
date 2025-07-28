@@ -1,13 +1,9 @@
 import OfferController from '#controllers/offer_controller'
 import { InferPageProps } from '@adonisjs/inertia/types'
-import AdminLayout from '~/components/layout/admin-layout'
 import { Link, router, usePage } from '@inertiajs/react'
-import { ColumnDef } from '@tanstack/react-table'
-import { useState } from 'react'
-import { Input } from '@repo/ui/components/ui/input'
-import { Button } from '@repo/ui/components/ui/button'
 import { DataTable } from '@repo/ui/components/data-table'
-import { formatDate, formatPrice } from '~/utils/index'
+import { Button } from '@repo/ui/components/ui/button'
+import { Input } from '@repo/ui/components/ui/input'
 import {
   Select,
   SelectContent,
@@ -15,14 +11,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import IsAvailableSwicthOffer from './is-available-switch'
+import { ColumnDef } from '@tanstack/react-table'
+import { useState } from 'react'
+import AdminLayout from '~/components/layout/admin-layout'
+import { formatDate, formatPrice } from '~/utils/index'
+import IsAvailableSwicthOffer from '../is-available-switch'
 
-type Props = InferPageProps<OfferController, 'index'>
+type Props = InferPageProps<OfferController, 'indexDiscount'>
 
 const columns: ColumnDef<Props['offers'][number]>[] = [
   { accessorKey: 'id', header: 'ID' },
   { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'sub_name', header: 'Sub Name' },
   { accessorKey: 'code', header: 'Code' },
   { accessorKey: 'quota', header: 'Quota' },
   {
@@ -67,7 +66,7 @@ const columns: ColumnDef<Props['offers'][number]>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <Button size="sm" asChild>
-          <Link href={`/admin/offers/${row.getValue('id')}/edit`}>Edit</Link>
+          <Link href={`/admin/offers/discount/${row.getValue('id')}/edit`}>Edit</Link>
         </Button>
         <Button
           variant="destructive"
@@ -77,7 +76,7 @@ const columns: ColumnDef<Props['offers'][number]>[] = [
             router.delete(`/admin/offers/${offerId}`, {
               preserveScroll: true,
               onSuccess: () => {
-                router.get('/admin/offers')
+                router.get('/admin/offers/discount')
               },
             })
           }}
@@ -98,19 +97,19 @@ export default function OfferIndex(props: Props) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    router.get('/admin/offers', { searchBy, searchQuery })
+    router.get('/admin/offers/discount', { searchBy, searchQuery })
   }
 
   const handlePageChange = (page: number) => {
-    router.get('/admin/offers', { ...filters, page })
+    router.get('/admin/offers/discount', { ...filters, page })
   }
 
   return (
     <AdminLayout>
       <div className="flex justify-between mt-5 mb-2 items-start">
-        <h1 className="text-2xl font-bold">Offer Management</h1>
+        <h1 className="text-2xl font-bold">Discount Management</h1>
         <Button asChild>
-          <Link href="/admin/offers/create">Create New Offer</Link>
+          <Link href="/admin/offers/discount/create">Create Discount</Link>
         </Button>
       </div>
       <form className="flex gap-2" onSubmit={handleSearch}>

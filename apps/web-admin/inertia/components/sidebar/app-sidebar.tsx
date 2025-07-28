@@ -72,8 +72,16 @@ const data = {
       icon: TicketIcon,
       items: [
         {
-          title: 'Manage Offers',
-          url: '/admin/offers',
+          title: 'Vouchers',
+          url: '/admin/offers/voucher',
+        },
+        {
+          title: 'Flash Sales',
+          url: '/admin/offers/flash-sale',
+        },
+        {
+          title: 'Discounts',
+          url: '/admin/offers/discount',
         },
         {
           title: 'Offers History',

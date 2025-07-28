@@ -12,15 +12,15 @@ import utc from 'dayjs/plugin/utc'
 import { FormEvent } from 'react'
 import FileManager from '~/components/file-manager'
 import AdminLayout from '~/components/layout/admin-layout'
-import OfferPaymentSection from './offer-payment'
-import OfferProductSection from './offer-product'
-import OfferUserSection from './offer-user'
+import OfferPaymentSection from '../offer-payment'
+import OfferProductSection from '../offer-product'
+import OfferUserSection from '../offer-user'
 
 dayjs.extend(utc)
 
-type Props = InferPageProps<OfferController, 'edit'>
+type Props = InferPageProps<OfferController, 'editDiscount'>
 
-export default function CreateOffer({ offer }: Props) {
+export default function EditOfferFlashSale({ offer }: Props) {
   const { data, setData, errors, processing, patch } = useForm<UpdateOfferValidator>({
     name: offer.name || '',
     sub_name: offer.sub_name || '',
@@ -43,6 +43,7 @@ export default function CreateOffer({ offer }: Props) {
     is_new_user: offer.is_new_user || false,
     label: offer.label || '',
     min_amount: offer.min_amount || 0,
+    usage_limit: offer.usage_limit || 0,
   })
 
   const handleSubmit = (e: FormEvent) => {
@@ -55,7 +56,7 @@ export default function CreateOffer({ offer }: Props) {
   return (
     <AdminLayout>
       <div className="">
-        <h1 className="text-2xl font-bold mb-6">Create Offer</h1>
+        <h1 className="text-2xl font-bold mb-6">Edit Discount</h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <Label htmlFor="image_url">
@@ -78,15 +79,6 @@ export default function CreateOffer({ offer }: Props) {
                 onChange={(e) => setData('name', e.target.value)}
               />
               {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-            </div>
-            <div className="w-full">
-              <Label htmlFor="sub_name">Sub Name</Label>
-              <Input
-                id="sub_name"
-                value={data.sub_name}
-                onChange={(e) => setData('sub_name', e.target.value)}
-              />
-              {errors.sub_name && <p className="text-red-500 text-sm">{errors.sub_name}</p>}
             </div>
           </div>
           <div className="flex gap-4">
@@ -199,26 +191,7 @@ export default function CreateOffer({ offer }: Props) {
               />
               <Label htmlFor="is_available">Available</Label>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_featured"
-                type="checkbox"
-                checked={data.is_featured}
-                onChange={(e) => setData('is_featured', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_featured">Featured</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_all_users"
-                type="checkbox"
-                checked={data.is_all_users}
-                onChange={(e) => setData('is_all_users', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_all_users">All Users</Label>
-            </div>
+
             <div className="flex items-center gap-2">
               <input
                 id="is_all_payment_methods"
@@ -229,68 +202,21 @@ export default function CreateOffer({ offer }: Props) {
               />
               <Label htmlFor="is_all_payment_methods">All Payment Methods</Label>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_all_products"
-                type="checkbox"
-                checked={data.is_all_products}
-                onChange={(e) => setData('is_all_products', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_all_products">All Products</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_deleted"
-                type="checkbox"
-                checked={data.is_deleted}
-                onChange={(e) => setData('is_deleted', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_deleted">Deleted</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_need_redeem"
-                type="checkbox"
-                checked={data.is_need_redeem}
-                onChange={(e) => setData('is_need_redeem', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_need_redeem">Need Redeem</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_new_user"
-                type="checkbox"
-                checked={data.is_new_user}
-                onChange={(e) => setData('is_new_user', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_new_user">New User</Label>
-            </div>
           </div>
+
           <div className="flex gap-4">
             <div className="w-full">
-              <Label htmlFor="min-amount">
-                Minimum Amount <span className="text-red-500">*</span>
+              <Label htmlFor="usage_limit">
+                Usage Per User <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="min_amount"
+                id="usage_limit"
                 type="number"
-                value={data.min_amount}
-                onChange={(e) => setData('min_amount', Number(e.target.value))}
+                value={data.usage_limit}
+                onChange={(e) => setData('usage_limit', Number(e.target.value))}
+                min={1}
               />
-              {errors.min_amount && <p className="text-red-500 text-sm">{errors.min_amount}</p>}
-            </div>
-            <div className="w-full">
-              <Label htmlFor="label">Label</Label>
-              <Input
-                id="label"
-                value={data.label}
-                onChange={(e) => setData('label', e.target.value)}
-              />
-              {errors.label && <p className="text-red-500 text-sm">{errors.label}</p>}
+              {errors.usage_limit && <p className="text-red-500 text-sm">{errors.usage_limit}</p>}
             </div>
           </div>
           <div>
@@ -318,13 +244,27 @@ export default function CreateOffer({ offer }: Props) {
             <TabsTrigger value="payments">Payment Methods</TabsTrigger>
           </TabsList>
           <TabsContent value="users">
-            <OfferUserSection offerId={offer.id} />
+            {data.is_all_users ? (
+              <p className="text-sm text-gray-500">This offer is available for all users.</p>
+            ) : (
+              <OfferUserSection offerId={offer.id} />
+            )}
           </TabsContent>
           <TabsContent value="products">
-            <OfferProductSection offerId={offer.id} />
+            {data.is_all_products ? (
+              <p className="text-sm text-gray-500">This offer is available for all products.</p>
+            ) : (
+              <OfferProductSection offerId={offer.id} />
+            )}
           </TabsContent>
           <TabsContent value="payments">
-            <OfferPaymentSection offerId={offer.id} />
+            {data.is_all_payment_methods ? (
+              <p className="text-sm text-gray-500">
+                This offer is available for all payment methods.
+              </p>
+            ) : (
+              <OfferPaymentSection offerId={offer.id} />
+            )}
           </TabsContent>
         </Tabs>
       </div>
