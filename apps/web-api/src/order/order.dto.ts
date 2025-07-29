@@ -41,6 +41,11 @@ export class GetPriceByDto {
   @ApiProperty()
   @IsUUID()
   product_id: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsUUID()
+  voucher_id?: string;
 }
 
 export class PreCheckoutPrepaidDto {
@@ -55,7 +60,7 @@ export class PreCheckoutPrepaidDto {
   @IsOptional()
   @ApiProperty()
   @IsUUID()
-  offer_id: string;
+  voucher_id: string;
 
   @ApiProperty()
   @IsPhoneNumber('ID')
@@ -91,7 +96,7 @@ export class CheckoutPrepaidDto {
   @IsOptional()
   @ApiProperty()
   @IsUUID()
-  offer_id: string;
+  voucher_id: string;
 
   @ApiProperty()
   @IsPhoneNumber('ID')

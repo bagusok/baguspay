@@ -31,9 +31,10 @@ export default function OrderDetailModal({ orderId }: Props) {
       user: InferSelectModel<typeof tb.users>
       product_snapshot: InferSelectModel<typeof tb.productSnapshots>
       payment_snapshot: InferSelectModel<typeof tb.paymentSnapshots>
-      offer_on_order?: {
-        offer: InferSelectModel<typeof tb.offers>
-      }
+      offer_on_orders?: InferSelectModel<typeof tb.offerOnOrders> &
+        {
+          offer: InferSelectModel<typeof tb.offers>
+        }[]
     }
   }>({
     mutationKey: ['detailOrder', orderId],
@@ -245,40 +246,38 @@ export default function OrderDetailModal({ orderId }: Props) {
               <div>
                 <div className="font-semibold text-base mb-2 border-b pb-1">Offer Info</div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label className="mb-1">Offer ID</Label>
-                    <div>{detailOrder.data?.order.offer_on_order?.offer?.id || '-'}</div>
-                  </div>
-                  <div>
-                    <Label className="mb-1">Offer Name</Label>
-                    <div>{detailOrder.data?.order.offer_on_order?.offer?.name || '-'}</div>
-                  </div>
-                  <div>
-                    <Label className="mb-1">Discount Maximum</Label>
-                    <div>
-                      {detailOrder.data?.order.offer_on_order?.offer?.discount_maximum || '-'}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="mb-1">Discount Percentage</Label>
-                    <div>
-                      {detailOrder.data?.order.offer_on_order?.offer?.discount_percentage || '-'}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="mb-1">Discount Static</Label>
-                    <div>
-                      {detailOrder.data?.order.offer_on_order?.offer?.discount_static || '-'}
-                    </div>
-                  </div>
-                  <div>
-                    <Label className="mb-1">Offer Code</Label>
-                    <div>{detailOrder.data?.order.offer_on_order?.offer?.code || '-'}</div>
-                  </div>
-                  <div>
-                    <Label className="mb-1">Quota</Label>
-                    <div>{detailOrder.data?.order.offer_on_order?.offer?.quota || '-'}</div>
-                  </div>
+                  {detailOrder.data?.order.offer_on_orders?.map((offer_on_order) => (
+                    <>
+                      <div>
+                        <Label className="mb-1">Offer ID</Label>
+                        <div>{offer_on_order?.offer?.id || '-'}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1">Offer Name</Label>
+                        <div>{offer_on_order?.offer?.name || '-'}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1">Discount Maximum</Label>
+                        <div>{offer_on_order?.offer?.discount_maximum || '-'}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1">Discount Percentage</Label>
+                        <div>{offer_on_order?.offer?.discount_percentage || '-'}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1">Discount Static</Label>
+                        <div>{offer_on_order?.offer?.discount_static || '-'}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1">Offer Code</Label>
+                        <div>{offer_on_order?.offer?.code || '-'}</div>
+                      </div>
+                      <div>
+                        <Label className="mb-1">Quota</Label>
+                        <div>{offer_on_order?.offer?.quota || '-'}</div>
+                      </div>
+                    </>
+                  ))}
                 </div>
               </div>
               {/* Other Info */}

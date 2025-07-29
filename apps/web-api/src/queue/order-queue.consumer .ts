@@ -1,6 +1,6 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
-import { and, eq } from '@repo/db';
+import { and, eq, sql } from '@repo/db';
 import {
   BalanceMutationRefType,
   BalanceMutationType,
@@ -61,6 +61,12 @@ export class OrderQueueConsumer extends WorkerHost {
                   email: true,
                 },
               },
+              offer_on_orders: {
+                columns: {
+                  id: true,
+                  offer_id: true,
+                },
+              },
             },
           });
 
@@ -97,6 +103,7 @@ export class OrderQueueConsumer extends WorkerHost {
                     .update(tb.orders)
                     .set({
                       order_status: topup.data.status,
+                      raw_response: JSON.stringify(topup.data),
                     })
                     .where(eq(tb.orders.id, order.id));
 
@@ -128,11 +135,23 @@ export class OrderQueueConsumer extends WorkerHost {
                     await this.databaseService.db
                       .update(tb.products)
                       .set({
-                        stock: order.product_snapshot.product.stock + 1,
+                        stock: sql`${tb.products.stock}::int + 1`,
                       })
                       .where(
                         eq(tb.products.id, order.product_snapshot.product_id),
                       );
+
+                    // update usage_count if offer is used
+                    if (order.offer_on_orders.length > 0) {
+                      for (const offer of order.offer_on_orders) {
+                        await this.databaseService.db
+                          .update(tb.offers)
+                          .set({
+                            usage_count: sql`${tb.offers.usage_count}::int - 1`,
+                          })
+                          .where(eq(tb.offers.id, offer.offer_id));
+                      }
+                    }
                   }
 
                   return `Topup failed or pending, order status updated. ${topup.data.status}, order ID: ${orderId}`;
@@ -147,15 +166,12 @@ export class OrderQueueConsumer extends WorkerHost {
                       order_status: topup.data.status,
                       cost_price: topup.data.provider_price,
                       profit:
-                        order.total_price -
+                        order.price -
                         topup.data.provider_price -
-                        order.fee,
+                        order.discount_price,
                       sn_number: topup.data.sn || null,
-                      notes: `
-                      Topup successful. SN: ${topup.data.sn}
-                      wa: ${topup.data.wa}
-                      tele: ${topup.data.tele}
-                      `,
+                      notes: `Topup successful. SN: ${topup.data.sn} wa: ${topup.data.wa} tele: ${topup.data.tele}`,
+                      raw_response: JSON.stringify(topup.data),
                     })
                     .where(eq(tb.orders.id, order.id));
                 }

@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { and, eq, lte } from '@repo/db';
+import { and, eq, lte, sql } from '@repo/db';
 import {
   BalanceMutationRefType,
   BalanceMutationType,
@@ -121,6 +121,11 @@ export class CallbackService {
               product: { columns: { id: true, stock: true } },
             },
           },
+          offer_on_orders: {
+            columns: {
+              id: true,
+            },
+          },
         },
       });
 
@@ -158,9 +163,22 @@ export class CallbackService {
         await this.databaseService.db
           .update(tb.products)
           .set({
-            stock: order.product_snapshot.product.stock + 1,
+            stock: sql`${tb.products.stock}::int + 1`,
           })
           .where(eq(tb.products.id, order.product_snapshot.product.id));
+      }
+
+      // if User Offers Update Usage Count
+
+      if (order.offer_on_orders.length > 0) {
+        for (const offer of order.offer_on_orders) {
+          await this.databaseService.db
+            .update(tb.offers)
+            .set({
+              usage_count: sql`${tb.offers.usage_count}::int - 1`,
+            })
+            .where(eq(tb.offers.id, offer.id));
+        }
       }
 
       return SendResponse.success(
@@ -214,6 +232,12 @@ export class CallbackService {
             },
           },
         },
+        offer_on_orders: {
+          columns: {
+            id: true,
+            offer_id: true,
+          },
+        },
       },
     });
 
@@ -234,10 +258,9 @@ export class CallbackService {
           order_status: OrderStatus.COMPLETED,
           sn_number: data.data.sn || null,
           cost_price: data.data.price,
-          profit: order.total_price - data.data.price - order.fee,
-          notes: `Topup successful. SN: ${data.data.sn}
-        wa: ${data.data.wa}
-        tele: ${data.data.tele}`,
+          profit: order.price - data.data.price - order.discount_price,
+          notes: `Topup successful. SN: ${data.data.sn} wa: ${data.data.wa} tele: ${data.data.tele}`,
+          raw_response: JSON.stringify(data),
         })
         .where(
           and(
@@ -257,8 +280,9 @@ export class CallbackService {
           order_status: OrderStatus.FAILED,
           sn_number: '',
           cost_price: data.data.price,
-          profit: order.total_price - data.data.price,
+          profit: order.price - data.data.price - order.discount_price,
           notes: `Topup failed: ${data.data.message}`,
+          raw_response: JSON.stringify(data.data),
         })
         .where(
           and(
@@ -267,6 +291,7 @@ export class CallbackService {
             eq(tb.orders.payment_status, PaymentStatus.SUCCESS),
           ),
         );
+
       this.logger.warn(
         `Order ${data.data.ref_id} topup failed: ${data.data.message}`,
       );
@@ -274,15 +299,28 @@ export class CallbackService {
       await this.databaseService.db
         .update(tb.products)
         .set({
-          stock: order.product_snapshot.product.stock + 1,
+          stock: sql`${tb.products.stock}::int + 1`,
         })
         .where(eq(tb.products.id, order.product_snapshot.product.id));
+
+      // Update usage_count for offers if applicable
+      if (order.offer_on_orders.length > 0) {
+        for (const offer of order.offer_on_orders) {
+          await this.databaseService.db
+            .update(tb.offers)
+            .set({
+              usage_count: sql`${tb.offers.usage_count}::int - 1`,
+            })
+            .where(eq(tb.offers.id, offer.offer_id));
+        }
+      }
 
       // refund
       if (order.user_id) {
         this.logger.log(
           `Refunding user ${order.user_id} for failed topup order ${order.order_id}`,
         );
+
         await this.balanceService.addBalance({
           userId: order.user_id,
           amount: order.total_price - order.fee,

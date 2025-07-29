@@ -68,7 +68,7 @@ const columns: ColumnDef<Props['orders'][number]>[] = [
   },
   {
     accessorKey: 'original_price',
-    header: 'Original Price',
+    header: 'Original Price + Fee',
     cell: ({ row }) => formatPrice(row.original.total_price + row.original.discount_price),
   },
   {
@@ -99,7 +99,7 @@ const columns: ColumnDef<Props['orders'][number]>[] = [
     accessorKey: 'use_discount',
     header: 'Use Discount',
     cell: ({ row }) => {
-      const useDiscount = row.original.offer_on_order
+      const useDiscount = row.original.offer_on_orders.length > 0
       if (useDiscount) {
         return <span className="text-green-500 font-semibold">Yes</span>
       } else {

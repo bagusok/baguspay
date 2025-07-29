@@ -28,12 +28,6 @@ export const orders = pgTable(
     user_id: uuid("user_id")
       .notNull()
       .references(() => users.id),
-    offer_on_order_id: uuid("offer_on_order_id").references(
-      () => offerOnOrders.id,
-    ),
-    offer_voucher_id: uuid("offer_voucher_id").references(
-      () => offerOnOrders.id,
-    ),
     product_snapshot_id: uuid("product_snapshot_id")
       .notNull()
       .references(() => productSnapshots.id),
@@ -41,11 +35,12 @@ export const orders = pgTable(
       .notNull()
       .references(() => paymentSnapshots.id),
 
-    total_price: integer("total_price").notNull(),
-    profit: integer("profit").notNull().default(0),
+    price: integer("price").notNull().default(0),
     cost_price: integer("cost_price").notNull().default(0),
     discount_price: integer("discount_price").notNull().default(0),
     fee: integer("fee").notNull().default(0),
+    total_price: integer("total_price").notNull(),
+    profit: integer("profit").notNull().default(0),
 
     sn_number: varchar("sn_number", { length: 150 }).notNull(),
     notes: varchar("notes"),
@@ -78,7 +73,7 @@ export const orders = pgTable(
   (table) => [index("orders_order_id_index").on(table.order_id)],
 );
 
-export const orderRelations = relations(orders, ({ one }) => ({
+export const orderRelations = relations(orders, ({ one, many }) => ({
   user: one(users, {
     fields: [orders.user_id],
     references: [users.id],
@@ -91,12 +86,5 @@ export const orderRelations = relations(orders, ({ one }) => ({
     fields: [orders.payment_snapshot_id],
     references: [paymentSnapshots.id],
   }),
-  offer_on_order: one(offerOnOrders, {
-    fields: [orders.offer_on_order_id],
-    references: [offerOnOrders.id],
-  }),
-  offer_voucher: one(offerOnOrders, {
-    fields: [orders.offer_voucher_id],
-    references: [offerOnOrders.id],
-  }),
+  offer_on_orders: many(offerOnOrders),
 }));

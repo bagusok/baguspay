@@ -23,6 +23,8 @@ export const offers = pgTable("offers", {
   description: text("description").notNull(),
   code: varchar("code", { length: 50 }).notNull().unique(),
   quota: integer("quota").notNull().default(0),
+  usage_count: integer("usage_count").notNull().default(0),
+  usage_limit: integer("usage_limit").notNull().default(0),
 
   type: offerTypeEnum("type").default(OfferType.VOUCHER).notNull(),
 
@@ -56,7 +58,7 @@ export const offers = pgTable("offers", {
 
   is_unlimited_date: boolean("is_unlimited_date").notNull().default(false),
   is_unlimited_quota: boolean("is_unlimited_quota").notNull().default(false),
-  usage_limit: integer("usage_limit").notNull().default(0),
+
   is_combinable_with_voucher: boolean("is_combinable_with_voucher")
     .notNull()
     .default(false),
@@ -159,10 +161,14 @@ export const offerOnOrders = pgTable("offer_on_orders", {
   offer_id: uuid("offer_id")
     .references(() => offers.id)
     .notNull(),
-  discount_total: integer("discount_total").notNull().default(0),
+  order_id: uuid("order_id")
+    .references(() => orders.id)
+    .notNull(),
   user_id: uuid("user_id")
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id)
+    .default("00000000-0000-0000-0000-000000000000"),
+  discount_total: integer("discount_total").notNull().default(0),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),
@@ -174,19 +180,12 @@ export const offerOnOrderRelations = relations(offerOnOrders, ({ one }) => ({
     fields: [offerOnOrders.offer_id],
     references: [offers.id],
   }),
-  order: one(orders, {
-    fields: [offerOnOrders.id],
-    references: [orders.offer_on_order_id],
-    relationName: "orderWithOffer",
-  }),
-
-  order_voucher: one(orders, {
-    fields: [offerOnOrders.id],
-    references: [orders.offer_voucher_id],
-    relationName: "orderWithOfferVoucher",
-  }),
   user: one(users, {
     fields: [offerOnOrders.user_id],
     references: [users.id],
+  }),
+  order: one(orders, {
+    fields: [offerOnOrders.order_id],
+    references: [orders.id],
   }),
 }));

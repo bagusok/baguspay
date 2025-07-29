@@ -4,6 +4,7 @@ import { pgEnum } from "drizzle-orm/pg-core";
 export enum UserRole {
   ADMIN = "admin",
   USER = "user",
+  GUEST = "GUEST",
 }
 
 export enum UserRegisteredType {

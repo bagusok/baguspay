@@ -2,6 +2,7 @@ import OfferController from '#controllers/offer_controller'
 import { UpdateOfferValidator } from '#validators/offer'
 import { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
+import { OfferType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
@@ -36,7 +37,7 @@ export default function EditOfferDiscount({ offer }: Props) {
     is_available: offer.is_available || false,
     is_featured: offer.is_featured || false,
     is_all_users: offer.is_all_users || false,
-    is_all_payment_methods: offer.is_all_payment_methods || false,
+    is_all_payment_methods: offer.is_all_payment_methods || true,
     is_all_products: offer.is_all_products || false,
     is_deleted: offer.is_deleted || false,
     is_need_redeem: offer.is_need_reedem || false,
@@ -44,6 +45,11 @@ export default function EditOfferDiscount({ offer }: Props) {
     label: offer.label || '',
     min_amount: offer.min_amount || 0,
     usage_limit: offer.usage_limit || 0,
+    type: OfferType.DISCOUNT,
+    is_allow_guest: offer.is_allow_guest || false,
+    is_unlimited_date: offer.is_unlimited_date || false,
+    is_unlimited_quota: offer.is_unlimited_quota || false,
+    is_combinable_with_voucher: offer.is_combinable_with_voucher || false,
   })
 
   const handleSubmit = (e: FormEvent) => {
@@ -190,17 +196,6 @@ export default function EditOfferDiscount({ offer }: Props) {
                 className="accent-primary h-5 w-5"
               />
               <Label htmlFor="is_available">Available</Label>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                id="is_all_payment_methods"
-                type="checkbox"
-                checked={data.is_all_payment_methods}
-                onChange={(e) => setData('is_all_payment_methods', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_all_payment_methods">All Payment Methods</Label>
             </div>
             <div className="flex items-center gap-2">
               <input

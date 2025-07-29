@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { articles } from "./articles";
 import { inputOnProductCategory } from "./input_fields";
+import { offer_products } from "./offers";
 import {
   ProductBillingType,
   productBillingTypeEnum,
@@ -136,9 +137,10 @@ export const products = pgTable("products", {
   ),
 });
 
-export const productRelations = relations(products, ({ one }) => ({
+export const productRelations = relations(products, ({ one, many }) => ({
   product_sub_category: one(productSubCategories, {
     fields: [products.product_sub_category_id],
     references: [productSubCategories.id],
   }),
+  offer_on_products: many(offer_products),
 }));

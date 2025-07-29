@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Headers,
+  Ip,
   Param,
   Post,
   Query,
@@ -25,9 +26,19 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('products/price')
-  getPriceBy(@Body() body: GetPriceByDto) {
-    return this.orderService.getPriceBy(body.product_id);
+  getPriceBy(
+    @Body() body: GetPriceByDto,
+    @Query('flash_sale') isFlashSale: boolean = false,
+    @User() user?: TUser,
+  ) {
+    return this.orderService.getPriceBy(
+      body.product_id,
+      isFlashSale,
+      body.voucher_id,
+      user,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -35,9 +46,15 @@ export class OrderController {
   async preCheckoutPrepaid(
     @Body() data: PreCheckoutPrepaidDto,
     @Headers('X-Time') timestamp: number,
+    @Query('flash_sale') isFlashSale: boolean = false,
     @User() user: TUser,
   ) {
-    return await this.orderService.preCheckoutPrepaid(data, timestamp, user);
+    return await this.orderService.preCheckoutPrepaid(
+      data,
+      timestamp,
+      isFlashSale,
+      user,
+    );
   }
 
   @UseGuards(JwtAuthGuard)
@@ -46,8 +63,18 @@ export class OrderController {
     @Body() data: CheckoutPrepaidDto,
     @Headers('X-Time') timestamp: number,
     @User() user: TUser,
+    @Query('flash_sale') isFlashSale: boolean = false,
+    @Ip() ip: string,
+    @Headers('User-Agent') userAgent: string,
   ) {
-    return await this.orderService.checkoutPrepaid(data, timestamp, user);
+    return await this.orderService.checkoutPrepaid(
+      data,
+      timestamp,
+      isFlashSale,
+      user,
+      ip,
+      userAgent,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

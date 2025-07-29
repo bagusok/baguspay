@@ -105,7 +105,6 @@ export const productSnapshots = pgTable("product_snapshots", {
   })
     .notNull()
     .default(0),
-  total_price: integer("total_price").notNull(),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: productProviderEnum("provider_name").default(
     ProductProvider.ATLANTICH2H,

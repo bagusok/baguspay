@@ -386,6 +386,8 @@ export default class OfferController {
       }
     )
 
+    console.log('offerData', offerData)
+
     let imageUrl: string | null = null
 
     if (imageId) {

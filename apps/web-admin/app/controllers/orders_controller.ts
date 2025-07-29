@@ -60,6 +60,7 @@ export default class OrdersController {
     const orders = await db.query.orders.findMany({
       columns: {
         order_id: true,
+        price: true,
         cost_price: true,
         total_price: true,
         fee: true,
@@ -79,11 +80,7 @@ export default class OrdersController {
             email: true,
           },
         },
-        offer_on_order: {
-          columns: {
-            id: true,
-          },
-        },
+        offer_on_orders: true,
         payment_snapshot: {
           columns: {
             name: true,
@@ -143,7 +140,7 @@ export default class OrdersController {
       where: eq(tb.orders.order_id, id),
       with: {
         user: true,
-        offer_on_order: {
+        offer_on_orders: {
           with: {
             offer: true,
           },

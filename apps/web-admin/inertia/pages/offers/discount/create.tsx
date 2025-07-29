@@ -35,7 +35,7 @@ export default function CreateOfferDiscount() {
     is_featured: false,
     label: '',
     is_all_users: true,
-    is_all_payment_methods: false,
+    is_all_payment_methods: true,
     is_all_products: false,
     is_deleted: false,
     is_need_redeem: false,
@@ -190,16 +190,6 @@ export default function CreateOfferDiscount() {
                 className="accent-primary h-5 w-5"
               />
               <Label htmlFor="is_available">Available</Label>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                id="is_all_payment_methods"
-                type="checkbox"
-                checked={data.is_all_payment_methods}
-                onChange={(e) => setData('is_all_payment_methods', e.target.checked)}
-                className="accent-primary h-5 w-5"
-              />
-              <Label htmlFor="is_all_payment_methods">All Payment Methods</Label>
             </div>
             <div className="flex items-center gap-2">
               <input
