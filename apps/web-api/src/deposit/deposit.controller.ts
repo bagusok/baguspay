@@ -7,16 +7,16 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { DepositService } from './deposit.service';
+import { ApiParam, ApiSecurity } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { User } from 'src/common/decorators/user.decorator';
+import { TUser } from 'src/common/types/meta.type';
 import {
   CreateDeposit,
   DepositHistoryQuery,
   DepositParams,
 } from './deposit.dto';
-import { ApiParam, ApiSecurity } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { User } from 'src/common/decorators/user.decorator';
-import { TUser } from 'src/common/types/global';
+import { DepositService } from './deposit.service';
 
 @ApiSecurity('access-token')
 @UseGuards(JwtAuthGuard)

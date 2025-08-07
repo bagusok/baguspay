@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { and, count, desc, eq, gte, lte, SQL } from '@repo/db';
 import { tb } from '@repo/db/types';
+import { MetaPaginated, TUser } from 'src/common/types/meta.type';
+import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
 import { GetBalanceMutationHistoryQuery } from './user.dto';
-import { SendResponse } from 'src/common/utils/response';
-import { MetaPaginated } from 'src/common/types/meta.type';
 
 @Injectable()
 export class UserService {
@@ -113,5 +113,36 @@ export class UserService {
         },
       },
     );
+  }
+
+  me(user?: TUser) {
+    if (!user) {
+      return SendResponse.success({
+        id: '00000000-0000-0000-0000-000000000000',
+        email: 'guest@baguspay.com',
+        name: 'Guest',
+        phone: null,
+        role: 'guest',
+        balance: 0,
+        is_banned: false,
+        is_email_verified: false,
+        image_url: null,
+      });
+    } else {
+      return SendResponse.success(
+        {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          phone: user.phone,
+          role: user.role,
+          balance: user.balance,
+          is_banned: user.is_banned,
+          is_email_verified: user.is_email_verified,
+          image_url: user.image_url,
+        },
+        'User profile retrieved successfully',
+      );
+    }
   }
 }

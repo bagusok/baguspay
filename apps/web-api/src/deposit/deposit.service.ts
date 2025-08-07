@@ -13,7 +13,7 @@ import {
   tb,
 } from '@repo/db/types';
 import crypto from 'crypto';
-import { TUser } from 'src/common/types/global';
+import { TUser } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
 import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service';

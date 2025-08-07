@@ -1,17 +1,39 @@
-import { ValidationPipe } from '@nestjs/common';
+import {
+  HttpStatus,
+  UnprocessableEntityException,
+  ValidationError,
+  ValidationPipe,
+} from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/exceptions/custom.exception';
+import { formatValidationErrors } from './common/utils/format';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || '*', // Set your CORS origin here
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
+      forbidNonWhitelisted: true,
+      errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
+      exceptionFactory: (errors: ValidationError[]) => {
+        const formattedErrors = formatValidationErrors(errors);
+
+        return new UnprocessableEntityException({
+          success: false,
+          message: 'Validation error',
+          errors: formattedErrors,
+        });
+      },
     }),
   );
   app.useGlobalFilters(new AllExceptionsFilter());

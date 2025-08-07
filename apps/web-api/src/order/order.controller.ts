@@ -9,9 +9,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiSecurity } from '@nestjs/swagger';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { TransactionGuard } from 'src/auth/guards/transaction.guard';
 import { User } from 'src/common/decorators/user.decorator';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
-import { TUser } from 'src/common/types/global';
+
+import { TUser } from 'src/common/types/meta.type';
 import {
   CheckoutPrepaidDto,
   GetOrderHistoryQueryDto,
@@ -26,12 +29,12 @@ import { OrderService } from './order.service';
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(TransactionGuard)
   @Post('products/price')
   getPriceBy(
     @Body() body: GetPriceByDto,
     @Query('flash_sale') isFlashSale: boolean = false,
-    @User() user?: TUser,
+    @CurrentUser() user?: TUser | null,
   ) {
     return this.orderService.getPriceBy(
       body.product_id,
@@ -41,13 +44,13 @@ export class OrderController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(TransactionGuard)
   @Post('prepaid/pre-checkout')
   async preCheckoutPrepaid(
     @Body() data: PreCheckoutPrepaidDto,
     @Headers('X-Time') timestamp: number,
     @Query('flash_sale') isFlashSale: boolean = false,
-    @User() user: TUser,
+    @CurrentUser() user?: TUser | null,
   ) {
     return await this.orderService.preCheckoutPrepaid(
       data,
@@ -57,15 +60,15 @@ export class OrderController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(TransactionGuard)
   @Post('prepaid/checkout')
   async checkoutPrepaid(
     @Body() data: CheckoutPrepaidDto,
     @Headers('X-Time') timestamp: number,
-    @User() user: TUser,
     @Query('flash_sale') isFlashSale: boolean = false,
     @Ip() ip: string,
     @Headers('User-Agent') userAgent: string,
+    @CurrentUser() user?: TUser | null,
   ) {
     return await this.orderService.checkoutPrepaid(
       data,
@@ -84,6 +87,11 @@ export class OrderController {
     @User() user: TUser,
   ) {
     return await this.orderService.getHistory(query, user);
+  }
+
+  @Post('check/:id')
+  async getOrderIdByGuest(@Param() param: OrderIdDto) {
+    return await this.orderService.getByIdByGuest(param);
   }
 
   @UseGuards(JwtAuthGuard)

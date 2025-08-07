@@ -1,29 +1,37 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 
-import { UserService } from './user.service';
-import { Request } from 'express';
-import { User } from 'src/common/decorators/user.decorator';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 import { ApiSecurity } from '@nestjs/swagger';
-import { TUser } from 'src/common/types/global';
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
+import { TransactionGuard } from 'src/auth/guards/transaction.guard';
+import { User } from 'src/common/decorators/user.decorator';
+import { TUser } from 'src/common/types/meta.type';
 import { GetBalanceMutationHistoryQuery } from './user.dto';
+import { UserService } from './user.service';
 
 @ApiSecurity('access-token')
 @Controller('user')
-@UseGuards(JwtAuthGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(TransactionGuard)
+  @Get('/me')
+  me(@User() user: TUser) {
+    return this.userService.me(user);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/profile')
   async getProfile(@User() user: TUser) {
     return await this.userService.getUserById(user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/balance')
   async getBalance(@User() user: TUser) {
     return await this.userService.getBalance(user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/balance/mutations')
   async getBalanceMutationHistory(
     @User() user: TUser,

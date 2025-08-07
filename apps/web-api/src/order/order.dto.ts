@@ -3,6 +3,7 @@ import { OrderStatus, PaymentStatus, RefundStatus } from '@repo/db/types';
 import { Type } from 'class-transformer';
 import {
   IsDateString,
+  IsEmail,
   IsEnum,
   IsOptional,
   IsPhoneNumber,
@@ -63,9 +64,14 @@ export class PreCheckoutPrepaidDto {
   voucher_id: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsPhoneNumber('ID')
   @Validate(StartsWith62Constraint)
   phone_number: string;
+
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
   @ApiProperty()
   @IsOptional()
@@ -102,6 +108,10 @@ export class CheckoutPrepaidDto {
   @IsPhoneNumber('ID')
   @Validate(StartsWith62Constraint)
   phone_number: string;
+
+  @ApiProperty()
+  @IsEmail()
+  email: string;
 
   @ApiProperty()
   @IsOptional()

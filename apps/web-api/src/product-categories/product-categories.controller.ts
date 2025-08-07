@@ -1,16 +1,9 @@
-import {
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
+import { ApiResponse } from '@nestjs/swagger';
 import { ProductCategoriesService } from './product-categories.service';
-import { ApiResponse, ApiSecurity } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/common/guards/jwt.guard';
 
-@ApiSecurity('access-token')
-@UseGuards(JwtAuthGuard)
+// @ApiSecurity('access-token')
+// @UseGuards(JwtAuthGuard)
 @Controller('product-categories')
 export class ProductCategoriesController {
   constructor(

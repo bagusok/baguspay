@@ -18,6 +18,8 @@ import { BullBoardModule } from '@bull-board/nestjs';
 import { ExpressAdapter } from '@bull-board/express';
 import { DigiflazzModule } from './integrations/h2h/digiflazz/digiflazz.module';
 import { AtlanticModule } from './integrations/h2h/atlantic/atlantic.module';
+import { ProductsModule } from './products/products.module';
+import { OffersModule } from './offers/offers.module';
 
 @Module({
   imports: [
@@ -48,6 +50,8 @@ import { AtlanticModule } from './integrations/h2h/atlantic/atlantic.module';
     QueueModule,
     DigiflazzModule,
     AtlanticModule,
+    ProductsModule,
+    OffersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

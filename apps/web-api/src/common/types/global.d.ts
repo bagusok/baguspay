@@ -1,10 +1,7 @@
-import { InferSelectModel } from '@repo/db';
-import { tb } from '@repo/db/types';
+import { TUser } from './meta.type';
 
 declare module 'express' {
   interface Request {
     user?: Omit<TUser, 'password'>;
   }
 }
-
-export type TUser = InferSelectModel<typeof tb.users>;

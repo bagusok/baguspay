@@ -34,7 +34,7 @@ import {
 
 import { ConfigService } from '@nestjs/config';
 import crypto from 'crypto';
-import { TUser } from 'src/common/types/global';
+import { TUser } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
 import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service';
@@ -77,11 +77,6 @@ export class OrderService {
     const where = [];
 
     if (isFlashSale) {
-      if (!user)
-        throw new BadRequestException(
-          'Please login to access flash sale offers.',
-        );
-
       if (voucherId)
         throw new BadRequestException(
           'Voucher is not supported for flash sale offers.',
@@ -152,12 +147,6 @@ export class OrderService {
     let totalDiscount = 0;
 
     if (isFlashSale) {
-      if (!user) {
-        throw new BadRequestException(
-          'Please login to access flash sale offers.',
-        );
-      }
-
       // Ambil offer flash sale pertama (jika ada)
       selectedOffer =
         offers.find((o) => o.type === OfferType.FLASH_SALE) || null;
@@ -204,10 +193,8 @@ export class OrderService {
     }
 
     if (voucherId) {
-      if (!user) {
-        throw new BadRequestException(
-          'Please login to use voucher with this offer.',
-        );
+      if (!user || user.role === UserRole.GUEST) {
+        throw new BadRequestException('Please login to use voucher.');
       }
 
       if (selectedOffer) {
@@ -347,36 +334,39 @@ export class OrderService {
         },
       });
 
-    const newPayments = paymentMethods.map((category) => ({
-      ...category,
-      payment_methods: category.payment_methods.map((m) => {
-        let isAvailable = m.is_available;
+    const newPayments = paymentMethods.map((category) => {
+      const { payment_methods, ...rest } = category;
+      return {
+        ...rest,
+        items: payment_methods.map((m) => {
+          let isAvailable = m.is_available;
 
-        if (selectedVoucher) {
-          if (!voucherPaymentMethod.includes(m.id)) {
+          if (selectedVoucher) {
+            if (!voucherPaymentMethod.includes(m.id)) {
+              isAvailable = false;
+            }
+          }
+
+          if (finalPrice < m.min_amount || finalPrice > m.max_amount) {
             isAvailable = false;
           }
-        }
 
-        if (finalPrice < m.min_amount || finalPrice > m.max_amount) {
-          isAvailable = false;
-        }
-
-        const fee = this.calculateFee(
-          finalPrice,
-          m.fee_percentage / 100,
-          m.fee_static,
-        );
-        return {
-          ...m,
-          is_available: isAvailable,
-          payment_fee: fee,
-          product_price: product.price,
-          discount: totalDiscount,
-          total: finalPrice + fee,
-        };
-      }),
-    }));
+          const fee = this.calculateFee(
+            finalPrice,
+            m.fee_percentage / 100,
+            m.fee_static,
+          );
+          return {
+            ...m,
+            is_available: isAvailable,
+            payment_fee: fee,
+            product_price: product.price,
+            discount: totalDiscount,
+            total: finalPrice + fee,
+          };
+        }),
+      };
+    });
 
     return SendResponse.success({
       payment_methods: newPayments,
@@ -548,6 +538,12 @@ export class OrderService {
     let totalDiscountVoucher = 0;
 
     if (isFlashSale) {
+      if (!user || user.role === UserRole.GUEST) {
+        throw new BadRequestException(
+          'Please login to access flash sale offers.',
+        );
+      }
+
       // Ambil offer flash sale pertama (jika ada)
       selectedOffer =
         offers.find((o) => o.type === OfferType.FLASH_SALE) || null;
@@ -625,10 +621,8 @@ export class OrderService {
     }
 
     if (data.voucher_id) {
-      if (!user) {
-        throw new BadRequestException(
-          'Please login to use voucher with this offer.',
-        );
+      if (!user || user.role === UserRole.GUEST) {
+        throw new BadRequestException('Please login to use voucher.');
       }
 
       if (selectedOffer) {
@@ -733,9 +727,9 @@ export class OrderService {
       totalDiscountVoucher = voucherDiscount;
     }
 
-    const totalDiscount = 0;
+    const totalDiscount = totalDiscountOffer + totalDiscountVoucher;
     const totalPrice = product.price - totalDiscount;
-    if (totalPrice < 100) {
+    if (totalPrice < 1000) {
       throw new NotAcceptableException(
         'Total price after discount cannot be less than 1000.',
       );
@@ -1099,10 +1093,8 @@ export class OrderService {
 
       // Voucher
       if (data.voucher_id) {
-        if (!user) {
-          throw new BadRequestException(
-            'Please login to use voucher with this offer.',
-          );
+        if (!user || user.role === UserRole.GUEST) {
+          throw new BadRequestException('Please login to use voucher.');
         }
 
         if (selectedOffer) {
@@ -1394,6 +1386,7 @@ export class OrderService {
               : OrderStatus.NONE,
           customer_input: merged,
           customer_phone: data.phone_number,
+          customer_email: data.email,
           customer_ip: ip,
           customer_ua: userAgent,
         })
@@ -1574,6 +1567,26 @@ export class OrderService {
       where: and(
         eq(tb.orders.order_id, data.id),
         eq(tb.orders.user_id, user.id),
+      ),
+      with: {
+        product_snapshot: true,
+        payment_snapshot: true,
+        offer_on_orders: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${data.id} not found.`);
+    }
+
+    return SendResponse.success(order);
+  }
+
+  async getByIdByGuest(data: OrderIdDto) {
+    const order = await this.databaseService.db.query.orders.findFirst({
+      where: and(
+        eq(tb.orders.order_id, data.id),
+        eq(tb.orders.user_id, '00000000-0000-0000-0000-000000000000'),
       ),
       with: {
         product_snapshot: true,

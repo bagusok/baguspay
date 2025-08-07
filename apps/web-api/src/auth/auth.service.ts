@@ -128,6 +128,13 @@ export class AuthService {
         refresh_token: refreshToken,
         access_token_expired_at: accesTokenExpiredAt,
         refresh_token_expired_at: refreshTokenExpiredAt,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          is_banned: user.is_banned,
+          role: user.role,
+        },
       },
     };
   }

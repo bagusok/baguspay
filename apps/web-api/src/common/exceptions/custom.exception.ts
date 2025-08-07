@@ -1,86 +1,74 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 
-interface HttpErrorResponse {
-  statusCode: number;
-  message: string | string[];
-  error?: string;
-  errors?: Record<string, string>;
-}
+// Interface custom tidak lagi diperlukan karena kita akan menangani secara dinamis
+// Helper method `formatValidationErrors` juga sudah dihapus
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  private logger = new Logger('AllExceptionsFilter');
+  private readonly logger = new Logger(AllExceptionsFilter.name);
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
-    // Default values
-    let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
-    let errors: Record<string, string> | null = null;
+    // Tentukan status dan payload respons berdasarkan jenis exception
+    let statusCode: number;
+    let responseBody: { success: boolean; message: string; errors?: any };
 
     if (exception instanceof HttpException) {
+      // Untuk semua error yang merupakan turunan HttpException (termasuk validation error kita)
       statusCode = exception.getStatus();
+      const exceptionResponse = exception.getResponse();
 
-      // Try to get response body and parse it
-      const res = exception.getResponse() as string | HttpErrorResponse;
-
-      if (typeof res === 'string') {
-        message = res;
-      } else if (typeof res === 'object' && res !== null) {
-        // Extract message field
-        if (typeof res.message === 'string') {
-          message = res.message;
-        } else if (Array.isArray(res.message)) {
-          // Usually validation errors come as array of strings
-          message = 'Validation Error';
-          errors = this.formatValidationErrors(res.message);
-        } else {
-          message = 'Error';
-        }
-
-        // Optional detailed errors field (if exists)
-        if (res.errors && typeof res.errors === 'object') {
-          errors = { ...errors, ...res.errors };
-        }
+      if (typeof exceptionResponse === 'string') {
+        // Kasus sederhana, misal: new NotFoundException('Halaman tidak ditemukan')
+        responseBody = {
+          success: false,
+          message: exceptionResponse,
+        };
+      } else {
+        // Kasus di mana exception memiliki body objek
+        // Ini akan menangkap validation error kita yang sudah terformat: { statusCode, message, errors }
+        // Dan juga error NestJS default: { statusCode, message, error }
+        const { message, errors } = exceptionResponse as any;
+        responseBody = {
+          success: false,
+          message: message || 'Terjadi kesalahan pada request.',
+          ...(errors && { errors }), // Hanya tambahkan properti 'errors' jika ada
+        };
       }
-    } else if (exception instanceof Error) {
-      // For unknown Errors, use their message
-      message = exception.message;
+    } else {
+      // Untuk semua error lain yang tidak terduga (bukan HttpException)
+      statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      responseBody = {
+        success: false,
+        message: 'Terjadi kesalahan pada server. Silakan coba lagi nanti.',
+      };
     }
 
-    const jsonResponse = {
-      success: false,
-      message,
-      ...(errors ? { errors } : {}),
-    };
+    // Log semua exception untuk debugging, terlepas dari tipenya.
+    // Untuk error server, kita bisa log stack trace-nya.
+    if (exception instanceof Error) {
+      this.logger.error(
+        `Exception: ${exception.message}, Status: ${statusCode}`,
+        exception.stack, // Stack trace sangat berguna untuk debugging 500 error
+      );
+    } else {
+      this.logger.error(
+        `Unknown Exception Caught, Status: ${statusCode}`,
+        exception,
+      );
+    }
 
-    this.logger.error(exception);
-
-    response.status(statusCode).json(jsonResponse);
-  }
-
-  /**
-   * Converts an array of error messages to key-value pairs, e.g.
-   * ["email must be an email"] => { email: "email must be an email" }
-   */
-  private formatValidationErrors(messages: string[]): Record<string, string> {
-    return messages.reduce(
-      (acc, curr) => {
-        const [field] = curr.split(' ');
-        acc[field] = curr;
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
+    // Kirim respons JSON yang konsisten
+    response.status(statusCode).json(responseBody);
   }
 }
