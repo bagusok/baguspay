@@ -16,6 +16,8 @@ import { offer_products } from "./offers";
 import {
   ProductBillingType,
   productBillingTypeEnum,
+  ProductCategoryType,
+  productCategoryTypeEnum,
   ProductFullfillmentType,
   productFullfillmentTypeEnum,
   ProductProvider,
@@ -40,6 +42,8 @@ export const productCategories = pgTable("product_categories", {
   seo_title: varchar("seo_title", { length: 100 }),
   seo_description: varchar("seo_description", { length: 255 }),
   seo_image: varchar("seo_image", { length: 255 }),
+
+  type: productCategoryTypeEnum("type").default(ProductCategoryType.GAME),
 
   created_at: timestamp("created_at", { withTimezone: true })
     .defaultNow()

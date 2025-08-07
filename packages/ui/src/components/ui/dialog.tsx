@@ -1,8 +1,8 @@
 "use client";
 
-import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { XIcon } from "lucide-react";
+import * as React from "react";
 
 import { cn } from "@repo/ui/lib/utils";
 
@@ -56,7 +56,7 @@ function DialogContent({
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay />
+      <DialogOverlay className="backdrop-blur-xs" />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(

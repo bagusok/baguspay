@@ -232,6 +232,13 @@
       "when": 1753768270042,
       "tag": "0032_famous_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1754369918278,
+      "tag": "0033_perfect_odin",
+      "breakpoints": true
     }
   ]
 }

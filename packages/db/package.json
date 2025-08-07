@@ -26,7 +26,6 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
-    "db:generate:pg": "drizzle-kit generate:pg",
     "db:pull": "drizzle-kit pull",
     "generate": "drizzle-kit generate:pg",
     "lint": "eslint . --ext .ts,.tsx --fix"

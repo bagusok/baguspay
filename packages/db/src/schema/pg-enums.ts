@@ -179,6 +179,25 @@ export const loginIsFromEnum = pgEnum(
   enumToPgEnum(LoginIsFrom),
 );
 
+export enum ProductCategoryType {
+  GAME = "game",
+  VOUCHER = "voucher",
+  PULSA = "pulsa",
+  KUOTA = "kuota",
+  ENTERTAINMENT = "entertainment",
+  FINANCE = "finance",
+  ECOMMERCE = "ecommerce",
+  TOPUP = "topup",
+  BILLING = "billing",
+  SENDMONEY = "send_money",
+  OTHER = "other",
+}
+
+export const productCategoryTypeEnum = pgEnum(
+  "product_category_type",
+  enumToPgEnum(ProductCategoryType),
+);
+
 export enum ProductProvider {
   DIGIFLAZZ = "digiflazz",
   MOOGOLD = "moogold",
