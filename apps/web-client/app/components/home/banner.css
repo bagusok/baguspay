@@ -1,0 +1,16 @@
+.mySwiper .swiper-slide {
+  opacity: 0.5;
+  transform: scale(0.85);
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.mySwiper .swiper-slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
+.mySwiper .swiper-slide-next,
+.mySwiper .swiper-slide-prev {
+  opacity: 0.8;
+  transform: scale(0.92);
+}
