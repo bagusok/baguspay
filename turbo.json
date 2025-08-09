@@ -23,6 +23,10 @@
     },
     "db:pull": {
       "outputs": []
+    },
+    "start": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

@@ -5,6 +5,7 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "start": "turbo run start",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
     "ui": "npm run -w @repo/ui ui --",
@@ -28,8 +29,13 @@
     "packages/*"
   ],
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
     "@tanstack/react-table": "^8.21.3",
     "eslint-plugin-unused-imports": "^4.1.4",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.0.14"
+  },
+  "overrides": {
+    "zod": "^4.0.14"
   }
 }
