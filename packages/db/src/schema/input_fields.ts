@@ -23,7 +23,7 @@ export const inputFields = pgTable("input_fields", {
   options: jsonb("options").$type<InputFieldOption[]>(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -41,7 +41,7 @@ export const inputOnProductCategory = pgTable("input_on_category", {
     .notNull(),
   created_at: timestamp("created_at", { withTimezone: true }),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -56,5 +56,5 @@ export const inputOnProductCategoryRelations = relations(
       fields: [inputOnProductCategory.product_category_id],
       references: [productCategories.id],
     }),
-  })
+  }),
 );

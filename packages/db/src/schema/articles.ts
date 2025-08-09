@@ -16,7 +16,7 @@ export const articleCategories = pgTable("article_categories", {
 
   created_at: timestamp("created_at", { withTimezone: true }),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -40,7 +40,7 @@ export const articles = pgTable("articles", {
     .defaultNow()
     .notNull(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
@@ -64,7 +64,7 @@ export const productCategoryOnArticles = pgTable(
         onDelete: "cascade",
         onUpdate: "cascade",
       }),
-  }
+  },
 );
 
 export const productCategoryOnArticleRelations = relations(
@@ -78,5 +78,5 @@ export const productCategoryOnArticleRelations = relations(
       fields: [productCategoryOnArticles.product_category_id],
       references: [productCategories.id],
     }),
-  })
+  }),
 );

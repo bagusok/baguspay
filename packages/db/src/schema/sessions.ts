@@ -37,7 +37,7 @@ export const sessions = pgTable("sessions", {
     .defaultNow()
     .notNull(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date()
+    () => new Date(),
   ),
 });
 
