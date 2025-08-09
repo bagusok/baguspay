@@ -11,6 +11,7 @@ import {
   varchar,
 } from "drizzle-orm/pg-core";
 import { articles } from "./articles";
+import { banners } from "./banner";
 import { inputOnProductCategory } from "./input_fields";
 import { offer_products } from "./offers";
 import {
@@ -59,6 +60,7 @@ export const productCategoryRelations = relations(
     product_sub_categories: many(productSubCategories),
     input_on_product_category: many(inputOnProductCategory),
     articles: many(articles),
+    banners: many(banners),
   }),
 );
 

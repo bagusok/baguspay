@@ -241,3 +241,33 @@ export enum OfferType {
 }
 
 export const offerTypeEnum = pgEnum("offer_type", enumToPgEnum(OfferType));
+
+export enum AppPlatform {
+  WEB = "web",
+  APP = "app",
+}
+
+export const appPlatformEnum = pgEnum(
+  "app_platform",
+  enumToPgEnum(AppPlatform),
+);
+
+export enum ProductGroupingType {
+  REDIRECT = "redirect",
+  MODAL = "modal",
+}
+
+export const productGroupingTypeEnum = pgEnum(
+  "product_grouping_type",
+  enumToPgEnum(ProductGroupingType),
+);
+
+export enum ProductGroupingMenuType {
+  HOME_MENU = "home_menu",
+  FAST_MENU = "fast_menu",
+}
+
+export const productGroupingMenuTypeEnum = pgEnum(
+  "product_grouping_menu_type",
+  enumToPgEnum(ProductGroupingMenuType),
+);

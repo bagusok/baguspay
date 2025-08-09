@@ -1,1 +1,1 @@
-ALTER TYPE "public"."user_role" ADD VALUE 'GUEST';
+ALTER TYPE "public"."user_role" ADD VALUE 'guest';

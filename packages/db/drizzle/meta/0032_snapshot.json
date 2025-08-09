@@ -2749,7 +2749,7 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": ["admin", "user", "GUEST"]
+      "values": ["admin", "user", "guest"]
     }
   },
   "schemas": {},
