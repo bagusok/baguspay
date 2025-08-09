@@ -39,4 +39,10 @@ export class UserController {
   ) {
     return await this.userService.getBalanceMutationHistory(query, user.id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/dashboard')
+  async dashboard(@User() user: TUser) {
+    return await this.userService.dashboard(user);
+  }
 }

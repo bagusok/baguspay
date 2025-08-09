@@ -9,6 +9,7 @@ import {
   IsPhoneNumber,
   IsString,
   IsUUID,
+  Max,
   Min,
   Validate,
   ValidateNested,
@@ -166,14 +167,15 @@ export class GetOrderHistoryQueryDto {
 
   @ApiProperty({ required: false, default: '1' })
   @IsOptional()
-  @Validate(Number)
+  @Type(() => Number)
   @Min(1)
   page?: number;
 
   @ApiProperty({ required: false, default: '10' })
   @IsOptional()
-  @Validate(Number)
-  @Min(10)
+  @Type(() => Number)
+  @Min(1)
+  @Max(100)
   limit?: number;
 
   @ApiProperty({ required: false })

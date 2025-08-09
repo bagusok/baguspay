@@ -3,7 +3,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { and, arrayContains, desc, eq, gte, lte, ne, or, SQL } from '@repo/db';
+import {
+  and,
+  arrayContains,
+  count,
+  desc,
+  eq,
+  gte,
+  lte,
+  ne,
+  or,
+  SQL,
+} from '@repo/db';
 import {
   DepositStatus,
   PaymentMethodAllowAccess,
@@ -73,7 +84,7 @@ export class DepositService {
   async getDespositHistory(query: DepositHistoryQuery, userId: string) {
     const { page, limit, deposit_id, start_date, end_date } = query;
 
-    const where: SQL[] = [];
+    const where: SQL[] = [eq(tb.deposits.user_id, userId)];
 
     if (deposit_id) {
       where.push(eq(tb.deposits.deposit_id, deposit_id));
@@ -88,7 +99,7 @@ export class DepositService {
     }
 
     const deposits = await this.databaseService.db.query.deposits.findMany({
-      where: and(eq(tb.deposits.user_id, userId), ...where),
+      where: and(...where),
       limit: limit,
       offset: (page - 1) * limit,
       orderBy: desc(tb.deposits.created_at),
@@ -111,7 +122,27 @@ export class DepositService {
       },
     });
 
-    return SendResponse.success<any>(deposits);
+    const [total] = await this.databaseService.db
+      .select({
+        count: count(),
+      })
+      .from(tb.deposits)
+      .where(and(...where));
+
+    return SendResponse.success<any>(
+      deposits,
+      'Deposit history retrieved successfully',
+      {
+        meta: {
+          pagination: {
+            total: total.count,
+            page: page,
+            limit: limit,
+            total_pages: Math.ceil(total.count / limit),
+          },
+        },
+      },
+    );
   }
 
   async getDepositDetail(deposit_id: string, userId: string) {
@@ -121,7 +152,32 @@ export class DepositService {
         eq(tb.deposits.user_id, userId),
       ),
       with: {
-        payment_method: true,
+        payment_method: {
+          columns: {
+            name: true,
+            image_url: true,
+            type: true,
+            is_need_phone_number: true,
+            is_need_email: true,
+            instruction: true,
+          },
+        },
+      },
+      columns: {
+        deposit_id: true,
+        payment_method_id: true,
+        amount_pay: true,
+        amount_received: true,
+        amount_fee: true,
+        phone_number: true,
+        email: true,
+        status: true,
+        pay_code: true,
+        pay_url: true,
+        qr_code: true,
+        expired_at: true,
+        created_at: true,
+        updated_at: true,
       },
     });
 

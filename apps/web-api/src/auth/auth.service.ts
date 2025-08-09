@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { and, eq, or } from '@repo/db';
+import { and, eq } from '@repo/db';
 import { tb, UserRegisteredType, UserRole } from '@repo/db/types';
 import { compare, hash } from 'bcrypt';
 import { DatabaseService } from 'src/database/database.service';
@@ -83,11 +83,7 @@ export class AuthService {
       await this.databaseService.db.query.sessions.findFirst({
         where: and(
           eq(tb.sessions.user_id, user.id),
-          or(
-            eq(tb.sessions.device_id, headers.deviceId),
-            eq(tb.sessions.ip_address, headers.ip),
-            eq(tb.sessions.user_agent, headers.userAgent),
-          ),
+          eq(tb.sessions.device_id, headers.deviceId),
         ),
       });
 
@@ -98,7 +94,7 @@ export class AuthService {
           ip_address: headers.ip,
           user_agent: headers.userAgent,
           user_id: user.id,
-          device_id: headers['x-device-id'],
+          device_id: headers.deviceId,
           login_type: UserRegisteredType.LOCAL,
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -109,7 +105,7 @@ export class AuthService {
     } else {
       await this.databaseService.db.insert(tb.sessions).values({
         user_id: user.id,
-        device_id: headers['x-device-id'],
+        device_id: headers.deviceId,
         ip_address: headers.ip,
         user_agent: headers.userAgent,
         login_type: UserRegisteredType.LOCAL,

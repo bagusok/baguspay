@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   Injectable,
   NotAcceptableException,
@@ -1327,6 +1328,7 @@ export class OrderService {
           pay_code: createPayment.data.pay_code,
           pay_url: createPayment.data.pay_url,
           expired_at: createPayment.data.expired_at,
+          type: paymentMethod.type,
         })
         .returning({ id: tb.paymentSnapshots.id });
 
@@ -1554,10 +1556,12 @@ export class OrderService {
 
     return SendResponse.success(orders, 'Success', {
       meta: {
-        total: total.count,
-        total_pages: Math.ceil(total.count / limit),
-        page: page,
-        limit: limit,
+        pagination: {
+          total: total.count,
+          total_pages: Math.ceil(total.count / limit),
+          page: page,
+          limit: limit,
+        },
       },
     });
   }
@@ -1569,9 +1573,68 @@ export class OrderService {
         eq(tb.orders.user_id, user.id),
       ),
       with: {
-        product_snapshot: true,
-        payment_snapshot: true,
-        offer_on_orders: true,
+        product_snapshot: {
+          columns: {
+            product_id: true,
+            name: true,
+            category_name: true,
+            sub_category_name: true,
+            price: true,
+            provider_ref_id: true,
+            fullfillment_type: true,
+            billing_type: true,
+          },
+        },
+        payment_snapshot: {
+          columns: {
+            email: true,
+            phone_number: true,
+            payment_method_id: true,
+            qr_code: true,
+            type: true,
+            pay_url: true,
+            pay_code: true,
+            name: true,
+            fee_type: true,
+            fee_static: true,
+            fee_percentage: true,
+            expired_at: true,
+          },
+        },
+        offer_on_orders: {
+          columns: {
+            discount_total: true,
+          },
+          with: {
+            offer: {
+              columns: {
+                name: true,
+                type: true,
+                discount_percentage: true,
+                discount_static: true,
+                discount_maximum: true,
+              },
+            },
+          },
+        },
+      },
+      columns: {
+        order_id: true,
+        order_status: true,
+        payment_status: true,
+        refund_status: true,
+        price: true,
+        total_price: true,
+        discount_price: true,
+        fee: true,
+        sn_number: true,
+        customer_input: true,
+        customer_email: true,
+        user_id: true,
+        voucher_code: true,
+        notes: true,
+        created_at: true,
+        updated_at: true,
       },
     });
 
@@ -1579,7 +1642,30 @@ export class OrderService {
       throw new NotFoundException(`Order with ID ${data.id} not found.`);
     }
 
-    return SendResponse.success(order);
+    if (order.user_id !== user.id) {
+      throw new ForbiddenException(
+        `You do not have permission to access this order.`,
+      );
+    }
+
+    const { payment_snapshot, product_snapshot, offer_on_orders, ...rest } =
+      order;
+
+    const buildResponse = {
+      ...rest,
+      product: {
+        ...product_snapshot,
+      },
+      payment: {
+        ...payment_snapshot,
+      },
+      offers: offer_on_orders.map((offer) => ({
+        ...offer.offer,
+        discount_total: offer.discount_total,
+      })),
+    };
+
+    return SendResponse.success(buildResponse);
   }
 
   async getByIdByGuest(data: OrderIdDto) {

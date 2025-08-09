@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   Ip,
   Param,
@@ -81,7 +82,7 @@ export class OrderController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('history')
+  @Get('history')
   async getHistory(
     @Query() query: GetOrderHistoryQueryDto,
     @User() user: TUser,

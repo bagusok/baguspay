@@ -114,7 +114,7 @@ export class OrderQueueConsumer extends WorkerHost {
                         amount: order.total_price - order.fee,
                         name: `Refund Order #${order.order_id}`,
                         ref_type: BalanceMutationRefType.ORDER,
-                        ref_id: order.id,
+                        ref_id: order.order_id,
                         type: BalanceMutationType.CREDIT,
                         userId: order.user_id,
                         notes: `Refund for order ${order.order_id} due to failed topup`,

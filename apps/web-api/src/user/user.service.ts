@@ -1,6 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, count, desc, eq, gte, lte, SQL } from '@repo/db';
-import { tb } from '@repo/db/types';
+import { and, count, desc, eq, gte, lte, sql, SQL, sum } from '@repo/db';
+import {
+  BalanceMutationType,
+  DepositStatus,
+  OrderStatus,
+  tb,
+} from '@repo/db/types';
 import { MetaPaginated, TUser } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
@@ -144,5 +149,173 @@ export class UserService {
         'User profile retrieved successfully',
       );
     }
+  }
+
+  async dashboard(user: TUser) {
+    // Get current month start and end dates
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const monthEnd = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
+
+    const [
+      balance,
+      total,
+      monthlyExpenses,
+      monthlyIncome,
+      totalDeposit,
+      recentOrder,
+      popularOrder,
+      monthlyOrderSuccess,
+    ] = await Promise.all([
+      this.databaseService.db.query.users.findFirst({
+        where: eq(tb.users.id, user.id),
+      }),
+      this.databaseService.db
+        .select({
+          totalPrice: sum(tb.orders.total_price),
+          totalPromo: sum(tb.orders.discount_price),
+          totalOrder: count(tb.orders.id),
+        })
+        .from(tb.orders)
+        .where(
+          and(
+            eq(tb.orders.user_id, user.id),
+            eq(tb.orders.order_status, OrderStatus.COMPLETED),
+          ),
+        )
+        .limit(1),
+      // Monthly expenses (negative balance mutations)
+      this.databaseService.db
+        .select({
+          totalExpenses: sum(tb.balanceMutations.amount),
+        })
+        .from(tb.balanceMutations)
+        .where(
+          and(
+            eq(tb.balanceMutations.user_id, user.id),
+            eq(tb.balanceMutations.type, BalanceMutationType.DEBIT),
+            gte(tb.balanceMutations.created_at, monthStart),
+            lte(tb.balanceMutations.created_at, monthEnd),
+          ),
+        )
+        .limit(1),
+      // Monthly income (positive balance mutations)
+      this.databaseService.db
+        .select({
+          totalIncome: sum(tb.balanceMutations.amount),
+        })
+        .from(tb.balanceMutations)
+        .where(
+          and(
+            eq(tb.balanceMutations.user_id, user.id),
+            eq(tb.balanceMutations.type, BalanceMutationType.CREDIT),
+            gte(tb.balanceMutations.created_at, monthStart),
+            lte(tb.balanceMutations.created_at, monthEnd),
+          ),
+        )
+        .limit(1),
+      // Total deposits
+      await this.databaseService.db
+        .select({
+          totalDeposit: sum(tb.deposits.amount_received),
+        })
+        .from(tb.deposits)
+        .where(
+          and(
+            eq(tb.deposits.user_id, user.id),
+            eq(tb.deposits.status, DepositStatus.COMPLETED),
+          ),
+        )
+        .limit(1),
+
+      // Recent Orders
+      this.databaseService.db.query.orders.findMany({
+        where: eq(tb.orders.user_id, user.id),
+
+        orderBy: desc(tb.orders.created_at),
+        limit: 5,
+        columns: {
+          order_id: true,
+          total_price: true,
+          order_status: true,
+          payment_status: true,
+          customer_input: true,
+          created_at: true,
+        },
+        with: {
+          product_snapshot: {
+            columns: {
+              name: true,
+              category_name: true,
+              sub_category_name: true,
+            },
+          },
+        },
+      }),
+
+      // Orderan Populer Bulan ini
+      this.databaseService.db
+        .select({
+          category_name: tb.productSnapshots.category_name,
+          total: count(tb.orders.id).as('total'), // beri alias agar bisa digunakan di orderBy
+        })
+        .from(tb.orders)
+        .innerJoin(
+          tb.productSnapshots,
+          eq(tb.orders.product_snapshot_id, tb.productSnapshots.id),
+        )
+        .where(
+          and(
+            eq(tb.orders.user_id, user.id),
+            eq(tb.orders.order_status, OrderStatus.COMPLETED),
+            gte(tb.orders.created_at, monthStart),
+            lte(tb.orders.created_at, monthEnd),
+          ),
+        )
+        .groupBy(tb.productSnapshots.category_name)
+        .orderBy(desc(sql`count(${tb.orders.id})`))
+        .limit(5),
+
+      // jumlah orderan sukses bulan ini
+      this.databaseService.db
+        .select({
+          totalPrice: sum(tb.orders.total_price),
+          totalPromo: sum(tb.orders.discount_price),
+          totalOrder: count(tb.orders.id),
+        })
+        .from(tb.orders)
+        .where(
+          and(
+            eq(tb.orders.user_id, user.id),
+            eq(tb.orders.order_status, OrderStatus.COMPLETED),
+            gte(tb.orders.created_at, monthStart),
+            lte(tb.orders.created_at, monthEnd),
+          ),
+        )
+        .limit(1),
+    ]);
+
+    return SendResponse.success({
+      balance: balance.balance,
+      totalOrder: total[0].totalOrder || 0,
+      totalOrderPrice: total[0].totalPrice || 0,
+      totalPromoPrice: total[0].totalPromo || 0,
+      monthlyExpenses: monthlyExpenses[0]?.totalExpenses || 0,
+      monthlyIncome: monthlyIncome[0]?.totalIncome || 0,
+      monthlyOrderSuccess: monthlyOrderSuccess[0]?.totalOrder || 0,
+      monthlyOrderSuccessPrice: monthlyOrderSuccess[0]?.totalPrice || 0,
+      monthlyOrderSuccessPromo: monthlyOrderSuccess[0]?.totalPromo || 0,
+      totalDeposit: totalDeposit[0].totalDeposit || 0,
+      recentOrders: recentOrder,
+      popularOrders: popularOrder,
+    });
   }
 }
