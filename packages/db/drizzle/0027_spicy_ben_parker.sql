@@ -1,1 +1,0 @@
-ALTER TABLE "offers" ADD COLUMN "is_combinable_with_voucher" boolean DEFAULT false NOT NULL;

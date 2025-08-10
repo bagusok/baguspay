@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import { productCategories } from "./products";
 
 export const banners = pgTable("banners", {
@@ -7,7 +14,7 @@ export const banners = pgTable("banners", {
   title: varchar("title").notNull(),
   description: text("description"),
   image_url: varchar("image").notNull(),
-  is_available: text("is_available").default("true"),
+  is_available: boolean("is_available").default(true),
   product_category_id: uuid("product_category_id").references(
     () => productCategories.id,
   ),

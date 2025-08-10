@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from "drizzle-orm/pg-core";
 import {
   AppPlatform,
   appPlatformEnum,
@@ -11,7 +19,7 @@ import {
 import { productCategories } from "./products";
 
 export const productGroupings = pgTable("product_groupings", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name").notNull(),
   description: text("description"),
   image_url: varchar("image_url").notNull(),
@@ -24,11 +32,11 @@ export const productGroupings = pgTable("product_groupings", {
   menu_type: productGroupingMenuTypeEnum("menu_type")
     .default(ProductGroupingMenuType.FAST_MENU)
     .notNull(),
-  is_available: text("is_available").default("true"),
+  is_available: boolean("is_available").default(false),
 
-  is_featured: text("is_featured").default("false"),
+  is_featured: boolean("is_featured").default(false),
   label: varchar("label"),
-  order: varchar("order").default("0"),
+  order: integer("order").default(0),
 
   created_at: timestamp("created_at", {
     withTimezone: true,

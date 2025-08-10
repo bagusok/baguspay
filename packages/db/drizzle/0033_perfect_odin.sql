@@ -1,2 +1,0 @@
-CREATE TYPE "public"."product_category_type" AS ENUM('game', 'voucher', 'pulsa', 'kuota', 'entertainment', 'finance', 'ecommerce', 'topup', 'billing', 'send_money', 'other');--> statement-breakpoint
-ALTER TABLE "product_categories" ADD COLUMN "type" "product_category_type" DEFAULT 'game';
