@@ -5,7 +5,7 @@
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev --host",
-    "start": "set PORT=3001 && react-router-serve ./build/server/index.js",
+    "start": "set PORT=9992 && react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
   "dependencies": {

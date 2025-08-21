@@ -1,0 +1,17 @@
+{
+  "name": "@cli/digiflazz",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@repo/db": "^0.0.0",
+    "axios": "^1.11.0",
+    "dotenv": "^16.0.3"
+  }
+}

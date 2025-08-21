@@ -26,7 +26,8 @@
   "packageManager": "npm@10.9.2",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "cli/*"
   ],
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

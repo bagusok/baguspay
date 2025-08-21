@@ -1,10 +1,11 @@
 import ProductsCategoriesController from '#controllers/product_categories_controller'
 import { InferPageProps } from '@adonisjs/inertia/types'
-import AdminLayout from '~/components/layout/admin-layout'
-import SectionInputFields from './input-fields'
-import SectionProductSubCategory from '../product-sub-categories'
 import { useState } from 'react'
+import Image from '~/components/image'
+import AdminLayout from '~/components/layout/admin-layout'
+import SectionProductSubCategory from '../product-sub-categories'
 import SectionProducts from '../section-products'
+import SectionInputFields from './input-fields'
 
 type Props = InferPageProps<ProductsCategoriesController, 'detail'>
 
@@ -14,16 +15,16 @@ export default function ProductCategoryDetail({ productCategory }: Props) {
   return (
     <AdminLayout>
       <div className="h-40 overflow-hidden rounded-md">
-        <img
-          src={`${import.meta.env.VITE_S3_URL}${productCategory.banner_url}`}
+        <Image
+          src={`${productCategory.banner_url}`}
           alt={productCategory.name}
           className="w-full h-full object-cover"
         />
       </div>
       <div className="flex flex-col md:flex-row justify-items-center items-center md:items-start gap-4 mt-4">
         <div className="aspect-square w-28 rounded overflow-hidden flex-none h-fit">
-          <img
-            src={`${import.meta.env.VITE_S3_URL}${productCategory.image_url}`}
+          <Image
+            src={`${productCategory.image_url}`}
             alt=""
             className="w-full h-full object-cover"
           />

@@ -8,7 +8,7 @@ import { tb } from "@/table";
 // Data seed untuk tabel product_categories
 export const seedGame = [
   {
-    id: "a4b1c2d3-e4f5-a6b7-c8d9-e0f1a2b3c4d5",
+    id: "51e11eb0-6821-4ee2-9cf4-d71d4102d7d8",
     slug: "honkai-star-rail",
     name: "Honkai: Star Rail",
     sub_name: "Topup Oneiric Shard",
@@ -27,7 +27,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "b5c2d3e4-f5a6-b7c8-d9e0-f1a2b3c4d5e6",
+    id: "065a90e4-8993-4fab-9c04-65bf431c26b4",
     slug: "genshin-impact",
     name: "Genshin Impact",
     sub_name: null,
@@ -46,7 +46,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "c6d3e4f5-a6b7-c8d9-e0f1-a2b3c4d5e6f7",
+    id: "e7af2c4d-f6ba-45bf-9b6b-612673581148",
     slug: "zenless-zone-zero",
     name: "Zenless Zone Zero",
     sub_name: null,
@@ -64,7 +64,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "d7e4f5a6-b7c8-d9e0-f1a2-b3c4d5e6f7a8",
+    id: "ef425981-90c7-47f9-ab2d-8aa5c8661940",
     slug: "wuthering-waves-gp",
     name: "Wuthering Waves",
     sub_name: "Google Play",
@@ -83,7 +83,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "e8f5a6b7-c8d9-e0f1-a2b3-c4d5e6f7a8b9",
+    id: "98bb80e5-c0b4-441a-b1ac-22f5b48c3eea",
     slug: "wuthering-waves",
     name: "Wuthering Waves",
     sub_name: "UID Top-Up",
@@ -101,7 +101,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "f9a6b7c8-d9e0-f1a2-b3c4-d5e6f7a8b9c0",
+    id: "33709a74-9af4-494b-9ae1-3c03afcfcb57",
     slug: "pubg-mobile",
     name: "PUBG Mobile",
     sub_name: null,
@@ -119,7 +119,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "a0b1c2d3-e4f5-a6b7-c8d9-e0f1a2b3c4d5",
+    id: "5dafee79-ee66-471d-a52c-90462cf542f4",
     slug: "ragnarok-m-classic",
     name: "Ragnarok M: Classic",
     sub_name: null,
@@ -137,7 +137,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "b1c2d3e4-f5a6-b7c8-d9e0-f1a2b3c4d5e6",
+    id: "75033b5d-d510-4d41-9853-b5367fe6ed70",
     slug: "sd-gundam-g-generation-eternal-gp",
     name: "SD Gundam G Generation ETERNAL",
     sub_name: null,
@@ -156,7 +156,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "c2d3e4f5-a6b7-c8d9-e0f1-a2b3c4d5e6f7",
+    id: "ad727347-d22e-4149-8357-69d9dd6ba590",
     slug: "crystal-of-atlan",
     name: "Crystal of Atlan",
     sub_name: "Asia",
@@ -174,7 +174,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "d3e4f5a6-b7c8-d9e0-f1a2-b3c4d5e6f7a8",
+    id: "9089d03f-8d19-4de9-b039-3a13c023c364",
     slug: "punishing-gray-raven",
     name: "Punishing: Gray Raven",
     sub_name: null,
@@ -192,7 +192,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "e4f5a6b7-c8d9-e0f1-a2b3-c4d5e6f7a8b9",
+    id: "03eb0add-b96e-49cf-bc40-6d91021e8249",
     slug: "pokemon-tcg-pocket-gp",
     name: "Pokémon TCG Pocket",
     sub_name: null,
@@ -210,7 +210,7 @@ export const seedGame = [
     type: ProductCategoryType.GAME,
   },
   {
-    id: "f5a6b7c8-d9e0-f1a2-b3c4-d5e6f7a8b9c0",
+    id: "74971b2e-edae-4f9f-a965-dadf10203ba0",
     slug: "identity-v",
     name: "Identity V",
     sub_name: "Global",
@@ -233,7 +233,7 @@ export const seedGame = [
 // Data seed untuk kategori Pulsa
 export const seedPulsa = [
   {
-    id: "550e8400-e29b-41d4-a716-446655440001",
+    id: "98c62681-69e2-450f-91a4-ce303515cf51",
     slug: "telkomsel",
     name: "Telkomsel",
     sub_name: "Pulsa",
@@ -252,7 +252,7 @@ export const seedPulsa = [
     type: ProductCategoryType.PULSA,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440002",
+    id: "f96a1cd4-4eec-4f8c-8600-e462bfdbb15a",
     slug: "byu",
     name: "byU",
     sub_name: "Pulsa",
@@ -270,7 +270,7 @@ export const seedPulsa = [
     type: ProductCategoryType.PULSA,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440003",
+    id: "8aa06389-d918-46b5-9f1b-362f1c21184e",
     slug: "tri",
     name: "Tri",
     sub_name: "Pulsa",
@@ -289,7 +289,7 @@ export const seedPulsa = [
     type: ProductCategoryType.PULSA,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440004",
+    id: "cb93f2fe-9a8b-4c35-b326-dc92dec11845",
     slug: "isat-pulsa",
     name: "Indosat",
     sub_name: "Pulsa",
@@ -308,7 +308,7 @@ export const seedPulsa = [
     type: ProductCategoryType.PULSA,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440005",
+    id: "00539fbe-dd47-4f57-a568-d85b2e7fe924",
     slug: "xl-pulsa",
     name: "XL",
     sub_name: "XL Axiata",
@@ -327,7 +327,7 @@ export const seedPulsa = [
     type: ProductCategoryType.PULSA,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440006",
+    id: "ea592e38-16f3-4273-8742-eb5f2c43ba49",
     slug: "axis-pulsa",
     name: "Axis",
     sub_name: "Pulsa",
@@ -345,7 +345,7 @@ export const seedPulsa = [
     type: ProductCategoryType.PULSA,
   },
   {
-    id: "550e8400-e29b-41d4-a716-446655440007",
+    id: "17d08cb9-e9a6-48f9-bda3-5a961b31e65d",
     slug: "smartfren",
     name: "Smartfren",
     sub_name: "Pulsa",
@@ -368,7 +368,7 @@ export const seedPulsa = [
 // Data seed untuk kategori Voucher
 export const seedVoucher = [
   {
-    id: "660e8400-e29b-41d4-a716-446655440001",
+    id: "46b04b55-40d3-40db-b9eb-16a95782da9a",
     slug: "google-play-idr",
     name: "Google Play Gift Card",
     sub_name: "Voucher",
@@ -387,7 +387,7 @@ export const seedVoucher = [
     type: ProductCategoryType.VOUCHER,
   },
   {
-    id: "660e8400-e29b-41d4-a716-446655440002",
+    id: "13a79e8f-c60b-43e7-908c-25cbd2a9b521",
     slug: "garena-shells",
     name: "Garena Shells",
     sub_name: "Voucher",
@@ -406,7 +406,7 @@ export const seedVoucher = [
     type: ProductCategoryType.VOUCHER,
   },
   {
-    id: "660e8400-e29b-41d4-a716-446655440003",
+    id: "83a436d9-9540-4045-a211-9cf2865a28d0",
     slug: "roblox",
     name: "Roblox Voucher",
     sub_name: "Voucher Robux",
@@ -425,7 +425,7 @@ export const seedVoucher = [
     type: ProductCategoryType.VOUCHER,
   },
   {
-    id: "660e8400-e29b-41d4-a716-446655440004",
+    id: "f51f78f2-1ae4-4ea7-9599-70fc3e5ae5f3",
     slug: "playstation-store",
     name: "PlayStation Gift Card",
     sub_name: "Voucher",
@@ -444,7 +444,7 @@ export const seedVoucher = [
     type: ProductCategoryType.VOUCHER,
   },
   {
-    id: "660e8400-e29b-41d4-a716-446655440005",
+    id: "eaf91a35-161a-4662-9a44-3dccc7062e7e",
     slug: "steam-wallet-idr",
     name: "Steam Wallet Code",
     sub_name: "Voucher",
@@ -463,7 +463,7 @@ export const seedVoucher = [
     type: ProductCategoryType.VOUCHER,
   },
   {
-    id: "660e8400-e29b-41d4-a716-446655440006",
+    id: "c6671582-b191-44a0-ba52-825b28688793",
     slug: "spotify",
     name: "Spotify",
     sub_name: "Spotify",
@@ -482,7 +482,7 @@ export const seedVoucher = [
     type: ProductCategoryType.VOUCHER,
   },
   {
-    id: "660e8400-e29b-41d4-a716-446655440007",
+    id: "84eaa3aa-3ce9-438c-8c23-dfa014061358",
     slug: "vidio",
     name: "Vidio",
     sub_name: "Voucher",

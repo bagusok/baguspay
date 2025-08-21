@@ -3,19 +3,8 @@ import { InferPageProps } from '@adonisjs/inertia/types'
 import { Link, router } from '@inertiajs/react'
 import AdminLayout from '~/components/layout/admin-layout'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@repo/ui/components/ui/select'
-import { Input } from '@repo/ui/components/ui/input'
-import { Button } from '@repo/ui/components/ui/button'
 import { DataTable } from '@repo/ui/components/data-table'
-import { useState } from 'react'
-import { ColumnDef } from '@tanstack/react-table'
-import { formatDate } from '~/utils'
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -25,7 +14,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
+import { Input } from '@repo/ui/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/components/ui/select'
+import { ColumnDef } from '@tanstack/react-table'
+import { useState } from 'react'
+import { formatDate } from '~/utils'
 
+import Image from '~/components/image'
 import IsAvailable from './product-categories/is-avalable'
 
 type Props = InferPageProps<ProductsCategoriesController, 'index'>
@@ -106,8 +107,8 @@ const columns: ColumnDef<Props['productCategories'][number]>[] = [
     header: 'Image',
     cell: ({ row }) => (
       <div className="aspect-square w-20 overflow-hidden rounded-md">
-        <img
-          src={`${import.meta.env.VITE_S3_URL}${row.original.image_url}`}
+        <Image
+          src={`${row.original.image_url}`}
           alt={row.getValue('name')}
           className="w-full h-full object-cover"
         />

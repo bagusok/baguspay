@@ -1,14 +1,15 @@
 import { GetAllProductsQueryValidator } from '#validators/product'
-import { useEffect, useState } from 'react'
-import AddProductModal from './add-modal'
-import { useQuery } from '@tanstack/react-query'
-import { apiClient } from '~/utils/axios'
 import { InferSelectModel } from '@repo/db'
 import { tb } from '@repo/db/types'
-import { MetaPagination } from '~/utils/types/pagination_types'
-import { ColumnDef } from '@tanstack/react-table'
-import { formatDate, formatPrice } from '~/utils'
 import { DataTable } from '@repo/ui/components/data-table'
+import { useQuery } from '@tanstack/react-query'
+import { ColumnDef } from '@tanstack/react-table'
+import { useEffect, useState } from 'react'
+import Image from '~/components/image'
+import { formatDate, formatPrice } from '~/utils'
+import { apiClient } from '~/utils/axios'
+import { MetaPagination } from '~/utils/types/pagination_types'
+import AddProductModal from './add-modal'
 import DeleteProductModal from './delete-modal'
 import EditProductModal from './edit-modal'
 import IsAvailableSwitchProduct from './is-available-switch'
@@ -77,8 +78,8 @@ const columns: ColumnDef<Product>[] = [
     header: 'Image',
     cell: ({ row }) => (
       <div className="aspect-square w-8 overflow-hidden rounded-md">
-        <img
-          src={`${import.meta.env.VITE_S3_URL}${row.original.image_url}`}
+        <Image
+          src={`${row.original.image_url}`}
           alt={row.getValue('name')}
           className="w-full h-full object-cover"
         />

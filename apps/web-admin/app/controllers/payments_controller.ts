@@ -2,12 +2,12 @@ import {
   createPayementMethodCategoryValidator,
   createPaymentMethodsValidator,
   paymentIdValidator,
-  updatePayementMethodCategoryValidator,
   paymentMethodsQueryValidator,
+  updatePayementMethodCategoryValidator,
   updatePaymentMethodsValidator,
 } from '#validators/payments'
 import type { HttpContext } from '@adonisjs/core/http'
-import { db, desc, eq, ilike, and, count, SQL } from '@repo/db'
+import { and, count, db, desc, eq, ilike, SQL } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 
@@ -205,6 +205,7 @@ export default class PaymentsController {
       const image = await db.query.fileManager.findFirst({
         where: eq(tb.fileManager.id, imageId),
       })
+      imageUrl = image?.url
 
       if (!image) {
         ctx.session.flashErrors({

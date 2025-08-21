@@ -54,6 +54,11 @@ export async function loader({ params }: Route.LoaderArgs) {
 
     const response = await apiClient.get(`/products/${slug}`);
 
+    console.log(
+      "Order slug page loaded successfully:",
+      response.data.data.product_sub_categories[0]
+    );
+
     return data({
       success: true,
       message: "Order details loaded successfully",
@@ -81,7 +86,7 @@ const preCheckoutSchema = z.object({
       z.object({
         name: z.string().min(1, "Name is required"),
         value: z.string().min(1, "Value is required"),
-      }),
+      })
     )
     .min(1, "At least one input field is required"),
 });
@@ -114,7 +119,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
   });
 
   const [selectedItem, setSelectedItem] = useState<OrderProducts | null>(
-    data.product_sub_categories[0]?.products[0] || null,
+    data.product_sub_categories[0]?.products[0] || null
   );
 
   const { update } = useFieldArray({
@@ -414,7 +419,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                                       className="text-xs px-1 py-0"
                                     >
                                       {Math.round(
-                                        (item.discount / item.price) * 100,
+                                        (item.discount / item.price) * 100
                                       )}
                                       %
                                     </Badge>

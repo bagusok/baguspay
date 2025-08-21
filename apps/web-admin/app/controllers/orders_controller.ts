@@ -346,9 +346,12 @@ export default class OrdersController {
     await db.transaction(async (tx) => {
       const [user] = await tx.select().from(tb.users).where(eq(tb.users.id, order.user_id)).limit(1)
 
-      await tx.update(tb.users).set({
-        balance: user.balance + order.total_price - order.fee,
-      })
+      await tx
+        .update(tb.users)
+        .set({
+          balance: user.balance + order.total_price - order.fee,
+        })
+        .where(eq(tb.users.id, order.user_id))
 
       await tx.insert(tb.balanceMutations).values({
         name: `Refund Order #${order.order_id}`,

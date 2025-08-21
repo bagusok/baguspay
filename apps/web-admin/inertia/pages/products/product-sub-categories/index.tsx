@@ -1,9 +1,7 @@
 import ProductsCategoriesController from '#controllers/product_categories_controller'
 import { InferPageProps } from '@adonisjs/inertia/types'
-import { Button } from '@repo/ui/components/ui/button'
-import { Trash2 } from 'lucide-react'
-import AddProductSubCategoryModal from './add-modal'
 import { router } from '@inertiajs/react'
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -13,8 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
-import EditProductSubCategoryModal from './edit-modal'
 import { cn } from '@repo/ui/lib/utils'
+import { Trash2 } from 'lucide-react'
+import Image from '~/components/image'
+import AddProductSubCategoryModal from './add-modal'
+import EditProductSubCategoryModal from './edit-modal'
 
 type Props = {
   productCategory: InferPageProps<ProductsCategoriesController, 'detail'>['productCategory']
@@ -56,8 +57,8 @@ export default function SectionProductSubCategory({
               <div className="flex-1">
                 <div className="flex items-start gap-2 mb-2">
                   {sub.image_url && (
-                    <img
-                      src={`${import.meta.env.VITE_S3_URL}${sub.image_url}`}
+                    <Image
+                      src={`${sub.image_url}`}
                       alt={sub.name}
                       className="w-8 h-8 rounded object-cover"
                     />

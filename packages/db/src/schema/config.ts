@@ -10,7 +10,7 @@ import {
 export const appConfig = pgTable(
   "app_config",
   {
-    id: uuid("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     key: varchar("key").notNull().unique(),
     value: text("value").notNull(),
     created_at: timestamp("created_at", {

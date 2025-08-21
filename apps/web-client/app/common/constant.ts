@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:9991";
 export const DEFAULT_LOCALE = "id";
 export const SUPPORTED_LANGUAGES = ["en", "id", "ms"];
 export const DEFAULT_THEME = "light";

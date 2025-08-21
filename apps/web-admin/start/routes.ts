@@ -20,6 +20,8 @@ const OfferController = () => import('#controllers/offer_controller')
 const DepositController = () => import('#controllers/deposits_controller')
 const OrderController = () => import('#controllers/orders_controller')
 const BalanceMutationController = () => import('#controllers/balance_mutations_controller')
+const ConfigHomesController = () => import('#controllers/config_homes_controller')
+const BannerController = () => import('#controllers/banners_controller')
 
 import router from '@adonisjs/core/services/router'
 import { UserRole } from '@repo/db/types'
@@ -260,4 +262,45 @@ router
     router.get('/', [BalanceMutationController, 'index']).as('balanceMutations.index')
   })
   .prefix('/admin/balance-mutations')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router
+      .group(() => {
+        router.get('/product-sections', [ConfigHomesController, 'index']).as('configHomes.index')
+        router
+          .post('/product-sections', [ConfigHomesController, 'createProductSection'])
+          .as('configHomes.postCreate')
+
+        router
+          .post('/product-sections/:id/connect-product', [
+            ConfigHomesController,
+            'connectProductToSection',
+          ])
+          .as('configHomes.connectProductToSection')
+
+        router.post('/product-sections/:id/disconnect-product', [
+          ConfigHomesController,
+          'disconnectProductFromSection',
+        ])
+
+        router
+          .get('/product-sections/:id', [ConfigHomesController, 'detail'])
+          .as('configHomes.detail')
+        router
+          .patch('/product-sections/:id', [ConfigHomesController, 'updateProductSection'])
+          .as('configHomes.postEdit')
+        router
+          .delete('/product-sections/:id', [ConfigHomesController, 'deleteProductSection'])
+          .as('configHomes.postDelete')
+
+        // banners
+        router.get('/banner', [BannerController, 'index']).as('banners.index')
+        router.post('/banner', [BannerController, 'postCreate']).as('banners.postCreate')
+        router.delete('/banner/:id', [BannerController, 'postDelete']).as('banners.delete')
+      })
+      .prefix('/home')
+  })
+  .prefix('/admin/config')
   .middleware(middleware.role(UserRole.ADMIN))

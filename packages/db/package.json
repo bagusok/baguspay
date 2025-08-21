@@ -39,6 +39,7 @@
     "tsx": "^4.20.3"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.0.3",
     "drizzle-orm": "^0.44.2",
     "postgres": "^3.4.7"

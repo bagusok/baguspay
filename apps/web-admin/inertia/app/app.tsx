@@ -3,8 +3,10 @@
 
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { createInertiaApp } from '@inertiajs/react'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { hydrateRoot } from 'react-dom/client'
 import { Toaster } from 'react-hot-toast'
+import { query } from '~/components/layout/admin-layout'
 import '../css/_keyframe-animations.scss'
 import '../css/_variables.scss'
 import '../css/app.css'
@@ -25,8 +27,10 @@ createInertiaApp({
     hydrateRoot(
       el,
       <>
-        <App {...props} />,
-        <Toaster position="top-right" />
+        <QueryClientProvider client={query}>
+          <App {...props} />,
+          <Toaster position="top-right" />
+        </QueryClientProvider>
       </>
     )
   },

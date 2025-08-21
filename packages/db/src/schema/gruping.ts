@@ -56,7 +56,7 @@ export const productGroupingRelations = relations(
 export const productGroupingToProductCategories = pgTable(
   "product_grouping_to_product_categories",
   {
-    id: uuid("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     product_grouping_id: uuid("product_grouping_id").references(
       () => productGroupings.id,
       { onDelete: "cascade" },

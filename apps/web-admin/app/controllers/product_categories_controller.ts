@@ -383,8 +383,21 @@ export default class ProductsCategoriesController {
       .innerJoin(tb.products, eq(tb.productSubCategories.id, tb.products.product_sub_category_id))
       .where(where.length ? and(...where) : undefined)
 
+    const productCategories = await db.query.productCategories.findMany({
+      columns: {
+        id: true,
+        name: true,
+        slug: true,
+        is_available: true,
+      },
+      where: where.length ? and(...where) : undefined,
+      orderBy: [desc(tb.productCategories.created_at)],
+      limit: 20,
+    })
+
     return ctx.response.json({
       data: products,
+      productCategories,
       meta: {
         page: page,
         limit,

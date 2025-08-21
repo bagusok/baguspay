@@ -10,7 +10,7 @@ import {
 import { productCategories } from "./products";
 
 export const banners = pgTable("banners", {
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   title: varchar("title").notNull(),
   description: text("description"),
   image_url: varchar("image").notNull(),

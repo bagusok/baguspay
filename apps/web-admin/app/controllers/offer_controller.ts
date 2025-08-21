@@ -361,7 +361,7 @@ export default class OfferController {
       return ctx.response.badRequest('Image not found')
     }
 
-    const [newOffer] = await db
+    await db
       .insert(tb.offers)
       .values({
         image_url: image.url,

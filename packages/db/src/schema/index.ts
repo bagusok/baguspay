@@ -1,5 +1,6 @@
 export * from "./articles";
 export * from "./balance_mutations";
+export * from "./banner";
 export * from "./config";
 export * from "./deposits";
 export * from "./file_manager";

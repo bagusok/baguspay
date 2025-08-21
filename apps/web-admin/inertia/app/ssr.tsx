@@ -1,6 +1,8 @@
-import ReactDOMServer from 'react-dom/server'
 import { createInertiaApp } from '@inertiajs/react'
+import { QueryClientProvider } from '@tanstack/react-query'
+import ReactDOMServer from 'react-dom/server'
 import { Toaster } from 'react-hot-toast'
+import { query } from '~/components/layout/admin-layout'
 
 export default function render(page: any) {
   return createInertiaApp({
@@ -12,8 +14,10 @@ export default function render(page: any) {
     },
     setup: ({ App, props }) => (
       <>
-        <App {...props} />,
-        <Toaster position="top-right" />
+        <QueryClientProvider client={query}>
+          <App {...props} />,
+          <Toaster position="top-right" />
+        </QueryClientProvider>
       </>
     ),
   })

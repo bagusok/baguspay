@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es2021", // Output modern JS (Node 16+ friendly)
+    "module": "es2022", // Output ES modules (Node 16+ friendly, supports bundler resolution)
+    "moduleResolution": "bundler", // Support package.json exports (subpath imports)
+    "outDir": "dist", // Hasil build ada di dist/
+    "rootDir": "src", // Source code di src/
+    "esModuleInterop": true, // Supaya bisa import default (axios, dotenv, dll)
+    "strict": true, // Type checking ketat
+    "skipLibCheck": true, // Biar build cepat
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

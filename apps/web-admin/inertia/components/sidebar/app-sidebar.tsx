@@ -5,12 +5,10 @@ import {
   BanknoteArrowDown,
   Command,
   DollarSignIcon,
-  Frame,
-  LifeBuoy,
-  Map,
+  LayoutGrid,
   PenIcon,
-  PieChart,
   RefreshCcwIcon,
+  Settings2Icon,
   ShoppingBagIcon,
   TicketIcon,
   UserIcon,
@@ -27,8 +25,6 @@ import {
   SidebarMenuItem,
 } from '@repo/ui/components/ui/sidebar'
 import { NavMain } from './nav-main'
-import { NavProjects } from './nav-projects'
-import { NavSecondary } from './nav-secondary'
 import { NavUser } from './nav-user'
 
 const data = {
@@ -97,7 +93,7 @@ const data = {
     },
     {
       title: 'Orders',
-      url: '/admin/orders',
+      url: '#',
       icon: ArrowLeftRight,
       items: [
         {
@@ -123,28 +119,37 @@ const data = {
       items: [],
     },
   ],
-  navSecondary: [
+  config: [
+    {
+      title: 'Home',
+      url: '#',
+      icon: LayoutGrid,
+      isActive: true,
+      items: [
+        {
+          title: 'Home Product Sections',
+          url: '/admin/config/home/product-sections',
+        },
+        {
+          title: 'Home Fast Menu',
+          url: '/admin/config/home/fast-menu',
+        },
+        {
+          title: 'Banner',
+          url: '/admin/config/home/banner',
+        },
+      ],
+    },
     {
       title: 'Settings',
       url: '#',
-      icon: LifeBuoy,
-    },
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
+      icon: Settings2Icon,
+      items: [
+        {
+          title: 'General Settings',
+          url: '/admin/config/settings/general',
+        },
+      ],
     },
   ],
 }
@@ -171,8 +176,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={data.config} title="Config" />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

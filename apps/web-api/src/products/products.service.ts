@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, eq, gte, lte, ne, or } from '@repo/db';
+import { and, asc, eq, gte, lte, ne, or } from '@repo/db';
 import { OfferType, tb } from '@repo/db/types';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
@@ -76,6 +76,7 @@ export class ProductsService {
                   sub_name: true,
                   label_image: true,
                 },
+                orderBy: asc(tb.products.price),
               },
             },
           },
@@ -92,126 +93,126 @@ export class ProductsService {
 
     delete category.input_on_product_category;
 
-    // Get Discount Available
-
-    // Discount khusus kategori
-    const categoryDiscounts = await this.databaseService.db
-      .select({
-        product: {
-          id: tb.products.id,
-          name: tb.products.name,
-          image_url: tb.products.image_url,
-          price: tb.products.price,
-          is_available: tb.products.is_available,
-          is_featured: tb.products.is_featured,
-          notes: tb.products.notes,
-          stock: tb.products.stock,
-          billing_type: tb.products.billing_type,
-          cut_off_start: tb.products.cut_off_start,
-          cut_off_end: tb.products.cut_off_end,
-          description: tb.products.description,
-          label_text: tb.products.label_text,
-          sku_code: tb.products.sku_code,
-          sub_name: tb.products.sub_name,
-          label_image: tb.products.label_image,
-        },
-        offer: {
-          id: tb.offers.id,
-          name: tb.offers.name,
-          discount_static: tb.offers.discount_static,
-          discount_percentage: tb.offers.discount_percentage,
-          discount_maximum: tb.offers.discount_maximum,
-          start_date: tb.offers.start_date,
-          end_date: tb.offers.end_date,
-          is_available: tb.offers.is_available,
-          is_all_payment_method: tb.offers.is_all_payment_methods,
-          is_all_products: tb.offers.is_all_products,
-          is_all_users: tb.offers.is_all_users,
-          quota: tb.offers.quota,
-          usage_count: tb.offers.usage_count,
-          is_allow_guest: tb.offers.is_allow_guest,
-          is_unlimited_date: tb.offers.is_unlimited_date,
-          is_unlimited_quota: tb.offers.is_unlimited_quota,
-          type: tb.offers.type,
-        },
-      })
-      .from(tb.offer_products)
-      .innerJoin(tb.products, eq(tb.offer_products.product_id, tb.products.id))
-      .innerJoin(
-        tb.productSubCategories,
-        eq(tb.products.product_sub_category_id, tb.productSubCategories.id),
-      )
-      .innerJoin(
-        tb.productCategories,
-        eq(
-          tb.productSubCategories.product_category_id,
-          tb.productCategories.id,
-        ),
-      )
-      .innerJoin(tb.offers, eq(tb.offer_products.offer_id, tb.offers.id))
-      .where(
-        and(
-          eq(tb.productCategories.id, category.id),
-          eq(tb.offers.is_available, true),
-          or(
-            and(
-              lte(tb.offers.start_date, new Date()),
-              gte(tb.offers.end_date, new Date()),
-            ),
-            eq(tb.offers.is_unlimited_date, true),
+    // Jalankan discount query paralel
+    const [categoryDiscounts, globalOffers] = await Promise.all([
+      this.databaseService.db
+        .select({
+          product: {
+            id: tb.products.id,
+            name: tb.products.name,
+            image_url: tb.products.image_url,
+            price: tb.products.price,
+            is_available: tb.products.is_available,
+            is_featured: tb.products.is_featured,
+            notes: tb.products.notes,
+            stock: tb.products.stock,
+            billing_type: tb.products.billing_type,
+            cut_off_start: tb.products.cut_off_start,
+            cut_off_end: tb.products.cut_off_end,
+            description: tb.products.description,
+            label_text: tb.products.label_text,
+            sku_code: tb.products.sku_code,
+            sub_name: tb.products.sub_name,
+            label_image: tb.products.label_image,
+          },
+          offer: {
+            id: tb.offers.id,
+            name: tb.offers.name,
+            discount_static: tb.offers.discount_static,
+            discount_percentage: tb.offers.discount_percentage,
+            discount_maximum: tb.offers.discount_maximum,
+            start_date: tb.offers.start_date,
+            end_date: tb.offers.end_date,
+            is_available: tb.offers.is_available,
+            is_all_payment_method: tb.offers.is_all_payment_methods,
+            is_all_products: tb.offers.is_all_products,
+            is_all_users: tb.offers.is_all_users,
+            quota: tb.offers.quota,
+            usage_count: tb.offers.usage_count,
+            is_allow_guest: tb.offers.is_allow_guest,
+            is_unlimited_date: tb.offers.is_unlimited_date,
+            is_unlimited_quota: tb.offers.is_unlimited_quota,
+            type: tb.offers.type,
+          },
+        })
+        .from(tb.offer_products)
+        .innerJoin(
+          tb.products,
+          eq(tb.offer_products.product_id, tb.products.id),
+        )
+        .innerJoin(
+          tb.productSubCategories,
+          eq(tb.products.product_sub_category_id, tb.productSubCategories.id),
+        )
+        .innerJoin(
+          tb.productCategories,
+          eq(
+            tb.productSubCategories.product_category_id,
+            tb.productCategories.id,
           ),
-          or(eq(tb.offers.is_unlimited_quota, true), gte(tb.offers.quota, 1)),
-          eq(tb.offers.is_deleted, false),
-          ne(tb.offers.type, OfferType.VOUCHER),
-          eq(tb.offers.is_all_products, false),
-        ),
-      );
-
-    // Discount global (is_all_products)
-    const globalOffers = await this.databaseService.db
-      .select({
-        offer: {
-          id: tb.offers.id,
-          name: tb.offers.name,
-          discount_static: tb.offers.discount_static,
-          discount_percentage: tb.offers.discount_percentage,
-          discount_maximum: tb.offers.discount_maximum,
-          start_date: tb.offers.start_date,
-          end_date: tb.offers.end_date,
-          is_available: tb.offers.is_available,
-          is_all_payment_method: tb.offers.is_all_payment_methods,
-          is_all_products: tb.offers.is_all_products,
-          is_all_users: tb.offers.is_all_users,
-          quota: tb.offers.quota,
-          usage_count: tb.offers.usage_count,
-          is_allow_guest: tb.offers.is_allow_guest,
-          is_unlimited_date: tb.offers.is_unlimited_date,
-          is_unlimited_quota: tb.offers.is_unlimited_quota,
-          type: tb.offers.type,
-        },
-      })
-      .from(tb.offers)
-      .where(
-        and(
-          eq(tb.offers.is_available, true),
-          eq(tb.offers.is_all_products, true),
-          or(
-            and(
-              lte(tb.offers.start_date, new Date()),
-              gte(tb.offers.end_date, new Date()),
+        )
+        .innerJoin(tb.offers, eq(tb.offer_products.offer_id, tb.offers.id))
+        .where(
+          and(
+            eq(tb.productCategories.id, category.id),
+            eq(tb.offers.is_available, true),
+            or(
+              and(
+                lte(tb.offers.start_date, new Date()),
+                gte(tb.offers.end_date, new Date()),
+              ),
+              eq(tb.offers.is_unlimited_date, true),
             ),
-            eq(tb.offers.is_unlimited_date, true),
+            or(eq(tb.offers.is_unlimited_quota, true), gte(tb.offers.quota, 1)),
+            eq(tb.offers.is_deleted, false),
+            ne(tb.offers.type, OfferType.VOUCHER),
+            eq(tb.offers.is_all_products, false),
           ),
-          or(eq(tb.offers.is_unlimited_quota, true), gte(tb.offers.quota, 1)),
-          eq(tb.offers.is_deleted, false),
-          ne(tb.offers.type, OfferType.VOUCHER),
         ),
-      );
 
-    // Mapping global offer ke semua produk di kategori (cukup satu kali)
+      this.databaseService.db
+        .select({
+          offer: {
+            id: tb.offers.id,
+            name: tb.offers.name,
+            discount_static: tb.offers.discount_static,
+            discount_percentage: tb.offers.discount_percentage,
+            discount_maximum: tb.offers.discount_maximum,
+            start_date: tb.offers.start_date,
+            end_date: tb.offers.end_date,
+            is_available: tb.offers.is_available,
+            is_all_payment_method: tb.offers.is_all_payment_methods,
+            is_all_products: tb.offers.is_all_products,
+            is_all_users: tb.offers.is_all_users,
+            quota: tb.offers.quota,
+            usage_count: tb.offers.usage_count,
+            is_allow_guest: tb.offers.is_allow_guest,
+            is_unlimited_date: tb.offers.is_unlimited_date,
+            is_unlimited_quota: tb.offers.is_unlimited_quota,
+            type: tb.offers.type,
+          },
+        })
+        .from(tb.offers)
+        .where(
+          and(
+            eq(tb.offers.is_available, true),
+            eq(tb.offers.is_all_products, true),
+            or(
+              and(
+                lte(tb.offers.start_date, new Date()),
+                gte(tb.offers.end_date, new Date()),
+              ),
+              eq(tb.offers.is_unlimited_date, true),
+            ),
+            or(eq(tb.offers.is_unlimited_quota, true), gte(tb.offers.quota, 1)),
+            eq(tb.offers.is_deleted, false),
+            ne(tb.offers.type, OfferType.VOUCHER),
+          ),
+        ),
+    ]);
+
     const globalDiscounts = this.mapGlobalDiscounts(category, globalOffers);
 
-    // Gabungkan keduanya
     const discounts = [...categoryDiscounts, ...globalDiscounts];
 
     const buildDiscounts = category.product_sub_categories.map(

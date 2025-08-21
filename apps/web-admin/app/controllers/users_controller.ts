@@ -7,7 +7,7 @@ import {
   userQueryValidator,
 } from '#validators/user'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, eq, ilike, or } from '@repo/db'
+import { and, count, db, desc, eq, ilike, or } from '@repo/db'
 import { BalanceMutationRefType, BalanceMutationType, tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { hash } from 'bcrypt-ts'
@@ -45,6 +45,7 @@ export default class UsersController {
       .where(whereFilter.length ? and(...whereFilter) : undefined)
       .limit(limit)
       .offset(offset)
+      .orderBy(desc(tb.users.created_at))
 
     const total = await db
       .select({
