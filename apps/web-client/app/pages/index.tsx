@@ -1,5 +1,5 @@
-import { useId } from "react";
-import { data, Link, redirect } from "react-router";
+import { Suspense, useId } from "react";
+import { Await, Link, redirect, useLoaderData } from "react-router";
 import HomeBanner from "~/components/home/banner";
 import { apiClient } from "~/utils/axios";
 import type { Route } from "./+types";
@@ -8,22 +8,29 @@ export async function loader({}: Route.LoaderArgs) {
   try {
     const response = await apiClient.get("/home/products");
 
-    return data({
+    const banners = apiClient.get("/banners");
+
+    return {
       data: response.data?.data,
-    });
+      banners: banners,
+    };
   } catch (error) {
     return redirect("/error");
   }
 }
 
 export default function Index({ loaderData }: Route.ComponentProps) {
-  const { data } = loaderData;
+  const { data, banners } = useLoaderData();
   const id = useId();
 
   return (
     <>
       <div className="md:max-w-7xl mx-auto">
-        <HomeBanner />
+        <Suspense fallback={<div>Loading.......</div>}>
+          <Await resolve={banners}>
+            {(banners) => <HomeBanner banners={banners.data.data} />}
+          </Await>
+        </Suspense>
         {data?.map((category: any) => (
           <section key={id} className="mt-14">
             <h2 className="text-xl font-semibold text-foreground capitalize">
