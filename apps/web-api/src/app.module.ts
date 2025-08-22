@@ -20,6 +20,7 @@ import { DigiflazzModule } from './integrations/h2h/digiflazz/digiflazz.module';
 import { AtlanticModule } from './integrations/h2h/atlantic/atlantic.module';
 import { ProductsModule } from './products/products.module';
 import { OffersModule } from './offers/offers.module';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { OffersModule } from './offers/offers.module';
     AtlanticModule,
     ProductsModule,
     OffersModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
