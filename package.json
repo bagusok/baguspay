@@ -30,7 +30,8 @@
     "cli/*"
   ],
   "overrides": {
-    "zod": "^4.0.14"
+    "zod": "^4.0.14",
+    "@types/node": "22.15.18"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
