@@ -1,6 +1,9 @@
-import { cn } from "@repo/ui/lib/utils";
+import * as React from "react";
+import { cn } from "../../lib/utils";
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+type SkeletonProps = React.ComponentProps<"div"> & { className?: string };
+
+function Skeleton({ className, ...props }: SkeletonProps): React.JSX.Element {
   return (
     <div
       data-slot="skeleton"

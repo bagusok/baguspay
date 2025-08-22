@@ -5,7 +5,8 @@
     "paths": {
       "@ui/*": ["./src/*"],
       "@repo/ui/*": ["./src/*"]
-    }
+    },
+    "types": ["react", "react-dom"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]

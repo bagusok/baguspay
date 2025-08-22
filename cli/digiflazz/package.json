@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@repo/db": "^0.0.0",
+    "@repo/db": "workspace:*",
     "axios": "^1.11.0",
     "dotenv": "^16.0.3"
   }

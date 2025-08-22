@@ -31,8 +31,8 @@
     "lint": "eslint . --ext .ts,.tsx --fix"
   },
   "devDependencies": {
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.8.4",
     "drizzle-kit": "^0.31.4",
     "tsup": "^8.5.0",

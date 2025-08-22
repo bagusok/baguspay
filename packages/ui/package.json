@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "ui": "npx shadcn@latest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build": "tsup"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
@@ -23,9 +24,12 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@tanstack/react-table": "^8.21.3",
     "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
+    "react": "^19.1.1",
     "react-day-picker": "^9.8.1",
+    "react-dom": "^19.1.1",
     "react-dropzone": "^14.3.8",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
@@ -47,6 +51,15 @@
     "./theme/*": "./src/theme/*.css"
   },
   "devDependencies": {
-    "@repo/tailwind-config": "*"
-  }
+    "@repo/eslint-config": "workspace:*",
+    "@repo/tailwind-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "tsup": "^8.5.0"
+  },
+  "types": "dist/index.d.ts",
+  "sideEffects": [
+    "**/*.css"
+  ]
 }
