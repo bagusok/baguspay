@@ -15,8 +15,8 @@ import toast from "react-hot-toast";
 import { Link } from "react-router";
 
 export default function Contact() {
-  const SUPPORT_EMAIL = "support@baguspay.id"; // TODO: ganti dengan email resmi
-  const WHATSAPP_URL = "https://wa.me/6281234567890"; // TODO: ganti dengan nomor WA resmi
+  const SUPPORT_EMAIL = "hunagus433@gmail.com"; // TODO: ganti dengan email resmi
+  const WHATSAPP_URL = "https://wa.me/6282122504669"; // TODO: ganti dengan nomor WA resmi
   const TELEGRAM_URL = "https://t.me/baguspay"; // TODO: ganti dengan username Telegram resmi
   const INSTAGRAM_URL = "https://instagram.com/baguspay"; // TODO: ganti dengan username Instagram resmi
   const FACEBOOK_URL = "https://facebook.com/baguspay"; // TODO: ganti dengan halaman Facebook resmi
@@ -35,12 +35,12 @@ export default function Contact() {
     }
     setLoading(true);
     const body = `Halo Baguspay,%0D%0A%0D%0A${encodeURIComponent(
-      message,
+      message
     )}%0D%0A%0D%0A--%0D%0ANama: ${encodeURIComponent(
-      name,
+      name
     )}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0ADikirim dari halaman Kontak`;
     const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-      subject,
+      subject
     )}&body=${body}`;
     // Buka aplikasi email default
     window.location.href = mailto;

@@ -20,8 +20,8 @@ import { Link } from "react-router";
 
 export default function Support() {
   // TODO: Ganti dengan kontak resmi
-  const SUPPORT_EMAIL = "support@baguspay.id";
-  const WHATSAPP_URL = "https://wa.me/6281234567890";
+  const SUPPORT_EMAIL = "hunagus433@gmail.com";
+  const WHATSAPP_URL = "https://wa.me/6282122504669";
   const TELEGRAM_URL = "https://t.me/baguspay";
   const INSTAGRAM_URL = "https://instagram.com/baguspay";
   const FACEBOOK_URL = "https://facebook.com/baguspay";
@@ -40,7 +40,7 @@ export default function Support() {
     setTimeout(() => {
       setLoading(null);
       setStatusNote(
-        `Status pesanan ${orderId} sedang diproses. Jika pembayaran sudah dilakukan, mohon tunggu beberapa menit.`,
+        `Status pesanan ${orderId} sedang diproses. Jika pembayaran sudah dilakukan, mohon tunggu beberapa menit.`
       );
       toast.success("Status diperbarui.");
     }, 700);
