@@ -56,6 +56,7 @@
     "@nestjs/cli": "^11.0.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.1",
+    "@repo/eslint-config": "workspace:*",
     "@swc/cli": "^0.6.0",
     "@swc/core": "^1.10.8",
     "@types/bcrypt": "^5.0.2",
@@ -98,5 +99,11 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core"
+    ]
   }
 }
