@@ -5,4 +5,10 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  // resolve: {
+  //   preserveSymlinks: true,
+  // },
+  ssr: {
+    noExternal: ["@repo/ui"],
+  },
 });

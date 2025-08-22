@@ -23,20 +23,19 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "npm@10.9.2",
+  "packageManager": "pnpm@10.0.0",
   "workspaces": [
     "apps/*",
     "packages/*",
     "cli/*"
   ],
-  "dependencies": {
-    "@hookform/resolvers": "^5.2.1",
-    "@tanstack/react-table": "^8.21.3",
-    "eslint-plugin-unused-imports": "^4.1.4",
-    "tailwind-merge": "^3.3.1",
-    "zod": "^4.0.14"
-  },
   "overrides": {
     "zod": "^4.0.14"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@swc/core"
+    ]
   }
 }
