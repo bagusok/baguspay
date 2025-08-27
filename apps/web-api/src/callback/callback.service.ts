@@ -18,7 +18,7 @@ import {
   DigiflazzService,
 } from 'src/integrations/h2h/digiflazz/digiflazz.service';
 import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service';
-import { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service';
+import { TripayApiService } from 'src/integrations/payment-gateway/tripay/tripay.api.service';
 import { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type';
 import { QueueService } from 'src/queue/queue.service';
 
@@ -28,7 +28,7 @@ export class CallbackService {
 
   constructor(
     private readonly databaseService: DatabaseService,
-    private readonly tripayService: TripayService,
+    private readonly tripayService: TripayApiService,
     private readonly balanceService: BalanceService,
     private readonly digiflazzService: DigiflazzService,
     private readonly queueService: QueueService,
@@ -146,7 +146,7 @@ export class CallbackService {
         await this.databaseService.db
           .update(tb.orders)
           .set({
-            order_status: OrderStatus.COMPLETED,
+            order_status: OrderStatus.PENDING,
             payment_status: PaymentStatus.SUCCESS,
           })
           .where(eq(tb.orders.order_id, data.merchant_ref));

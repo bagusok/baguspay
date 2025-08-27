@@ -23,6 +23,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let statusCode: number;
     let responseBody: { success: boolean; message: string; errors?: any };
 
+    // console.log('HttpException caught:', exception);
     if (exception instanceof HttpException) {
       // Untuk semua error yang merupakan turunan HttpException (termasuk validation error kita)
       statusCode = exception.getStatus();

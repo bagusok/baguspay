@@ -8,10 +8,15 @@ export default function FooterSection() {
               Baguspay
             </h2>
             <p className="text-sm mt-2 text-muted-foreground text-center md:text-start max-w-full lg:max-w-2/3">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Culpa
-              ipsa minima facilis numquam, qui aliquid asperiores, voluptatibus
-              deleniti fuga corporis tempore cum voluptas? Beatae, porro!
+              Baguspay adalah platform top-up & pembayaran digital yang
+              memudahkan pembelian pulsa, paket data, game voucher, dan layanan
+              digital lainnya secara cepat, aman, dan transparan
             </p>
+            <address className="not-italic mt-4 text-xs leading-relaxed text-muted-foreground text-center md:text-start max-w-full lg:max-w-2/3">
+              Jl. Raya Bandung Durenan, Desa Gandong, Kec. Bandung,
+              <br className="hidden md:block" />
+              Kab. Tulungagung, Jawa Timur, Kode Pos 66274
+            </address>
 
             <h2 className="font-semibold mt-8 text-center md:text-start text-foreground">
               Dapatkan Aplikasi

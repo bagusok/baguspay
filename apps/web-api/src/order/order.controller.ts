@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Ip,
@@ -35,7 +36,7 @@ export class OrderController {
   getPriceBy(
     @Body() body: GetPriceByDto,
     @Query('flash_sale') isFlashSale: boolean = false,
-    @CurrentUser() user?: TUser | null,
+    @CurrentUser() user: TUser,
   ) {
     return this.orderService.getPriceBy(
       body.product_id,
@@ -51,8 +52,9 @@ export class OrderController {
     @Body() data: PreCheckoutPrepaidDto,
     @Headers('X-Time') timestamp: number,
     @Query('flash_sale') isFlashSale: boolean = false,
-    @CurrentUser() user?: TUser | null,
+    @CurrentUser() user: TUser,
   ) {
+    console.log(user);
     return await this.orderService.preCheckoutPrepaid(
       data,
       timestamp,
@@ -69,7 +71,7 @@ export class OrderController {
     @Query('flash_sale') isFlashSale: boolean = false,
     @Ip() ip: string,
     @Headers('User-Agent') userAgent: string,
-    @CurrentUser() user?: TUser | null,
+    @CurrentUser() user: TUser,
   ) {
     return await this.orderService.checkoutPrepaid(
       data,
@@ -95,9 +97,15 @@ export class OrderController {
     return await this.orderService.getByIdByGuest(param);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(TransactionGuard)
   @Post(':id')
   async getOrderById(@Param() param: OrderIdDto, @User() user: TUser) {
     return await this.orderService.getById(param, user);
+  }
+
+  @UseGuards(TransactionGuard)
+  @Delete(':id')
+  async cancelOrderById(@Param() param: OrderIdDto, @User() user: TUser) {
+    return await this.orderService.cancelOrder(param, user);
   }
 }

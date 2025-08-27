@@ -12,7 +12,10 @@ export class ProductCategoriesService {
 
   async getAllCategories() {
     const categories =
-      await this.databaseService.db.query.productCategories.findMany();
+      await this.databaseService.db.query.productCategories.findMany({
+        where: eq(tb.productCategories.is_available, true),
+        orderBy: asc(tb.productCategories.name),
+      });
 
     return {
       success: true,

@@ -31,6 +31,7 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { data } from "react-router";
 import z from "zod";
+import Image from "~/components/image";
 import { useFormMutation } from "~/hooks/use-form-mutation";
 import { apiClient } from "~/utils/axios";
 import { formatPrice } from "~/utils/format";
@@ -179,30 +180,22 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="w-full md:max-w-7xl mx-auto space-y-4">
-        <section id="banner">
+        {/* <section id="banner">
           <div className="w-full overflow-hidden rounded-2xl">
-            <img
-              src={
-                loaderData.data.banner_url.startsWith("http")
-                  ? loaderData.data.banner_url
-                  : `https://is3.cloudhost.id/bagusok${loaderData.data.banner_url}`
-              }
+            <Image
+              src={loaderData.data.banner_url}
               alt="Order Banner"
               className="object-cover"
             />
           </div>
-        </section>
+        </section> */}
 
         <div className="grid md:grid-cols-5 gap-6">
           <div className="md:col-span-3 space-y-4">
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-start gap-4 rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
               <div className="w-32 rounded-lg overflow-hidden">
-                <img
-                  src={
-                    loaderData.data.image_url.startsWith("http")
-                      ? loaderData.data.image_url
-                      : `https://is3.cloudhost.id/bagusok${loaderData.data.image_url}`
-                  }
+                <Image
+                  src={loaderData.data.image_url}
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -379,12 +372,8 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
 
                             <div className="p-3">
                               <div className="flex items-center gap-2 mb-2">
-                                <img
-                                  src={
-                                    item.image_url.startsWith("http")
-                                      ? item.image_url
-                                      : `https://is3.cloudhost.id/bagusok${item.image_url}`
-                                  }
+                                <Image
+                                  src={item.image_url}
                                   alt={item.name}
                                   className="w-8 h-8 transition-transform duration-300 group-hover:scale-110"
                                 />

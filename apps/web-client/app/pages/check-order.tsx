@@ -1,93 +1,36 @@
-import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
+import { useMutation } from "@tanstack/react-query";
+import { isAxiosError } from "axios";
 import {
   ClockIcon,
   Loader2Icon,
   SearchIcon,
   TicketCheckIcon,
 } from "lucide-react";
-import { useMemo, useState } from "react";
-
-type MockOrder = {
-  order_id: string;
-  created_at: string;
-  order_status: "pending" | "success" | "failed";
-  payment_status: "pending" | "success" | "failed" | "expired";
-  total_price: number;
-};
-
-function formatIDR(n: number) {
-  try {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(n);
-  } catch {
-    return `Rp ${n.toLocaleString("id-ID")}`;
-  }
-}
-
-function getStatusBadge(orderStatus: string, paymentStatus: string) {
-  if (orderStatus === "success" && paymentStatus === "success") {
-    return (
-      <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-        Berhasil
-      </Badge>
-    );
-  } else if (orderStatus === "pending" || paymentStatus === "pending") {
-    return <Badge variant="secondary">Diproses</Badge>;
-  } else if (
-    orderStatus === "failed" ||
-    paymentStatus === "failed" ||
-    paymentStatus === "expired"
-  ) {
-    return <Badge variant="destructive">Gagal</Badge>;
-  } else {
-    return <Badge variant="outline">Unknown</Badge>;
-  }
-}
+import { useState } from "react";
+import toast from "react-hot-toast";
+import LinkWithLocale from "~/components/link";
+import { apiClient } from "~/utils/axios";
+import { formatDate, formatPrice } from "~/utils/format";
 
 export default function CheckOrderPage() {
   const [orderId, setOrderId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<MockOrder | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  const disabled = useMemo(() => !orderId || loading, [orderId, loading]);
+  const checkOrder = useMutation({
+    mutationKey: ["check-order"],
+    mutationFn: async (orderId: string) =>
+      apiClient.post(`/order/check/${orderId}`).then((res) => res.data),
+  });
 
-  const onSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setResult(null);
-    if (!orderId.trim()) return;
-    setLoading(true);
-
-    // UI only: simulate a short lookup delay and deterministic mock result
-    window.setTimeout(() => {
-      const score = Array.from(orderId).reduce(
-        (acc, ch) => acc + ch.charCodeAt(0),
-        0,
-      );
-      const statusPick = score % 3;
-      const order_status =
-        statusPick === 0 ? "pending" : statusPick === 1 ? "success" : "failed";
-      const payment_status =
-        statusPick === 1 ? "success" : statusPick === 2 ? "failed" : "pending";
-      const daysAgo = (score % 10) + 1;
-      const created = new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000);
-      const total = 10000 * (1 + (score % 15));
-      setResult({
-        order_id: orderId.trim(),
-        created_at: created.toISOString(),
-        order_status: order_status as MockOrder["order_status"],
-        payment_status: payment_status as MockOrder["payment_status"],
-        total_price: total,
-      });
-      setLoading(false);
-    }, 800);
+    if (!orderId.trim()) {
+      toast.error("Order ID tidak boleh kosong");
+      return;
+    }
+    checkOrder.mutate(orderId);
   };
 
   return (
@@ -110,20 +53,25 @@ export default function CheckOrderPage() {
 
       {/* Form */}
       <section className="mt-8 rounded-xl border border-border bg-card p-4 md:p-6">
-        <form onSubmit={onSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
             <div className="space-y-2">
               <Label htmlFor="orderId">Order ID</Label>
               <div className="flex gap-2">
                 <Input
-                  id="orderId"
-                  placeholder="Contoh: BGSPY-123456"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value)}
+                  id="orderId"
+                  placeholder="Contoh: T1234XXXXXX"
+                  name="orderId"
                   autoComplete="off"
                 />
-                <Button type="submit" disabled={disabled} className="shrink-0">
-                  {loading ? (
+                <Button
+                  type="submit"
+                  disabled={checkOrder.isPending}
+                  className="shrink-0"
+                >
+                  {checkOrder.isPending ? (
                     <>
                       <Loader2Icon className="size-4 animate-spin" />
                       <span className="ml-2">Memeriksa...</span>
@@ -147,73 +95,85 @@ export default function CheckOrderPage() {
 
       {/* Result */}
       <section className="mt-6">
-        {!result && !loading && !error ? (
+        {checkOrder.isIdle && (
           <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
             Masukkan Order ID kemudian klik "Cek Status" untuk melihat hasil.
           </div>
-        ) : null}
+        )}
 
-        {loading ? (
+        {checkOrder.isPending && (
           <div className="rounded-xl border border-border p-6 flex items-center gap-3">
             <Loader2Icon className="size-5 animate-spin" />
             <span className="text-sm text-muted-foreground">
               Mengambil data pesanan...
             </span>
           </div>
-        ) : null}
+        )}
 
-        {error ? (
+        {checkOrder.isError && (
           <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-destructive text-sm">
-            {error}
+            {isAxiosError(checkOrder.error) &&
+            checkOrder.error.response?.status === 404
+              ? "Order ID tidak ditemukan. Periksa kembali dan coba lagi."
+              : "Terjadi kesalahan saat memeriksa pesanan. Silakan coba lagi."}
           </div>
-        ) : null}
+        )}
 
-        {result && !loading ? (
+        {checkOrder.isSuccess && (
           <article className="rounded-xl border border-border bg-card p-4 md:p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TicketCheckIcon className="size-5 text-primary" />
-                <h2 className="font-semibold">Order #{result.order_id}</h2>
+                <h2 className="font-semibold">
+                  Order #{checkOrder.data.data.order_id}
+                </h2>
               </div>
-              {getStatusBadge(result.order_status, result.payment_status)}
+              <Button asChild>
+                <LinkWithLocale
+                  to={`/order/detail/${checkOrder.data.data.order_id}`}
+                  className="text-sm"
+                >
+                  Lihat Detail
+                </LinkWithLocale>
+              </Button>
+              {/* {getStatusBadge(result.order_status, result.payment_status)} */}
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Order ID</p>
-                <p className="font-medium break-all">{result.order_id}</p>
+                <p className="font-medium break-all">
+                  {checkOrder.data.data.order_id}
+                </p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Status Pembayaran</p>
                 <p className="font-medium capitalize">
-                  {result.payment_status}
+                  {checkOrder.data.data.payment_status}
                 </p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Status Order</p>
-                <p className="font-medium capitalize">{result.order_status}</p>
+                <p className="font-medium capitalize">
+                  {checkOrder.data.data.order_status}
+                </p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Total</p>
-                <p className="font-medium">{formatIDR(result.total_price)}</p>
+                <p className="font-medium">
+                  {formatPrice(checkOrder.data.data.total_price)}
+                </p>
               </div>
             </div>
 
             <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
               <ClockIcon className="size-4" />
               <time>
-                Dibuat pada{" "}
-                {new Date(result.created_at).toLocaleString("id-ID", {
-                  day: "2-digit",
-                  month: "long",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
+                Dibuat pada {formatDate(checkOrder.data.data.created_at)}
               </time>
             </div>
           </article>
-        ) : null}
+        )}
       </section>
     </div>
   );
