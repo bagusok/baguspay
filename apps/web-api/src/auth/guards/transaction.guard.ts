@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { eq } from '@repo/db';
 import { tb } from '@repo/db/types';
 import { Request } from 'express';
+import { GUEST_USER } from 'src/common/constants/guest-user';
 import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
@@ -26,7 +27,7 @@ export class TransactionGuard implements CanActivate {
 
     // Guest access is allowed only when no authorization header is provided
     if (!accessToken) {
-      request.user = null;
+      request.user = GUEST_USER;
       return true;
     }
 

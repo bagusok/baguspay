@@ -6,12 +6,19 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { DigiflazzCallbackData } from 'src/integrations/h2h/digiflazz/digiflazz.service';
+import { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type';
 import { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type';
 import { CallbackService } from './callback.service';
+import { DepositCallbackService } from './deposit.callback.service';
+import { PaymentCallbackService } from './payment.callback.service';
 
 @Controller('callback')
 export class CallbackController {
-  constructor(private readonly callbackService: CallbackService) {}
+  constructor(
+    private readonly callbackService: CallbackService,
+    private readonly depositCallbackService: DepositCallbackService,
+    private readonly paymentCallbackService: PaymentCallbackService,
+  ) {}
 
   @Post('tripay')
   async handleTripayCallback(
@@ -38,6 +45,16 @@ export class CallbackController {
       throw new UnprocessableEntityException(
         'Invalid User-Agent. Only Digiflazz-Hookshot is allowed.',
       );
+    }
+  }
+
+  @Post('duitku')
+  async handleSuitkuCallback(@Body() data: DuitkuCallbackPayload) {
+    console.log('Callback Duitku Masuk:', data);
+    if (data.merchantOrderId.startsWith('DEPO')) {
+      return this.depositCallbackService.duitkuCallback(data);
+    } else {
+      return this.paymentCallbackService.duitkuCallback(data);
     }
   }
 }

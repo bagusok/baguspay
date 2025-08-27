@@ -256,26 +256,29 @@ export class DepositService {
             fee_type: payment.fee_type,
             id: depositId,
             expired_in: payment.expired_in,
-            fee: totalFee,
+            fee_static: payment.fee_static,
+            fee_in_percent: payment.fee_percentage,
           });
+
+          console.log(pg);
 
           const deposit = await tx
             .insert(tb.deposits)
             .values({
-              ref_id: pg.data.ref_id,
+              ref_id: pg.ref_id,
               deposit_id: depositId,
               payment_method_id: payment.id,
               status: DepositStatus.PENDING,
               user_id: user.id,
-              amount_pay: pg.data.amount,
-              expired_at: pg.data.expired_at,
-              amount_received: pg.data.amount_received,
-              amount_fee: pg.data.total_fee,
-              email: pg.data.customer_email,
+              amount_pay: pg.amount_total,
+              expired_at: pg.expired_at,
+              amount_received: pg.amount_received,
+              amount_fee: pg.total_fee,
+              email: pg.customer_email,
               phone_number: data.phone_number,
-              pay_code: pg.data.pay_code,
-              pay_url: pg.data.pay_url,
-              qr_code: pg.data.qr_code,
+              pay_code: pg.pay_code,
+              pay_url: pg.pay_url,
+              qr_code: pg.qr_code,
             })
             .returning();
 

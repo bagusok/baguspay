@@ -11,7 +11,8 @@ export interface CreatePaymentGatewayRequest {
   fee_type: PaymentMethodFeeType;
   id: string;
   amount: number;
-  fee: number;
+  fee_in_percent: number;
+  fee_static: number;
   customer_name: string;
   customer_email: string;
   customer_phone?: string;
@@ -29,8 +30,7 @@ export interface CreatePaymentGatewayResponse {
   provider_code: string;
   amount: number;
   amount_received: number;
-  fee_merchant: number;
-  fee_customer: number;
+  amount_total: number;
   total_fee: number;
   fee_type: PaymentMethodFeeType;
   customer_name: string;

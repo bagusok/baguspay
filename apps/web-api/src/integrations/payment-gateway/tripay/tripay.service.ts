@@ -1,102 +1,111 @@
 import {
-  BadRequestException,
+  HttpException,
   Injectable,
   InternalServerErrorException,
-  Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios, { AxiosInstance } from 'axios';
-import * as crypto from 'crypto';
-import { SendResponse } from 'src/common/utils/response';
+import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types';
+import { ApiServiceException } from 'src/common/exceptions/api-service.exception';
 import {
-  Data,
-  TripayApiErrorResponse,
-  TripayCreateClosedPaymentRequest,
-  TripayCreateClosedPaymentResponse,
-} from './tripay.type';
+  CreatePaymentGatewayRequest,
+  CreatePaymentGatewayResponse,
+} from '../payment-gateway.type';
+import { PaymentGateway } from '../payment.interface';
+import { TripayApiService } from './tripay.api.service';
+import { TripayPaymentMethodCode } from './tripay.type';
 
 @Injectable()
-export class TripayService {
-  private url: string;
-  private apiClient: AxiosInstance;
-  private logger = new Logger(TripayService.name);
+export class TripayService implements PaymentGateway {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly tripayApiService: TripayApiService,
+  ) {}
 
-  constructor(private readonly configService: ConfigService) {
-    const environment = this.configService.get<string>('NODE_ENV');
-    const apiKey = this.configService.get<string>('TRIPAY_APIKEY');
+  async createTransaction(
+    data: CreatePaymentGatewayRequest,
+  ): Promise<CreatePaymentGatewayResponse> {
+    const expiredTime = Math.floor(Date.now() / 1000) + data.expired_in;
 
-    if (environment === 'production') {
-      this.url = 'https://tripay.co.id';
+    let amount = data.amount;
+    let fee = 0;
+    let totalAmount = 0;
+
+    if (data.fee_type == PaymentMethodFeeType.BUYER) {
+      totalAmount = data.amount;
     } else {
-      this.url = 'https://tripay.co.id/api-sandbox';
+      fee = this.calculateFee(
+        amount,
+        data.fee_in_percent / 100,
+        data.fee_static,
+      );
+      totalAmount = data.amount + fee;
     }
 
-    this.apiClient = axios.create({
-      baseURL: this.url,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    });
-  }
-
-  public generateClosedPaymentSignature(
-    merchant_ref: string,
-    amount: number,
-  ): string {
-    return crypto
-      .createHmac(
-        'sha256',
-        this.configService.get<string>('TRIPAY_PRIVATE_KEY'),
-      )
-      .update(
-        this.configService.get<string>('TRIPAY_MERCHANT_CODE') +
-          merchant_ref +
-          amount,
-      )
-      .digest('hex');
-  }
-
-  public generateCallbackSignature(data: object): string {
-    return crypto
-      .createHmac(
-        'sha256',
-        this.configService.get<string>('TRIPAY_PRIVATE_KEY'),
-      )
-      .update(JSON.stringify(data))
-      .digest('hex');
-  }
-
-  public async createClosedPayment(_data: TripayCreateClosedPaymentRequest) {
     try {
-      const signature = this.generateClosedPaymentSignature(
-        _data.merchant_ref,
-        _data.amount,
-      );
+      const response = await this.tripayApiService.createClosedPayment({
+        amount: totalAmount,
+        merchant_ref: data.id,
+        customer_name: data.customer_name,
+        customer_email: data.customer_email,
+        method: data.provider_code as TripayPaymentMethodCode,
+        order_items: data.order_items,
+        callback_url: data.callback_url,
+        return_url: data.return_url,
+        expired_time: expiredTime,
+        customer_phone: data.customer_phone,
+      });
 
-      const response =
-        await this.apiClient.post<TripayCreateClosedPaymentResponse>(
-          '/transaction/create',
-          {
-            ..._data,
-            signature,
-          },
-        );
-
-      const data = response.data;
-
-      return SendResponse.success<Data>(data.data);
+      return {
+        amount: response.data.amount,
+        customer_email: response.data.customer_email,
+        customer_name: response.data.customer_name,
+        customer_phone: response.data.customer_phone,
+        amount_received: response.data.amount_received,
+        amount_total: totalAmount,
+        fee_type: data.fee_type,
+        order_items: response.data.order_items,
+        provider_code: data.provider_code,
+        provider_name: data.provider_name,
+        ref_id: response.data.reference,
+        total_fee: response.data.total_fee,
+        callback_url: response.data.callback_url,
+        checkout_url: response.data.checkout_url,
+        return_url: response.data.return_url,
+        qr_url: response.data.qr_url,
+        qr_code: response.data.qr_string,
+        pay_code: response.data.pay_code,
+        pay_url: response.data.pay_url,
+        id: data.id,
+        expired_at: new Date(expiredTime * 1000),
+        status: PaymentStatus.PENDING,
+      };
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      this.logger.error('Error creating closed payment', error.message);
-      if (axios.isAxiosError<TripayApiErrorResponse>(error)) {
-        throw new BadRequestException(
-          error.response?.data.message || 'Tripay API Error',
-        );
+      if (error instanceof ApiServiceException) {
+        throw new HttpException(error.message, error.httpCode);
       }
 
       throw new InternalServerErrorException(
-        'An unexpected error occurred while creating tripay closed payment',
+        'Internal server error when creating Tripay transaction',
       );
     }
+  }
+
+  cancelTransaction(data: any): Promise<any> {
+    throw new Error('Method not implemented.');
+  }
+
+  handleCallback(data: any): Promise<any> {
+    throw new Error('Method not implemented.');
+  }
+
+  calculateFee(
+    amountReceived: number,
+    feePercent: number,
+    feeFixed: number,
+  ): number {
+    const total =
+      amountReceived / (1 - feePercent) + feeFixed / (1 - feePercent);
+    const fee = total - amountReceived;
+    return Math.ceil(fee);
   }
 }

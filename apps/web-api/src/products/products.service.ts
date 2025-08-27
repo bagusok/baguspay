@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, asc, eq, gte, lte, ne, or } from '@repo/db';
+import { and, asc, count, eq, gte, lte, ne, or, SQL } from '@repo/db';
 import { OfferType, tb } from '@repo/db/types';
+import { MetaPaginated } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
+import { GetAllProductsDto } from './products.dto';
 
 @Injectable()
 export class ProductsService {
@@ -323,6 +325,78 @@ export class ProductsService {
         flash_sales: buildProductFlashSale,
       },
       'Category retrieved successfully',
+    );
+  }
+
+  async getProducts(data: GetAllProductsDto) {
+    const where: SQL[] = [eq(tb.products.billing_type, data.billing_type)];
+
+    if (data.category_id) {
+      where.push(eq(tb.productCategories.id, data.category_id));
+    }
+
+    const products = await this.databaseService.db
+      .select({
+        id: tb.products.id,
+        name: tb.products.name,
+        category_name: tb.productCategories.name,
+        sub_category_name: tb.productSubCategories.name,
+        image_url: tb.products.image_url,
+        price: tb.products.price,
+        is_available: tb.products.is_available,
+        billing_type: tb.products.billing_type,
+        cut_off_start: tb.products.cut_off_start,
+        cut_off_end: tb.products.cut_off_end,
+        description: tb.products.description,
+        sku_code: tb.products.sku_code,
+        sub_name: tb.products.sub_name,
+      })
+      .from(tb.products)
+      .innerJoin(
+        tb.productSubCategories,
+        eq(tb.products.product_sub_category_id, tb.productSubCategories.id),
+      )
+      .innerJoin(
+        tb.productCategories,
+        eq(
+          tb.productSubCategories.product_category_id,
+          tb.productCategories.id,
+        ),
+      )
+      .where(and(...where))
+      .orderBy(asc(tb.productCategories.name), asc(tb.products.price))
+      .limit(data.limit)
+      .offset((data.page - 1) * data.limit);
+
+    const [total] = await this.databaseService.db
+      .select({
+        count: count(),
+      })
+      .from(tb.products)
+      .innerJoin(
+        tb.productSubCategories,
+        eq(tb.products.product_sub_category_id, tb.productSubCategories.id),
+      )
+      .innerJoin(
+        tb.productCategories,
+        eq(
+          tb.productSubCategories.product_category_id,
+          tb.productCategories.id,
+        ),
+      )
+      .where(and(...where));
+
+    return SendResponse.success<typeof products, MetaPaginated>(
+      products,
+      'Products retrieved successfully',
+      {
+        meta: {
+          limit: data.limit,
+          page: data.page,
+          total: total.count || 0,
+          total_pages: Math.ceil((total.count || 0) / data.limit) || 1,
+        },
+      },
     );
   }
 

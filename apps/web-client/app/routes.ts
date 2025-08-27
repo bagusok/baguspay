@@ -29,6 +29,7 @@ export default [
     route("support", "pages/support.tsx"),
 
     route("check-order", "pages/check-order.tsx"),
+    route("price-list", "pages/list-product-price.tsx"),
 
     ...prefix("blog", [
       index("pages/blog/index.tsx"),

@@ -35,6 +35,7 @@ import {
 
 import { ConfigService } from '@nestjs/config';
 import crypto from 'crypto';
+import { GUEST_USER } from 'src/common/constants/guest-user';
 import { TUser } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
@@ -60,7 +61,7 @@ export class OrderService {
     productId: string,
     isFlashSale = false,
     voucherId: string | null = null,
-    user?: TUser,
+    user: TUser,
   ) {
     const product = await this.databaseService.db.query.products.findFirst({
       where: and(
@@ -399,7 +400,7 @@ export class OrderService {
     data: PreCheckoutPrepaidDto,
     timestamp: number,
     isFlashSale = false,
-    user?: TUser,
+    user: TUser,
   ) {
     const [product] = await this.databaseService.db
       .select({
@@ -539,7 +540,7 @@ export class OrderService {
     let totalDiscountVoucher = 0;
 
     if (isFlashSale) {
-      if (!user || user.role === UserRole.GUEST) {
+      if (user.role === UserRole.GUEST) {
         throw new BadRequestException(
           'Please login to access flash sale offers.',
         );
@@ -864,7 +865,7 @@ export class OrderService {
     data: CheckoutPrepaidDto,
     timestamp: number,
     isFlashSale = false,
-    user?: TUser,
+    user: TUser,
     ip: string | null = null,
     userAgent: string | null = null,
   ) {
@@ -1012,7 +1013,7 @@ export class OrderService {
       let totalDiscountVoucher = 0;
 
       if (isFlashSale) {
-        if (!user || user.role == UserRole.GUEST) {
+        if (user.role == UserRole.GUEST) {
           throw new BadRequestException(
             'Please login to access flash sale offers.',
           );
@@ -1094,7 +1095,7 @@ export class OrderService {
 
       // Voucher
       if (data.voucher_id) {
-        if (!user || user.role === UserRole.GUEST) {
+        if (user.role === UserRole.GUEST) {
           throw new BadRequestException('Please login to use voucher.');
         }
 
@@ -1165,10 +1166,7 @@ export class OrderService {
           .where(
             and(
               eq(tb.offerOnOrders.offer_id, voucher.id),
-              eq(
-                tb.offerOnOrders.user_id,
-                user?.id || '00000000-0000-0000-0000-000000000000',
-              ),
+              eq(tb.offerOnOrders.user_id, user.id),
             ),
           )
           .limit(1);
@@ -1287,14 +1285,15 @@ export class OrderService {
 
       // --- Payment ---
       const createPayment = await this.pgService.createPayment({
-        user_id: user?.id ?? null,
+        user_id: user.id,
         amount: totalPrice,
-        customer_email: user?.email,
+        customer_email: user.email,
         customer_phone: data.payment_phone_number,
-        customer_name: user?.name,
+        customer_name: user.name,
         expired_in: paymentMethod.expired_in,
         provider_code: paymentMethod.provider_code,
-        fee: fee,
+        fee_in_percent: paymentMethod.fee_percentage,
+        fee_static: paymentMethod.fee_static,
         fee_type: paymentMethod.fee_type,
         provider_name: paymentMethod.provider_name,
         id: orderId,
@@ -1317,17 +1316,17 @@ export class OrderService {
           provider_code: paymentMethod.provider_code,
           provider_name: paymentMethod.provider_name,
           payment_method_id: paymentMethod.id,
-          provider_ref_id: createPayment.data.ref_id,
+          provider_ref_id: createPayment.ref_id,
           allow_access: paymentMethod.allow_access,
-          email: user?.email,
+          email: user.email,
           phone_number: data.payment_phone_number,
-          qr_code: createPayment.data.qr_code,
+          qr_code: createPayment.qr_code,
           fee_percentage: paymentMethod.fee_percentage,
           fee_static: paymentMethod.fee_static,
           fee_type: paymentMethod.fee_type,
-          pay_code: createPayment.data.pay_code,
-          pay_url: createPayment.data.pay_url,
-          expired_at: createPayment.data.expired_at,
+          pay_code: createPayment.pay_code,
+          pay_url: createPayment.pay_url,
+          expired_at: createPayment.expired_at,
           type: paymentMethod.type,
         })
         .returning({ id: tb.paymentSnapshots.id });
@@ -1355,15 +1354,12 @@ export class OrderService {
         })
         .returning({ id: tb.productSnapshots.id });
 
-      // const profit = Math.round(
-      //   product.products.price -
-      //     product.products.provider_price -
-      //     totalDiscount,
-      // );
+      console.log(createPayment);
+
       const profit = Math.round(
-        createPayment.data.amount_received +
-          totalDiscount -
+        createPayment.amount_total -
           product.products.provider_price -
+          createPayment.total_fee -
           totalDiscount,
       );
 
@@ -1372,18 +1368,18 @@ export class OrderService {
         .values({
           payment_snapshot_id: createPaymentSnapshot.id,
           product_snapshot_id: createProductSnapshot.id,
-          user_id: user?.id || '00000000-0000-0000-0000',
+          user_id: user.id,
           price: product.products.price,
-          total_price: createPayment.data.amount,
+          total_price: createPayment.amount,
           discount_price: totalDiscount,
           cost_price: product.products.provider_price,
-          fee: createPayment.data.total_fee,
+          fee: createPayment.total_fee,
           profit: profit,
           sn_number: '',
           order_id: orderId,
-          payment_status: createPayment.data.status,
+          payment_status: createPayment.status,
           order_status:
-            createPayment.data.status == PaymentStatus.SUCCESS
+            createPayment.status == PaymentStatus.SUCCESS
               ? OrderStatus.PENDING
               : OrderStatus.NONE,
           customer_input: merged,
@@ -1399,7 +1395,7 @@ export class OrderService {
       if (selectedOffer) {
         await tx.insert(tb.offerOnOrders).values({
           offer_id: selectedOffer.id,
-          user_id: user?.id || '00000000-0000-0000-0000',
+          user_id: user.id,
           discount_total: totalDiscountOffer,
           order_id: order.id,
         });
@@ -1415,7 +1411,7 @@ export class OrderService {
       if (selectedVoucher) {
         await tx.insert(tb.offerOnOrders).values({
           offer_id: selectedVoucher.id,
-          user_id: user?.id || '00000000-0000-0000-0000',
+          user_id: user.id,
           discount_total: totalDiscountVoucher,
           order_id: order.id,
         });
@@ -1428,13 +1424,12 @@ export class OrderService {
           .where(eq(tb.offers.id, selectedVoucher.id));
       }
 
-      if (createPayment.data.status == PaymentStatus.SUCCESS) {
+      if (createPayment.status == PaymentStatus.SUCCESS) {
         await this.queueService.addOrderJob(orderId);
       }
 
-      if (createPayment.data.status == PaymentStatus.PENDING) {
-        const delay =
-          new Date(createPayment.data.expired_at).getTime() - Date.now();
+      if (createPayment.status == PaymentStatus.PENDING) {
+        const delay = new Date(createPayment.expired_at).getTime() - Date.now();
         await this.queueService.addExpiredOrderJob(orderId, delay);
       }
 
@@ -1672,12 +1667,29 @@ export class OrderService {
     const order = await this.databaseService.db.query.orders.findFirst({
       where: and(
         eq(tb.orders.order_id, data.id),
-        eq(tb.orders.user_id, '00000000-0000-0000-0000-000000000000'),
+        eq(tb.orders.user_id, GUEST_USER.id),
       ),
       with: {
-        product_snapshot: true,
-        payment_snapshot: true,
-        offer_on_orders: true,
+        product_snapshot: {
+          columns: {
+            name: true,
+            category_name: true,
+            sub_category_name: true,
+          },
+        },
+        payment_snapshot: {
+          columns: {
+            name: true,
+          },
+        },
+      },
+      columns: {
+        order_id: true,
+        order_status: true,
+        payment_status: true,
+        refund_status: true,
+        total_price: true,
+        created_at: true,
       },
     });
 
@@ -1686,6 +1698,47 @@ export class OrderService {
     }
 
     return SendResponse.success(order);
+  }
+
+  async cancelOrder(data: OrderIdDto, user: TUser) {
+    const order = await this.databaseService.db.query.orders.findFirst({
+      where: and(
+        eq(tb.orders.order_id, data.id),
+        eq(tb.orders.user_id, user.id),
+      ),
+      columns: {
+        id: true,
+        order_status: true,
+        payment_status: true,
+        user_id: true,
+        total_price: true,
+        fee: true,
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order with ID ${data.id} not found.`);
+    }
+
+    if (order.payment_status !== PaymentStatus.PENDING) {
+      throw new BadRequestException(
+        `Only orders with pending payment status can be cancelled.`,
+      );
+    }
+
+    await this.databaseService.db
+      .update(tb.orders)
+      .set({
+        payment_status: PaymentStatus.CANCELLED,
+      })
+      .where(
+        and(
+          eq(tb.orders.id, order.id),
+          eq(tb.orders.payment_status, PaymentStatus.PENDING),
+        ),
+      );
+
+    return SendResponse.success(null, 'Order cancelled successfully.');
   }
 
   private generateOrderId(userId?: string): string {
