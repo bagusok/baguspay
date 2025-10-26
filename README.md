@@ -1,9 +1,9 @@
 <h1 align="center">Baguspay</h1>
-
 <p align='center'>Baguspay adalah platform Top Up Game & PPOB (Payment Point Online Bank) modern yang dirancang untuk memberikan pengalaman transaksi digital yang cepat, aman, dan responsif.  
-Dibangun dengan arsitektur **monorepo menggunakan Turborepo, menggabungkan kekuatan NestJS, React Router v7, dan AdonisJS dalam satu ekosistem pengembangan yang efisien.</p>
+Dibangun dengan arsitektur monorepo menggunakan Turborepo, menggabungkan kekuatan NestJS, React Router v7, dan AdonisJS dalam satu ekosistem pengembangan yang efisien.</p>
 
-<!-- Image Heres -->
+<img width="1920" height="1080" alt="Baguspay Web" src="https://github.com/user-attachments/assets/179b41b3-4287-4d55-b50f-49ac5f766fdc" />
+
 
 ## 🚀 Tech Stack
 
