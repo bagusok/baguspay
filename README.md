@@ -1,135 +1,201 @@
-# Turborepo starter
+<h1 align="center">Baguspay</h1>
 
-This Turborepo starter is maintained by the Turborepo core team.
+<p align='center'>Baguspay adalah platform Top Up Game & PPOB (Payment Point Online Bank) modern yang dirancang untuk memberikan pengalaman transaksi digital yang cepat, aman, dan responsif.  
+Dibangun dengan arsitektur **monorepo menggunakan Turborepo, menggabungkan kekuatan NestJS, React Router v7, dan AdonisJS dalam satu ekosistem pengembangan yang efisien.</p>
 
-## Using this example
+<!-- Image Heres -->
 
-Run the following command:
+## 🚀 Tech Stack
 
-```sh
-npx create-turbo@latest
-```
+| Layer          | Framework                                   | Deskripsi                                                       |
+| -------------- | ------------------------------------------- | --------------------------------------------------------------- |
+| 🧠 Backend API | [NestJS](https://nestjs.com/)               | Backend utama untuk RESTful API & integrasi layanan topup/PPOB  |
+| 🌐 Web Client  | [React Router v7](https://reactrouter.com/) | Frontend modern untuk pengguna akhir (customer portal)          |
+| 🛠️ Admin Panel | [AdonisJS](https://adonisjs.com/)           | Monolit untuk panel admin dan manajemen konten                  |
+| ⚡ Monorepo    | [Turborepo](https://turbo.build/)           | Pengelola workspace untuk efisiensi build, lint, dan deployment |
 
-## What's inside?
+---
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
+## 🏗️ Struktur Proyek
 
 ```
-cd my-turborepo
+baguspay
+|-- README.md
+|-- apps
+|   |-- web-admin
+|   |   |-- ace.js
+|   |   |-- adonisrc.ts
+|   |   |-- app
+|   |   |-- bin
+|   |   |-- config
+|   |   |-- eslint.config.js
+|   |   |-- inertia
+|   |   |-- package.json
+|   |   |-- resources
+|   |   |-- start
+|   |   |-- tests
+|   |   |-- tsconfig.json
+|   |   `-- vite.config.ts
+|   |-- web-api
+|   |   |-- README.md
+|   |   |-- eslint.config.mjs
+|   |   |-- nest-cli.json
+|   |   |-- package-lock.json
+|   |   |-- package.json
+|   |   |-- src
+|   |   |-- test
+|   |   |-- tsconfig.build.json
+|   |   `-- tsconfig.json
+|   `-- web-client
+|       |-- Dockerfile
+|       |-- README.md
+|       |-- app
+|       |-- package.json
+|       |-- public
+|       |-- react-router.config.ts
+|       |-- tsconfig.json
+|       `-- vite.config.ts
+|-- cli
+|   `-- digiflazz
+|       |-- package.json
+|       |-- src
+|       `-- tsconfig.json
+|-- package.json
+|-- packages
+|   |-- db
+|   |   |-- drizzle
+|   |   |-- drizzle.config.ts
+|   |   |-- eslint.config.js
+|   |   |-- package.json
+|   |   |-- scripts
+|   |   |-- src
+|   |   |-- tsconfig.json
+|   |   `-- tsup.config.ts
+|   |-- eslint-config
+|   |   |-- README.md
+|   |   |-- base.js
+|   |   |-- next.js
+|   |   |-- package.json
+|   |   `-- react-internal.js
+|   |-- tailwind-config
+|   |   |-- global.css
+|   |   `-- package.json
+|   |-- typescript-config
+|   |   |-- base.json
+|   |   |-- nextjs.json
+|   |   |-- package.json
+|   |   |-- react-library.json
+|   |   `-- react-router.json
+|   `-- ui
+|       |-- README.md
+|       |-- components.json
+|       |-- eslint.config.js
+|       |-- package.json
+|       |-- postcss.config.mjs
+|       |-- src
+|       |-- tsconfig.json
+|       `-- tsup.config.ts
+|-- pnpm-lock.yaml
+|-- pnpm-workspace.yaml
+|-- turbo.json
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+---
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+## ⚙️ Fitur Utama
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
+### 🕹️ Untuk Pengguna
 
-### Develop
+- Top Up berbagai game populer (Mobile Legends, Free Fire, PUBG, dll)
+- Pembayaran PPOB: Pulsa, Token PLN, PDAM, Internet, eMoney, dan lainnya
+- Riwayat transaksi real-time
+- Integrasi pembayaran otomatis (VA, QRIS, eWallet)
+- Notifikasi status transaksi
 
-To develop all apps and packages, run the following command:
+### 🧑‍💼 Untuk Admin
 
-```
-cd my-turborepo
+- Dashboard transaksi dan penjualan
+- Manajemen produk & harga
+- Manajemen user & role
+- Monitoring sistem & laporan keuangan
+- Kelola promo dan voucher
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+---
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
+## 🧩 Instalasi & Pengembangan
 
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+### 1. Clone Repositori
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+git clone https://github.com/username/baguspay.git
+cd baguspay
 ```
 
-### Remote Caching
+### 2. Instal Dependensi
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
+```bash
+pnpm install
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+### 3. Jalankan Semua Aplikasi
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
+```bash
+pnpm dev
 ```
 
-## Useful Links
+> Turborepo akan menjalankan semua aplikasi (`web`, `api`, dan `admin`) secara paralel dengan hot reload.
 
-Learn more about the power of Turborepo:
+---
 
-- [Tasks](https://turborepo.com/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.com/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.com/docs/reference/configuration)
-- [CLI Usage](https://turborepo.com/docs/reference/command-line-reference)
+## 🔧 Environment Variables
+
+Buat file `.env` di masing-masing folder aplikasi (`/apps/web-api`, `/apps/web-admin`, `/apps/web-client`).
+
+## 🧱 Script Umum
+
+| Perintah     | Deskripsi                                          |
+| ------------ | -------------------------------------------------- |
+| `pnpm dev`   | Menjalankan semua aplikasi dalam mode pengembangan |
+| `pnpm build` | Build semua aplikasi untuk production              |
+| `pnpm lint`  | Jalankan linting untuk seluruh workspace           |
+| `pnpm test`  | Jalankan unit test seluruh project                 |
+
+---
+
+## 🧰 Build Manual (Opsional)
+
+### Web
+
+```bash
+cd apps/web-client
+pnpm dev
+```
+
+### API
+
+```bash
+cd apps/web-api
+pnpm start:dev
+```
+
+### Admin
+
+```bash
+cd apps/web-admin
+node ace serve --watch
+```
+
+---
+
+## 📦 Deployment
+
+| Aplikasi             | Platform Rekomendasi                |
+| -------------------- | ----------------------------------- |
+| **Web (React)**      | Vercel / Netlify / Cloudflare Pages |
+| **API (NestJS)**     | Render / Railway / VPS / Docker     |
+| **Admin (AdonisJS)** | VPS / PM2 / Docker                  |
+
+---
+
+> 💡 _"Baguspay — top up game & PPOB semudah klik!"_
