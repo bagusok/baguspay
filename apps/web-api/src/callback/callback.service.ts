@@ -260,7 +260,7 @@ export class CallbackService {
           cost_price: data.data.price,
           profit: order.price - data.data.price - order.discount_price,
           notes: `Topup successful. SN: ${data.data.sn} wa: ${data.data.wa} tele: ${data.data.tele}`,
-          raw_response: JSON.stringify(data),
+          order_raw_response: data.data,
         })
         .where(
           and(
@@ -282,7 +282,7 @@ export class CallbackService {
           cost_price: data.data.price,
           profit: order.price - data.data.price - order.discount_price,
           notes: `Topup failed: ${data.data.message}`,
-          raw_response: JSON.stringify(data.data),
+          callback_raw_response: data,
         })
         .where(
           and(

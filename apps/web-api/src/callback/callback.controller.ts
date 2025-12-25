@@ -25,7 +25,17 @@ export class CallbackController {
     @Body() data: TripayCallbackData,
     @Headers('X-Callback-Signature') callbackSignature,
   ) {
-    return this.callbackService.handleTripayCallback(data, callbackSignature);
+    if (data.merchant_ref.startsWith('DEPO')) {
+      return this.depositCallbackService.tripayCallback(
+        data,
+        callbackSignature,
+      );
+    } else {
+      return this.paymentCallbackService.tripayCallback(
+        data,
+        callbackSignature,
+      );
+    }
   }
 
   @Post('digiflazz')
@@ -49,8 +59,7 @@ export class CallbackController {
   }
 
   @Post('duitku')
-  async handleSuitkuCallback(@Body() data: DuitkuCallbackPayload) {
-    console.log('Callback Duitku Masuk:', data);
+  async handleDuitkuCallback(@Body() data: DuitkuCallbackPayload) {
     if (data.merchantOrderId.startsWith('DEPO')) {
       return this.depositCallbackService.duitkuCallback(data);
     } else {

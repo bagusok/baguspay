@@ -1,7 +1,6 @@
-import ProductsCategoriesController from '#controllers/product_categories_controller'
-import { UpdateProductCategoryValidator } from '#validators/product'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import { CreateProductCategoryValidator } from '#validators/product'
 import { useForm } from '@inertiajs/react'
+import { ProductBillingType, ProductCategoryType, ProductFullfillmentType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
@@ -18,29 +17,38 @@ import toast from 'react-hot-toast'
 import FileManager from '~/components/file-manager'
 import AdminLayout from '~/components/layout/admin-layout'
 
-export default function EditProductCategory(
-  props: InferPageProps<ProductsCategoriesController, 'edit'>
-) {
-  const { data, errors, setData, patch, processing } = useForm<UpdateProductCategoryValidator>({
-    file_image_id: props.image.file_image_id || '',
-    file_banner_id: props.image.file_banner_id || '',
-    name: props.productCategory.name,
-    sub_name: props.productCategory.sub_name || '',
-    description: props.productCategory.description || '',
-    publisher: props.productCategory.publisher || '',
-    is_available: props.productCategory.is_available,
-    is_featured: props.productCategory.is_featured,
-    label: props.productCategory.label || '',
-    delivery_type: props.productCategory.delivery_type as 'instant' | 'manual',
-    is_seo_enabled: props.productCategory.is_seo_enabled,
-    seo_title: props.productCategory.seo_title || '',
-    seo_description: props.productCategory.seo_description || '',
-    seo_image_id: props.image.seo_image_id || '',
-  })
+export default function CreateProductCategory() {
+  const { data, errors, setData, post, processing } = useForm<CreateProductCategoryValidator>(
+    'createpulsa',
+    {
+      file_image_id: 'cffe1506-4a45-4ee5-aa7d-eb69748192a9',
+      file_icon_id: '',
+      file_banner_id: '',
+      name: '',
+      sub_name: '',
+      description: '',
+      publisher: '',
+      is_available: true,
+      is_featured: false,
+      label: '',
+      delivery_type: 'instant',
+      is_seo_enabled: false,
+      seo_title: '',
+      seo_description: '',
+      seo_image_id: '',
+      product_billing_type: ProductBillingType.PREPAID,
+      type: ProductCategoryType.PULSA,
+      product_fullfillment_type: ProductFullfillmentType.AUTOMATIC_DIRECT,
+      is_special_feature: false,
+      special_feature_key: '',
+      tags1: [],
+      tags2: [],
+    }
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    patch(`/admin/product-categories/${props.productCategory.id}`, {
+    post('/admin/product-categories/pulsa/create', {
       onSuccess: () => {
         toast.success('Product category created successfully!')
       },
@@ -54,21 +62,30 @@ export default function EditProductCategory(
 
   return (
     <AdminLayout>
-      <h2 className="text-2xl font-bold mt-4">Edit Product Category</h2>
+      <h2 className="text-2xl font-bold mt-4">Create Product Category</h2>
       <form className="w-full mx-auto bg-white rounded-lg space-y-4 mt-6" onSubmit={handleSubmit}>
         {/* File Image */}
         <div>
           <Label htmlFor="file_image_id" className="mb-2">
-            Image
+            Image (Large)
           </Label>
           <div className="flex items-center gap-2 mt-1">
-            <FileManager
-              onFilesSelected={(file) => setData('file_image_id', file.id)}
-              defaultFileId={props.image.file_image_id}
-            />
+            <FileManager onFilesSelected={(file) => setData('file_image_id', file.id)} />
           </div>
           {errors.file_image_id && (
             <p className="text-xs text-red-500 mt-1">{errors.file_image_id}</p>
+          )}
+        </div>
+        {/* File Icon */}
+        <div>
+          <Label htmlFor="file_icon_id" className="mb-2">
+            Image (Icon APK)
+          </Label>
+          <div className="flex items-center gap-2 mt-1">
+            <FileManager onFilesSelected={(file) => setData('file_icon_id', file.id)} />
+          </div>
+          {errors.file_icon_id && (
+            <p className="text-xs text-red-500 mt-1">{errors.file_icon_id}</p>
           )}
         </div>
 
@@ -78,10 +95,7 @@ export default function EditProductCategory(
             Banner
           </Label>
           <div className="flex items-center gap-2 mt-1">
-            <FileManager
-              onFilesSelected={(file) => setData('file_banner_id', file.id)}
-              defaultFileId={props.image.file_banner_id}
-            />
+            <FileManager onFilesSelected={(file) => setData('file_banner_id', file.id)} />
           </div>
           {errors.file_banner_id && (
             <p className="text-xs text-red-500 mt-1">{errors.file_banner_id}</p>
@@ -196,6 +210,55 @@ export default function EditProductCategory(
             <p className="text-xs text-red-500 mt-1">{errors.delivery_type}</p>
           )}
         </div>
+        {/* Billing & Fullfilment Type */}
+        <div className="form-group flex gap-4 ">
+          {/* <div>
+            <Label htmlFor="billing_type" className="mb-2">
+              Billing Type
+            </Label>
+            <Select
+              value={data.product_billing_type}
+              onValueChange={(val) => setData('product_billing_type', val as any)}
+            >
+              <SelectTrigger id="product_billing_type">
+                <SelectValue placeholder="Select billing type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(ProductBillingType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.product_billing_type && (
+              <p className="text-xs text-red-500 mt-1">{errors.product_billing_type}</p>
+            )}
+          </div> */}
+          <div>
+            <Label htmlFor="billing_type" className="mb-2">
+              Fullfillment Type
+            </Label>
+            <Select
+              value={data.product_fullfillment_type}
+              onValueChange={(val) => setData('product_fullfillment_type', val as any)}
+            >
+              <SelectTrigger id="product_fullfillment_type">
+                <SelectValue placeholder="Select fullfillment type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(ProductFullfillmentType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.product_billing_type && (
+              <p className="text-xs text-red-500 mt-1">{errors.product_billing_type}</p>
+            )}
+          </div>
+        </div>
 
         {/* SEO Enabled */}
 
@@ -249,10 +312,7 @@ export default function EditProductCategory(
                 SEO Image
               </Label>
               <div className="flex items-center gap-2 mt-1">
-                <FileManager
-                  onFilesSelected={(file) => setData('seo_image_id', file.id)}
-                  defaultFileId={props.image.seo_image_id}
-                />
+                <FileManager onFilesSelected={(file) => setData('seo_image_id', file.id)} />
               </div>
               {errors.seo_image_id && (
                 <p className="text-xs text-red-500 mt-1">{errors.seo_image_id}</p>

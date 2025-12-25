@@ -1,3 +1,4 @@
+import { db } from '@repo/db';
 import {
   CreatePaymentGatewayRequest,
   CreatePaymentGatewayResponse,
@@ -6,6 +7,7 @@ import {
 export interface PaymentGateway {
   createTransaction(
     data: CreatePaymentGatewayRequest,
+    dbInstance?: Parameters<Parameters<(typeof db)['transaction']>[0]>[0],
   ): Promise<CreatePaymentGatewayResponse>;
 
   cancelTransaction(data: any): Promise<any>;

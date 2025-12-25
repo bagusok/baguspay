@@ -1433,7 +1433,10 @@ export class OrderService {
         await this.queueService.addExpiredOrderJob(orderId, delay);
       }
 
-      await tx.update(tb.products).set({ stock: product.products.stock - 1 });
+      await tx
+        .update(tb.products)
+        .set({ stock: product.products.stock - 1 })
+        .where(eq(tb.products.id, product.products.id));
 
       return {
         selectedOffer,

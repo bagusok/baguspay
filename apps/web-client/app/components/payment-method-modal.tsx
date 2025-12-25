@@ -27,6 +27,7 @@ import type {
   DepositPaymentData,
   DepositPaymentMethod,
 } from "~/pages/protected/user/deposit";
+import Image from "./image";
 
 interface PaymentMethodModalProps {
   paymentData: DepositPaymentData[];
@@ -74,7 +75,7 @@ export default function PaymentMethodModal({
             <div className="flex items-center gap-3">
               <div className="flex-shrink-0">
                 {selectedPaymentMethod.image_url ? (
-                  <img
+                  <Image
                     src={selectedPaymentMethod.image_url}
                     alt={selectedPaymentMethod.name}
                     className="w-8 h-8 object-contain rounded"
@@ -137,7 +138,7 @@ export default function PaymentMethodModal({
                     <div className="flex items-center gap-3">
                       <div className="flex-shrink-0">
                         {getPaymentMethodIcon(
-                          category.payment_methods[0]?.type || "default",
+                          category.payment_methods[0]?.type || "default"
                         )}
                       </div>
                       <div className="text-left">
@@ -147,7 +148,7 @@ export default function PaymentMethodModal({
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {
                             category.payment_methods.filter(
-                              (m) => m.is_available,
+                              (m) => m.is_available
                             ).length
                           }{" "}
                           methods available
@@ -172,7 +173,7 @@ export default function PaymentMethodModal({
                             <div className="flex items-center gap-3">
                               <div className="flex-shrink-0">
                                 {method.image_url ? (
-                                  <img
+                                  <Image
                                     src={method.image_url}
                                     alt={method.name}
                                     className="w-12 h-12 object-contain rounded"

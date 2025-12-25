@@ -1,6 +1,8 @@
 import { relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
+  jsonb,
   numeric,
   pgTable,
   text,
@@ -35,7 +37,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
     {
       onDelete: "set null",
       onUpdate: "cascade",
-    },
+    }
   ),
   type: paymentMethodTypeEnum("type")
     .default(PaymentMethodType.BANK_TRANSFER)
@@ -50,7 +52,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
     .notNull()
     .default(0),
   fee_type: paymentMethodFeeTypeEnum("fee_type").default(
-    PaymentMethodFeeType.MERCHANT,
+    PaymentMethodFeeType.MERCHANT
   ),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: paymentMethodProviderEnum("provider_name")
@@ -70,7 +72,7 @@ export const paymentSnapshots = pgTable("payment_snapshots", {
   expired_at: timestamp("expired_at", { withTimezone: true }).notNull(),
   created_at: timestamp("created_at", { withTimezone: true }),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
+    () => new Date()
   ),
 });
 
@@ -82,7 +84,7 @@ export const paymentSnapshotRelations = relations(
       references: [paymentMethods.id],
     }),
     order: one(orders),
-  }),
+  })
 );
 
 export const productSnapshots = pgTable("product_snapshots", {
@@ -91,11 +93,18 @@ export const productSnapshots = pgTable("product_snapshots", {
     onDelete: "set null",
     onUpdate: "cascade",
   }),
+
+  // new fields 👇
+  is_special_feature: boolean("is_special_feature").notNull().default(false),
+  special_feature_key: varchar("special_feature_key", { length: 50 }),
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+
   provider_ref_id: varchar("provider_ref_id", { length: 100 }).notNull(),
   name: varchar("name", { length: 100 }).notNull(),
   category_name: varchar("category_name", { length: 100 }).default(""),
   sub_category_name: varchar("sub_category_name", { length: 100 }).default(""),
   sku_code: varchar("sku_code", { length: 15 }).notNull(),
+
   price: integer("price").notNull(),
   profit_static: integer("profit_static").notNull().default(0),
   profit_percentage: numeric("profit_percentage", {
@@ -107,7 +116,7 @@ export const productSnapshots = pgTable("product_snapshots", {
     .default(0),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: productProviderEnum("provider_name").default(
-    ProductProvider.ATLANTICH2H,
+    ProductProvider.ATLANTICH2H
   ),
   provider_price: integer("provider_price").notNull(),
   provider_max_price: integer("provider_max_price").notNull(),
@@ -116,14 +125,15 @@ export const productSnapshots = pgTable("product_snapshots", {
     .default(""),
   notes: text("notes"),
   billing_type: productBillingTypeEnum("billing_type").default(
-    ProductBillingType.PREPAID,
+    ProductBillingType.PREPAID
   ),
   fullfillment_type: productFullfillmentTypeEnum("fullfillment_type").default(
-    ProductFullfillmentType.AUTOMATIC_DIRECT,
+    ProductFullfillmentType.AUTOMATIC_DIRECT
   ),
+
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
+    () => new Date()
   ),
 });
 
@@ -135,5 +145,5 @@ export const productSnapshotRelations = relations(
       references: [products.id],
     }),
     order: one(orders),
-  }),
+  })
 );

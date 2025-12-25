@@ -131,6 +131,7 @@ const columns: ColumnDef<Props['productCategories'][number]>[] = [
         key={row.original.id}
         isAvailable={row.original.is_available}
         id={row.original.id}
+        type="game"
       />
     ),
   },

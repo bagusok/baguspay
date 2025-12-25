@@ -10,6 +10,8 @@ export * from "./offers";
 export * from "./orders";
 export * from "./payments";
 export * from "./pg-enums";
+// export * from "./product_view";
+export * from "./inquiry";
 export * from "./products";
 export * from "./sessions";
 export * from "./snapshots";

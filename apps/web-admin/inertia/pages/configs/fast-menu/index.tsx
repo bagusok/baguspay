@@ -1,4 +1,4 @@
-import ConfigHomesController from '#controllers/config_homes_controller'
+import ConfigHomesController from '#controllers/configs/config_homes_controller'
 import { CreateHomeProductSectionValidator } from '#validators/config_home'
 import { InferPageProps } from '@adonisjs/inertia/types'
 import { Link, router, useForm } from '@inertiajs/react'
@@ -107,7 +107,7 @@ const columns: ColumnDef<Props['productSections'][number]>[] = [
     cell: ({ row }) => (
       <div className="flex gap-2">
         <Button size="sm" variant="secondary" asChild>
-          <Link href={`/admin/config/home/product-sections/${row.original.id}`}>
+          <Link href={`/admin/config/home/fast-menu/${row.original.id}`}>
             <EyeIcon />
           </Link>
         </Button>
@@ -130,7 +130,7 @@ const columns: ColumnDef<Props['productSections'][number]>[] = [
                 variant="destructive"
                 onClick={() => {
                   const id = row.original.id
-                  router.delete(`/admin/config/home/product-sections/${id}`, {
+                  router.delete(`/admin/config/home/fast-menu/${id}`, {
                     preserveScroll: true,
                     onSuccess: () => router.get('/admin/config/home/product-sections'),
                   })
@@ -152,15 +152,20 @@ export default function ProductSectionsIndex({ productSections }: Props) {
 
   const { data, setData, post, processing, errors, reset } =
     useForm<CreateHomeProductSectionValidator>({
-      image_id: '',
       name: '',
-      is_available: false,
-      is_featured: false,
-      menu_type: ProductGroupingMenuType.HOME_MENU,
-      order: 0,
+      description: '',
+      image_id: '',
+      redirect_url: '',
+      app_key: '',
       platform: AppPlatform.WEB,
       type: ProductGroupingType.MODAL,
-      description: '',
+      menu_type: ProductGroupingMenuType.HOME_MENU,
+      is_available: false,
+      is_featured: false,
+      label: '',
+      order: 0,
+      is_special_feature: false,
+      special_feature_key: '',
     })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -177,14 +182,14 @@ export default function ProductSectionsIndex({ productSections }: Props) {
   return (
     <AdminLayout>
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Product Sections</h1>
+        <h1 className="text-2xl font-bold">Home Sections</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Create Product Section</Button>
+            <Button>Create Home Section</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-xl overflow-y-auto max-h-[80vh]">
             <DialogHeader>
-              <DialogTitle>Create Product Section</DialogTitle>
+              <DialogTitle>Create Home Section</DialogTitle>
               <DialogDescription>Tambahkan section produk untuk Home.</DialogDescription>
             </DialogHeader>
 
@@ -231,8 +236,38 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                 )}
               </div>
 
+              {/* Redirect URL */}
+              <div>
+                <Label htmlFor="redirect_url" className="mb-2">
+                  Redirect URL
+                </Label>
+                <Input
+                  id="redirect_url"
+                  value={data.redirect_url}
+                  onChange={(e) => setData('redirect_url', e.target.value)}
+                  placeholder="Optional redirect URL"
+                />
+                {errors.redirect_url && (
+                  <p className="text-xs text-red-500 mt-1">{errors.redirect_url}</p>
+                )}
+              </div>
+
+              {/* App Key */}
+              <div>
+                <Label htmlFor="app_key" className="mb-2">
+                  App Key
+                </Label>
+                <Input
+                  id="app_key"
+                  value={data.app_key}
+                  onChange={(e) => setData('app_key', e.target.value)}
+                  placeholder="Optional app key"
+                />
+                {errors.app_key && <p className="text-xs text-red-500 mt-1">{errors.app_key}</p>}
+              </div>
+
               {/* Enums */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="platform" className="mb-2">
                     Platform
@@ -245,18 +280,67 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                       <SelectValue placeholder="Select platform" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={AppPlatform.WEB}>Web</SelectItem>
-                      <SelectItem value={AppPlatform.APP}>App</SelectItem>
+                      {Object.values(AppPlatform).map((platform) => (
+                        <SelectItem key={platform} value={platform}>
+                          {platform}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {errors.platform && (
                     <p className="text-xs text-red-500 mt-1">{errors.platform}</p>
                   )}
                 </div>
+
+                <div>
+                  <Label htmlFor="type" className="mb-2">
+                    Type
+                  </Label>
+                  <Select
+                    value={data.type}
+                    onValueChange={(v) => setData('type', v as ProductGroupingType)}
+                  >
+                    <SelectTrigger id="type">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(ProductGroupingType).map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.type && <p className="text-xs text-red-500 mt-1">{errors.type}</p>}
+                </div>
+
+                <div>
+                  <Label htmlFor="menu_type" className="mb-2">
+                    Menu Type
+                  </Label>
+                  <Select
+                    value={data.menu_type}
+                    onValueChange={(v) => setData('menu_type', v as ProductGroupingMenuType)}
+                  >
+                    <SelectTrigger id="menu_type">
+                      <SelectValue placeholder="Select menu type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(ProductGroupingMenuType).map((menuType) => (
+                        <SelectItem key={menuType} value={menuType}>
+                          {menuType}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.menu_type && (
+                    <p className="text-xs text-red-500 mt-1">{errors.menu_type}</p>
+                  )}
+                </div>
               </div>
 
               {/* Toggles */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center gap-2">
                   <Switch
                     id="is_available"
@@ -273,6 +357,14 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                   />
                   <Label htmlFor="is_featured">Featured</Label>
                 </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="is_special_feature"
+                    checked={data.is_special_feature}
+                    onCheckedChange={(v) => setData('is_special_feature', v)}
+                  />
+                  <Label htmlFor="is_special_feature">Special Feature</Label>
+                </div>
               </div>
               {errors.is_available && (
                 <p className="text-xs text-red-500 mt-1">{errors.is_available}</p>
@@ -280,9 +372,12 @@ export default function ProductSectionsIndex({ productSections }: Props) {
               {errors.is_featured && (
                 <p className="text-xs text-red-500 mt-1">{errors.is_featured}</p>
               )}
+              {errors.is_special_feature && (
+                <p className="text-xs text-red-500 mt-1">{errors.is_special_feature}</p>
+              )}
 
-              {/* Label and Order */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Label, Order, and Special Feature Key */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="label" className="mb-2">
                     Label
@@ -291,8 +386,37 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                     id="label"
                     value={data.label || ''}
                     onChange={(e) => setData('label', e.target.value)}
+                    placeholder="Optional label"
                   />
                   {errors.label && <p className="text-xs text-red-500 mt-1">{errors.label}</p>}
+                </div>
+
+                <div>
+                  <Label htmlFor="order" className="mb-2">
+                    Order
+                  </Label>
+                  <Input
+                    id="order"
+                    type="number"
+                    value={data.order}
+                    onChange={(e) => setData('order', parseInt(e.target.value) || 0)}
+                  />
+                  {errors.order && <p className="text-xs text-red-500 mt-1">{errors.order}</p>}
+                </div>
+
+                <div>
+                  <Label htmlFor="special_feature_key" className="mb-2">
+                    Special Feature Key
+                  </Label>
+                  <Input
+                    id="special_feature_key"
+                    value={data.special_feature_key || ''}
+                    onChange={(e) => setData('special_feature_key', e.target.value)}
+                    placeholder="Optional special feature key"
+                  />
+                  {errors.special_feature_key && (
+                    <p className="text-xs text-red-500 mt-1">{errors.special_feature_key}</p>
+                  )}
                 </div>
               </div>
 

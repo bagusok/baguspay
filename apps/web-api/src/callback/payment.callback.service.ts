@@ -12,9 +12,10 @@ import {
 } from '@repo/db/types';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
-import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service';
 import { DuitkuService } from 'src/integrations/payment-gateway/duitku/duitku.service';
 import { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type';
+import { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service';
+import { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type';
 import { QueueService } from 'src/queue/queue.service';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class PaymentCallbackService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly duitkuService: DuitkuService,
-    private readonly balanceService: BalanceService,
+    private readonly tripayService: TripayService,
     private readonly queueService: QueueService,
   ) {}
 
@@ -96,19 +97,81 @@ export class PaymentCallbackService {
         .where(eq(tb.orders.order_id, data.merchantOrderId));
 
       await this.revertProductStock(order);
+      await this.revertOfferStock(order);
     }
 
-    await this.revertOfferStock(order);
+    return SendResponse.success({
+      orderId: order.order_id,
+      status: paymentStatus,
+    });
+  }
+
+  public async tripayCallback(data: TripayCallbackData, cbSignature: string) {
+    const verifySignature = this.tripayService.verifyCallbackSignature({
+      data: data,
+      signature: cbSignature,
+    });
+
+    if (!verifySignature) {
+      throw new BadRequestException('Invalid signature');
+    }
+
+    const order = await this.databaseService.db.query.orders.findFirst({
+      where: and(
+        eq(tb.orders.order_id, data.merchant_ref),
+        eq(tb.orders.payment_status, PaymentStatus.PENDING),
+      ),
+      with: {
+        payment_snapshot: {
+          columns: {
+            provider_name: true,
+            provider_code: true,
+            expired_at: true,
+          },
+        },
+        product_snapshot: {
+          columns: {
+            product_id: true,
+          },
+        },
+        offer_on_orders: {
+          columns: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found or already processed');
+    }
+
+    if (data.status === 'PAID') {
+      await this.databaseService.db
+        .update(tb.orders)
+        .set({
+          order_status: OrderStatus.PENDING,
+          payment_status: PaymentStatus.SUCCESS,
+        })
+        .where(eq(tb.orders.order_id, data.merchant_ref));
+
+      await this.queueService.addOrderJob(order.order_id);
+    } else {
+      await this.databaseService.db
+        .update(tb.orders)
+        .set({
+          payment_status: PaymentStatus.FAILED,
+        })
+        .where(eq(tb.orders.order_id, data.merchant_ref));
+
+      this.revertProductStock(order);
+      this.revertOfferStock(order);
+    }
 
     return SendResponse.success({
-      message:
-        paymentStatus === PaymentStatus.SUCCESS
-          ? 'Payment successful'
-          : 'Payment failed',
-      data: {
-        orderId: order.order_id,
-        status: paymentStatus,
-      },
+      orderId: order.order_id,
+      status:
+        data.status === 'PAID' ? PaymentStatus.SUCCESS : PaymentStatus.FAILED,
     });
   }
 

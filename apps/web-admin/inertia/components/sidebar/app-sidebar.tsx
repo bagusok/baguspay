@@ -35,11 +35,116 @@ const data = {
   },
   navMain: [
     {
-      title: 'Products',
-      url: '/admin/product-categories',
+      title: 'Products Prabayar',
+      url: '#',
       icon: ShoppingBagIcon,
-      isActive: true,
-      items: [],
+      isActive: false,
+      items: [
+        {
+          title: 'All Products',
+          url: '/admin/product-categories',
+        },
+        {
+          title: 'Games',
+          url: '/admin/product-categories/game',
+        },
+        {
+          title: 'Pulsa',
+          url: '/admin/product-categories/pulsa',
+        },
+        {
+          title: 'Kuota Data',
+          url: '/admin/product-categories/kuota',
+        },
+        {
+          title: 'Token PLN (Prepaid)',
+          url: '/admin/product-categories/token-pln',
+        },
+        {
+          title: 'E-Wallet',
+          url: '/admin/product-categories/e-wallet',
+        },
+        {
+          title: 'Voucher',
+          url: '/admin/product-categories/voucher',
+        },
+        {
+          title: 'App Premium',
+          url: '/admin/product-categories/app-premium',
+        },
+        {
+          title: 'Other Prepaid',
+          url: '/admin/product-categories/other-prepaid',
+        },
+      ],
+    },
+    {
+      title: 'Products Pascabayar',
+      url: '#',
+      icon: ShoppingBagIcon,
+      isActive: false,
+      items: [
+        {
+          title: 'All Products',
+          url: '/admin/product-categories/postpaid',
+        },
+        {
+          title: 'PLN Tagihan (Postpaid)',
+          url: '/admin/product-categories/pln-tagihan',
+        },
+        {
+          title: 'PLN Non Taglist (Postpaid)',
+          url: '/admin/product-categories/pln-non-taglist',
+        },
+        {
+          title: 'PDAM',
+          url: '/admin/product-categories/pdam',
+        },
+        {
+          title: 'Internet',
+          url: '/admin/product-categories/internet',
+        },
+        {
+          title: 'Kuota Rekomendasi',
+          url: '/admin/product-categories/kuota-rekomendasi',
+        },
+        {
+          title: 'BPJS Kesehatan',
+          url: '/admin/product-categories/bpjs-kesehatan',
+        },
+        {
+          title: 'BPJS Ketenagakerjaan',
+          url: '/admin/product-categories/bpjs-ketenagakerjaan',
+        },
+        {
+          title: 'Other Postpaid',
+          url: '/admin/product-categories/other-postpaid',
+        },
+      ],
+    },
+    {
+      title: 'Products Fitur Khusus',
+      url: '#',
+      icon: ShoppingBagIcon,
+      isActive: false,
+      items: [
+        {
+          title: 'Send Money',
+          url: '/admin/product-categories/send-money',
+        },
+        {
+          title: 'Ewallet (Bebas Nominal)',
+          url: '/admin/product-categories/e-wallet-bebas-nominal',
+        },
+        {
+          title: 'E-Money',
+          url: '/admin/product-categories/e-money',
+        },
+        {
+          title: 'Kereta Api',
+          url: '/admin/product-categories/kereta-api',
+        },
+      ],
     },
     {
       title: 'Inputs',

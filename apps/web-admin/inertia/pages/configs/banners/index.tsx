@@ -2,6 +2,7 @@ import BannersController from '#controllers/banners_controller'
 import { CreateBannerValidator } from '#validators/banners'
 import { InferPageProps } from '@adonisjs/inertia/types'
 import { router, useForm } from '@inertiajs/react'
+import { BannerLocation } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
 import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
@@ -16,6 +17,13 @@ import {
 } from '@repo/ui/components/ui/dialog'
 import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@repo/ui/components/ui/select'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import { useMutation } from '@tanstack/react-query'
@@ -48,6 +56,9 @@ function AddBannerDialog() {
     description: '',
     is_available: true,
     product_category_id: '' as any,
+    banner_location: BannerLocation.HOME_TOP,
+    href_url: '',
+    app_url: '',
   })
 
   const [categoryQuery, setCategoryQuery] = useState('')
@@ -134,6 +145,47 @@ function AddBannerDialog() {
             <FileManager onFilesSelected={(f) => form.setData('image_id', (f as any).id)} />
             {form.errors.image_id && (
               <p className="text-xs text-red-500 mt-1">{form.errors.image_id}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="banner_location">Banner Location</Label>
+            <Select>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih lokasi banner" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={BannerLocation.HOME_TOP}>Home TOP</SelectItem>
+                <SelectItem value={BannerLocation.HOME_MIDDLE}>Home MIDDLE</SelectItem>
+                <SelectItem value={BannerLocation.HOME_BOTTOM}>Home BOTTOM</SelectItem>
+              </SelectContent>
+            </Select>
+            {form.errors.banner_location && (
+              <p className="text-xs text-red-500 mt-1">{form.errors.banner_location}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="href_url">Href URL</Label>
+            <Input
+              id="href_url"
+              value={form.data.href_url}
+              onChange={(e) => form.setData('href_url', e.target.value)}
+            />
+            {form.errors.href_url && (
+              <p className="text-xs text-red-500 mt-1">{form.errors.href_url}</p>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="app_url">App URL</Label>
+            <Input
+              id="app_url"
+              value={form.data.app_url}
+              onChange={(e) => form.setData('app_url', e.target.value)}
+            />
+            {form.errors.app_url && (
+              <p className="text-xs text-red-500 mt-1">{form.errors.app_url}</p>
             )}
           </div>
 
@@ -263,7 +315,7 @@ export default function BannersIndex({ banners }: Props) {
         accessorKey: 'description',
         header: 'Description',
         cell: ({ row }) => (
-          <span className="line-clamp-2 max-w-[420px] text-muted-foreground text-sm">
+          <span className="line-clamp-2 max-w-105 text-muted-foreground text-sm">
             {row.original.description ?? '-'}
           </span>
         ),
@@ -281,6 +333,11 @@ export default function BannersIndex({ banners }: Props) {
         accessorKey: 'product_category_id',
         header: 'Category',
         cell: ({ row }) => row.original.product_category_id ?? '-',
+      },
+      {
+        accessorKey: 'banner_location',
+        header: 'Location',
+        cell: ({ row }) => row.original.banner_location ?? '-',
       },
       {
         accessorKey: 'created_at',

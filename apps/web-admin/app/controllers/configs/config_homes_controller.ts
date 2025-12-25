@@ -16,7 +16,14 @@ export default class ConfigHomesController {
       where: eq(tb.productGroupings.menu_type, ProductGroupingMenuType.HOME_MENU),
     })
 
-    return ctx.inertia.render('product-sections/index', {
+    for (const section of productSections) {
+      const file = await db.query.fileManager.findFirst({
+        where: eq(tb.fileManager.url, section.image_url),
+      })
+      ;(section as any).image_id = file?.id || null
+    }
+
+    return ctx.inertia.render('configs/home-product/index', {
       productSections,
     })
   }
@@ -63,7 +70,7 @@ export default class ConfigHomesController {
       where: eq(tb.productGroupingToProductCategories.product_grouping_id, productSection.id),
     })
 
-    return ctx.inertia.render('product-sections/detail', {
+    return ctx.inertia.render('configs/home-product/detail', {
       productSection,
       productOnProductSections,
     })
@@ -73,14 +80,18 @@ export default class ConfigHomesController {
     const {
       image_id,
       name,
+      description = null,
+      redirect_url = null,
+      app_key = null,
+      platform = AppPlatform.WEB,
+      type = ProductGroupingType.MODAL,
+      menu_type = ProductGroupingMenuType.FAST_MENU,
       is_available = false,
       is_featured = false,
       label = null,
       order = 0,
-      menu_type = ProductGroupingMenuType.FAST_MENU,
-      platform = AppPlatform.WEB,
-      type = ProductGroupingType.MODAL,
-      description = null,
+      is_special_feature = false,
+      special_feature_key = null,
     } = await ctx.request.validateUsing(vine.compile(createHomeProductSectionValidator), {
       data: ctx.request.body(),
     })
@@ -101,7 +112,8 @@ export default class ConfigHomesController {
       name: name,
       image_url: image.url,
       description,
-      redirect_url: null,
+      redirect_url,
+      app_key,
       platform,
       type,
       menu_type,
@@ -109,6 +121,8 @@ export default class ConfigHomesController {
       is_featured,
       label,
       order,
+      is_special_feature,
+      special_feature_key,
     })
 
     ctx.session.flash('success', 'Product section created successfully')
@@ -120,15 +134,19 @@ export default class ConfigHomesController {
 
     const {
       name,
+      description = null,
       image_id,
+      redirect_url = null,
+      app_key = null,
+      platform = AppPlatform.WEB,
+      type = ProductGroupingType.MODAL,
+      menu_type = ProductGroupingMenuType.FAST_MENU,
       is_available = false,
       is_featured = false,
       label = null,
       order = 0,
-      menu_type = ProductGroupingMenuType.FAST_MENU,
-      platform = AppPlatform.WEB,
-      type = ProductGroupingType.MODAL,
-      description = null,
+      is_special_feature = false,
+      special_feature_key = null,
     } = await ctx.request.validateUsing(vine.compile(updateHomeProductSectionValidator), {
       data: ctx.request.body(),
     })
@@ -169,7 +187,8 @@ export default class ConfigHomesController {
         name,
         ...(imageUrl ? { image_url: imageUrl } : {}),
         description,
-        redirect_url: null,
+        redirect_url,
+        app_key,
         platform,
         type,
         menu_type,
@@ -177,6 +196,8 @@ export default class ConfigHomesController {
         is_featured,
         label,
         order,
+        is_special_feature,
+        special_feature_key,
       })
       .where(eq(tb.productGroupings.id, id))
 

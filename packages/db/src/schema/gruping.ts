@@ -24,6 +24,7 @@ export const productGroupings = pgTable("product_groupings", {
   description: text("description"),
   image_url: varchar("image_url").notNull(),
   redirect_url: varchar("redirect_url"),
+  app_key: varchar("app_key", { length: 100 }),
 
   platform: appPlatformEnum("platform").default(AppPlatform.WEB).notNull(),
   type: productGroupingTypeEnum("type")
@@ -38,6 +39,9 @@ export const productGroupings = pgTable("product_groupings", {
   label: varchar("label"),
   order: integer("order").default(0),
 
+  is_special_feature: boolean("is_special_feature").default(false),
+  special_feature_key: varchar("special_feature_key"),
+
   created_at: timestamp("created_at", {
     withTimezone: true,
   }).defaultNow(),
@@ -50,7 +54,7 @@ export const productGroupingRelations = relations(
   productGroupings,
   ({ many }) => ({
     productCategories: many(productGroupingToProductCategories),
-  }),
+  })
 );
 
 export const productGroupingToProductCategories = pgTable(
@@ -59,11 +63,11 @@ export const productGroupingToProductCategories = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     product_grouping_id: uuid("product_grouping_id").references(
       () => productGroupings.id,
-      { onDelete: "cascade" },
+      { onDelete: "cascade" }
     ),
     product_category_id: uuid("product_category_id").references(
       () => productCategories.id,
-      { onDelete: "cascade" },
+      { onDelete: "cascade" }
     ),
     created_at: timestamp("created_at", {
       withTimezone: true,
@@ -71,7 +75,7 @@ export const productGroupingToProductCategories = pgTable(
     updated_at: timestamp("updated_at", {
       withTimezone: true,
     }).$onUpdate(() => new Date()),
-  },
+  }
 );
 
 export const productGroupingToProductCategoriesRelations = relations(
@@ -85,5 +89,5 @@ export const productGroupingToProductCategoriesRelations = relations(
       fields: [productGroupingToProductCategories.product_category_id],
       references: [productCategories.id],
     }),
-  }),
+  })
 );

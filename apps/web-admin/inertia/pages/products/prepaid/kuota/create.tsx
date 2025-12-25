@@ -1,12 +1,9 @@
-import { useForm } from '@inertiajs/react'
-import FileManager from '~/components/file-manager'
-import AdminLayout from '~/components/layout/admin-layout'
 import { CreateProductCategoryValidator } from '#validators/product'
-import { Label } from '@repo/ui/components/ui/label'
-import { Input } from '@repo/ui/components/ui/input'
-import { Textarea } from '@repo/ui/components/ui/textarea'
+import { useForm } from '@inertiajs/react'
+import { ProductBillingType, ProductCategoryType, ProductFullfillmentType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
-import { Switch } from '@repo/ui/components/ui/switch'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
 import {
   Select,
   SelectContent,
@@ -14,29 +11,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
+import { Switch } from '@repo/ui/components/ui/switch'
+import { Textarea } from '@repo/ui/components/ui/textarea'
 import toast from 'react-hot-toast'
+import FileManager from '~/components/file-manager'
+import AdminLayout from '~/components/layout/admin-layout'
 
 export default function CreateProductCategory() {
-  const { data, errors, setData, post, processing } = useForm<CreateProductCategoryValidator>({
-    file_image_id: 'cffe1506-4a45-4ee5-aa7d-eb69748192a9',
-    file_banner_id: '',
-    name: '',
-    sub_name: '',
-    description: '',
-    publisher: '',
-    is_available: true,
-    is_featured: false,
-    label: '',
-    delivery_type: 'instant',
-    is_seo_enabled: false,
-    seo_title: '',
-    seo_description: '',
-    seo_image_id: '',
-  })
+  const { data, errors, setData, post, processing } = useForm<CreateProductCategoryValidator>(
+    'createkuota',
+    {
+      file_image_id: 'cffe1506-4a45-4ee5-aa7d-eb69748192a9',
+      file_icon_id: '',
+      file_banner_id: '',
+      name: '',
+      sub_name: '',
+      description: '',
+      publisher: '',
+      is_available: true,
+      is_featured: false,
+      label: '',
+      delivery_type: 'instant',
+      is_seo_enabled: false,
+      seo_title: '',
+      seo_description: '',
+      seo_image_id: '',
+      product_billing_type: ProductBillingType.PREPAID,
+      type: ProductCategoryType.KUOTA,
+      product_fullfillment_type: ProductFullfillmentType.AUTOMATIC_DIRECT,
+      is_special_feature: false,
+      special_feature_key: '',
+      tags1: [],
+      tags2: [],
+    }
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    post('/admin/product-categories/create', {
+    post('/admin/product-categories/kuota/create', {
       onSuccess: () => {
         toast.success('Product category created successfully!')
       },
@@ -55,13 +67,25 @@ export default function CreateProductCategory() {
         {/* File Image */}
         <div>
           <Label htmlFor="file_image_id" className="mb-2">
-            Image
+            Image (Large)
           </Label>
           <div className="flex items-center gap-2 mt-1">
             <FileManager onFilesSelected={(file) => setData('file_image_id', file.id)} />
           </div>
           {errors.file_image_id && (
             <p className="text-xs text-red-500 mt-1">{errors.file_image_id}</p>
+          )}
+        </div>
+        {/* File Icon */}
+        <div>
+          <Label htmlFor="file_icon_id" className="mb-2">
+            Image (Icon APK)
+          </Label>
+          <div className="flex items-center gap-2 mt-1">
+            <FileManager onFilesSelected={(file) => setData('file_icon_id', file.id)} />
+          </div>
+          {errors.file_icon_id && (
+            <p className="text-xs text-red-500 mt-1">{errors.file_icon_id}</p>
           )}
         </div>
 
@@ -185,6 +209,55 @@ export default function CreateProductCategory() {
           {errors.delivery_type && (
             <p className="text-xs text-red-500 mt-1">{errors.delivery_type}</p>
           )}
+        </div>
+        {/* Billing & Fullfilment Type */}
+        <div className="form-group flex gap-4 ">
+          {/* <div>
+            <Label htmlFor="billing_type" className="mb-2">
+              Billing Type
+            </Label>
+            <Select
+              value={data.product_billing_type}
+              onValueChange={(val) => setData('product_billing_type', val as any)}
+            >
+              <SelectTrigger id="product_billing_type">
+                <SelectValue placeholder="Select billing type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(ProductBillingType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.product_billing_type && (
+              <p className="text-xs text-red-500 mt-1">{errors.product_billing_type}</p>
+            )}
+          </div> */}
+          <div>
+            <Label htmlFor="billing_type" className="mb-2">
+              Fullfillment Type
+            </Label>
+            <Select
+              value={data.product_fullfillment_type}
+              onValueChange={(val) => setData('product_fullfillment_type', val as any)}
+            >
+              <SelectTrigger id="product_fullfillment_type">
+                <SelectValue placeholder="Select fullfillment type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(ProductFullfillmentType).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.product_billing_type && (
+              <p className="text-xs text-red-500 mt-1">{errors.product_billing_type}</p>
+            )}
+          </div>
         </div>
 
         {/* SEO Enabled */}

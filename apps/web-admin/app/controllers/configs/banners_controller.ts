@@ -5,9 +5,18 @@ import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 export default class BannersController {
   async index(ctx: HttpContext) {
-    const banners = await db.query.banners.findMany({})
+    const banners = await db.query.banners.findMany({
+      columns: {
+        id: true,
+        title: true,
+        image_url: true,
+        created_at: true,
+        is_available: true,
+        banner_location: true,
+      },
+    })
 
-    return ctx.inertia.render('banners/index', {
+    return ctx.inertia.render('configs/banners/index', {
       banners,
     })
   }
@@ -19,6 +28,9 @@ export default class BannersController {
       description,
       is_available: isAvailable,
       product_category_id: productCategoryId,
+      banner_location: bannerLocation,
+      href_url: hrefUrl,
+      app_url: appUrl,
     } = await ctx.request.validateUsing(vine.compile(createBannerValidator), {
       data: ctx.request.body(),
     })
@@ -49,6 +61,9 @@ export default class BannersController {
       description: description ?? null,
       is_available: isAvailable ?? true,
       product_category_id: productCategoryId ?? null,
+      banner_location: bannerLocation,
+      href_url: hrefUrl ?? null,
+      app_url: appUrl ?? null,
     })
 
     ctx.session.flash('success', 'Banner created successfully')

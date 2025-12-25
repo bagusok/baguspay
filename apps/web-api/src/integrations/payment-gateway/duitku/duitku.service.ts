@@ -14,6 +14,8 @@ import { DuitkuAPiService } from './duitku.api.service';
 export class DuitkuService implements PaymentGateway {
   private API_KEY: string;
   private MERCHANT_CODE: string;
+  private RETURN_URL: string;
+  private CALLBACK_URL: string;
 
   constructor(
     private readonly duitkuApiService: DuitkuAPiService,
@@ -21,6 +23,8 @@ export class DuitkuService implements PaymentGateway {
   ) {
     this.API_KEY = this.configService.get<string>('DUITKU_APIKEY');
     this.MERCHANT_CODE = this.configService.get<string>('DUITKU_MERCHANT_CODE');
+    this.RETURN_URL = this.configService.get<string>('DUITKU_RETURN_URL');
+    this.CALLBACK_URL = this.configService.get<string>('DUITKU_CALLBACK_URL');
   }
 
   async createTransaction(
@@ -58,14 +62,14 @@ export class DuitkuService implements PaymentGateway {
         email: data.customer_email,
         customerVaName: data.customer_name,
         phoneNumber: data.customer_phone,
-        callbackUrl: '',
+        callbackUrl: data.callback_url ?? this.CALLBACK_URL ?? '',
         expiryPeriod: expiryPeriod,
         merchantOrderId: data.id,
         signature: signature,
-        returnUrl: '',
+        returnUrl:
+          data.return_url ??
+          (this.RETURN_URL ? this.RETURN_URL + '/' + data.id : ''),
       });
-
-      let amountReceived = data.amount;
 
       // Data Setelah Revisi Create Payment
       let r_fee = 0;

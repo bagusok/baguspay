@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "nodenext",
     "declaration": true,
     "removeComments": true,
@@ -13,6 +14,7 @@
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
+
     // "moduleResolution": "nodenext"
   }
 }

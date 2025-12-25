@@ -1,4 +1,4 @@
-import ConfigHomesController from '#controllers/config_homes_controller'
+import ConfigHomesController from '#controllers/configs/config_homes_controller'
 import { InferPageProps } from '@adonisjs/inertia/types'
 import { router, useForm } from '@inertiajs/react'
 import { Badge } from '@repo/ui/components/ui/badge'
@@ -86,7 +86,7 @@ export default function ProductSectionDetail({ productSection, productOnProductS
       <div className="flex flex-col gap-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Kelola Product Section</h1>
+            <h1 className="text-2xl font-bold">Kelola Home Sections</h1>
 
             <p className="text-sm text-muted-foreground">
               Sambungkan atau lepaskan Product Category ke Section ini.

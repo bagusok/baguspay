@@ -23,6 +23,7 @@
     "node": ">=20.0.0"
   },
   "dependencies": {
+    "@repo/db": "workspace:*",
     "@bull-board/api": "^6.11.1",
     "@bull-board/express": "^6.11.1",
     "@bull-board/nestjs": "^6.11.1",
@@ -34,7 +35,6 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.0",
-    "@repo/db": "workspace:*",
     "@scalar/nestjs-api-reference": "^0.5.10",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",

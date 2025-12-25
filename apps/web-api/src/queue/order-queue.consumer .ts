@@ -103,7 +103,7 @@ export class OrderQueueConsumer extends WorkerHost {
                     .update(tb.orders)
                     .set({
                       order_status: topup.data.status,
-                      raw_response: JSON.stringify(topup.data),
+                      order_raw_response: topup.data,
                     })
                     .where(eq(tb.orders.id, order.id));
 
@@ -171,7 +171,7 @@ export class OrderQueueConsumer extends WorkerHost {
                         order.discount_price,
                       sn_number: topup.data.sn || null,
                       notes: `Topup successful. SN: ${topup.data.sn} wa: ${topup.data.wa} tele: ${topup.data.tele}`,
-                      raw_response: JSON.stringify(topup.data),
+                      order_raw_response: topup.data,
                     })
                     .where(eq(tb.orders.id, order.id));
                 }

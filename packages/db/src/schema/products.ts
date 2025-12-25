@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
+  json,
   numeric,
   pgTable,
   text,
@@ -33,11 +34,14 @@ export const productCategories = pgTable("product_categories", {
   description: text("description").notNull(),
   image_url: varchar("image_url", { length: 255 }).notNull(),
   banner_url: varchar("banner_url", { length: 255 }).notNull(),
+  icon_url: varchar("icon_url", { length: 255 }),
   publisher: varchar("publisher", { length: 100 }).notNull(),
   is_available: boolean("is_available").notNull().default(true),
   is_featured: boolean("is_featured").notNull().default(false),
   label: varchar("label", { length: 50 }),
   delivery_type: varchar("delivery_type", { length: 50 }).notNull(),
+  tags1: json("tags1").$type<string[]>().default([]),
+  tags2: json("tags2").$type<string[]>().default([]),
 
   is_seo_enabled: boolean("is_seo_enabled").notNull().default(false),
   seo_title: varchar("seo_title", { length: 100 }),
@@ -45,12 +49,21 @@ export const productCategories = pgTable("product_categories", {
   seo_image: varchar("seo_image", { length: 255 }),
 
   type: productCategoryTypeEnum("type").default(ProductCategoryType.GAME),
+  is_special_feature: boolean("is_special_feature").notNull().default(false),
+  special_feature_key: varchar("special_feature_key", { length: 50 }),
+
+  product_billing_type: productBillingTypeEnum("product_billing_type").default(
+    ProductBillingType.PREPAID
+  ),
+  product_fullfillment_type: productFullfillmentTypeEnum(
+    "product_fullfillment_type"
+  ).default(ProductFullfillmentType.AUTOMATIC_DIRECT),
 
   created_at: timestamp("created_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
+    () => new Date()
   ),
 });
 
@@ -61,7 +74,7 @@ export const productCategoryRelations = relations(
     input_on_product_category: many(inputOnProductCategory),
     articles: many(articles),
     banners: many(banners),
-  }),
+  })
 );
 
 export const productSubCategories = pgTable("product_sub_categories", {
@@ -78,7 +91,7 @@ export const productSubCategories = pgTable("product_sub_categories", {
     .notNull(),
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
+    () => new Date()
   ),
 });
 
@@ -90,7 +103,7 @@ export const productSubCategoryRelations = relations(
       references: [productCategories.id],
     }),
     products: many(products),
-  }),
+  })
 );
 
 export const products = pgTable("products", {
@@ -107,6 +120,7 @@ export const products = pgTable("products", {
   label_image: varchar("label_image", { length: 255 }),
   image_url: varchar("image_url", { length: 255 }).notNull(),
   sku_code: varchar("sku_code", { length: 15 }).notNull(),
+
   price: integer("price").notNull(),
   profit_static: integer("profit_static").notNull().default(0),
   profit_percentage: numeric("profit_percentage", {
@@ -116,10 +130,12 @@ export const products = pgTable("products", {
   })
     .notNull()
     .default(0),
+  profit_max: integer("profit_max").notNull().default(0),
+  profit_min: integer("profit_min").notNull().default(0),
   stock: integer("stock").notNull().default(0),
   provider_code: varchar("provider_code", { length: 50 }).notNull(),
   provider_name: productProviderEnum("provider_name").default(
-    ProductProvider.ATLANTICH2H,
+    ProductProvider.ATLANTICH2H
   ),
   provider_price: integer("provider_price").notNull(),
   provider_max_price: integer("provider_max_price").notNull(),
@@ -128,10 +144,10 @@ export const products = pgTable("products", {
     .default(""),
   notes: text("notes"),
   billing_type: productBillingTypeEnum("billing_type").default(
-    ProductBillingType.PREPAID,
+    ProductBillingType.PREPAID
   ),
   fullfillment_type: productFullfillmentTypeEnum("fullfillment_type").default(
-    ProductFullfillmentType.AUTOMATIC_DIRECT,
+    ProductFullfillmentType.AUTOMATIC_DIRECT
   ),
 
   cut_off_start: time("cut_off_start", { withTimezone: true }),
@@ -139,7 +155,7 @@ export const products = pgTable("products", {
 
   created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-    () => new Date(),
+    () => new Date()
   ),
 });
 

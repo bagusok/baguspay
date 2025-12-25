@@ -2,14 +2,22 @@ import { UpdateProductCategoryValidator } from '#validators/product'
 import { router } from '@inertiajs/react'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { useState } from 'react'
-import toast, { LoaderIcon } from 'react-hot-toast'
+import { LoaderIcon } from 'react-hot-toast'
 
-export default function IsAvailable({ isAvailable, id }: { isAvailable: boolean; id: string }) {
+export default function IsAvailable({
+  isAvailable,
+  id,
+  type,
+}: {
+  isAvailable: boolean
+  id: string
+  type: string
+}) {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleChange = async (v: boolean) => {
     router.patch<UpdateProductCategoryValidator>(
-      `/admin/product-categories/${id}`,
+      `/admin/product-categories/${type}/${id}`,
       {
         is_available: v,
       },
