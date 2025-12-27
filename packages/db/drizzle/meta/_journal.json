@@ -15,6 +15,69 @@
       "when": 1754894347213,
       "tag": "0001_mean_venom",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1762135290265,
+      "tag": "0002_worthless_shadowcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1762355583061,
+      "tag": "0003_glamorous_jubilee",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1762401131016,
+      "tag": "0004_youthful_paladin",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1766639095563,
+      "tag": "0005_sweet_maestro",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1766828867166,
+      "tag": "0006_graceful_white_tiger",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1766829692550,
+      "tag": "0007_lucky_korvac",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1766829810312,
+      "tag": "0008_even_gorgon",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1766832194935,
+      "tag": "0009_greedy_nick_fury",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1766832377292,
+      "tag": "0010_lush_wallflower",
+      "breakpoints": true
     }
   ]
 }

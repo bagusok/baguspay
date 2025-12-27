@@ -82,6 +82,7 @@ export type TripayCreateClosedPaymentRequest = {
   callback_url?: string;
   return_url?: string;
   expired_time?: number; // timestamp
+  signature: string;
 };
 
 export interface TripayCallbackData {

@@ -1,6 +1,8 @@
 import { Suspense, useId } from "react";
 import { Await, Link, redirect, useLoaderData } from "react-router";
 import HomeBanner from "~/components/home/banner";
+import FastMenu from "~/components/home/fast-menu";
+import HomeProductSections from "~/components/home/product-sections";
 import { apiClient } from "~/utils/axios";
 import type { Route } from "./+types";
 
@@ -8,7 +10,7 @@ export async function loader({}: Route.LoaderArgs) {
   try {
     const response = await apiClient.get("/home/products");
 
-    const banners = apiClient.get("/banners");
+    const banners = apiClient.get("/home/banners");
 
     return {
       data: response.data?.data,
@@ -28,9 +30,17 @@ export default function Index({ loaderData }: Route.ComponentProps) {
       <div className="md:max-w-7xl mx-auto">
         <Suspense fallback={<div>Loading.......</div>}>
           <Await resolve={banners}>
-            {(banners) => <HomeBanner banners={banners.data.data} />}
+            {(banners) => (
+              <HomeBanner
+                home_top={banners.data.data.home_top}
+                home_middle={banners.data.data.home_middle}
+                home_bottom={banners.data.data.home_bottom}
+              />
+            )}
           </Await>
         </Suspense>
+        <FastMenu />
+        <HomeProductSections />
         {data?.map((category: any) => (
           <section key={id} className="mt-14">
             <h2 className="text-xl font-semibold text-foreground capitalize">
@@ -52,18 +62,18 @@ export default function Index({ loaderData }: Route.ComponentProps) {
                       />
 
                       {/* Shimmer Effect on Hover */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700 ease-in-out pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-all duration-700 ease-in-out pointer-events-none" />
 
                       {/* Featured Badge */}
                       {item.is_featured && (
-                        <div className="absolute top-2 left-2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+                        <div className="absolute top-2 left-2 bg-linear-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
                           ⭐ FEATURED
                         </div>
                       )}
 
                       {/* Discount Label */}
                       {item.label && (
-                        <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3">
+                        <div className="absolute top-2 right-2 bg-linear-to-r from-red-500 to-pink-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-pulse transform transition-all duration-300 group-hover:scale-110 group-hover:-rotate-3">
                           {item.label}
                         </div>
                       )}
@@ -71,7 +81,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
 
                     <div className="px-2 pt-2 pb-6 bg-secondary dark:bg-card flex-1 flex flex-col relative overflow-hidden">
                       {/* Background Gradient Animation */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                      <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-all duration-500" />
                       <h3 className="font-semibold text-foreground text-ellipsis line-clamp-1 relative z-10 transition-all duration-300 group-hover:text-primary">
                         {item.name}
                       </h3>

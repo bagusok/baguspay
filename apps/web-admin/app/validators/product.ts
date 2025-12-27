@@ -1,10 +1,16 @@
-import { ProductBillingType, ProductFullfillmentType, ProductProvider } from '@repo/db/types'
+import {
+  ProductBillingType,
+  ProductCategoryType,
+  ProductFullfillmentType,
+  ProductProvider,
+} from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/types'
 
 export const createProductCategoryValidator = vine.object({
   file_image_id: vine.string().uuid(),
   file_banner_id: vine.string().uuid(),
+  file_icon_id: vine.string().uuid().optional(),
   name: vine.string(),
   sub_name: vine.string().optional(),
   description: vine.string(),
@@ -17,6 +23,16 @@ export const createProductCategoryValidator = vine.object({
   seo_title: vine.string().optional(),
   seo_description: vine.string().optional(),
   seo_image_id: vine.string().uuid().optional(),
+
+  type: vine.enum(ProductCategoryType),
+  product_billing_type: vine.enum(ProductBillingType),
+  product_fullfillment_type: vine.enum(ProductFullfillmentType),
+
+  is_special_feature: vine.boolean().optional(),
+  special_feature_key: vine.string().optional(),
+
+  tags1: vine.array(vine.string()),
+  tags2: vine.array(vine.string()),
 })
 
 export type CreateProductCategoryValidator = Infer<typeof createProductCategoryValidator>
@@ -24,6 +40,7 @@ export type CreateProductCategoryValidator = Infer<typeof createProductCategoryV
 export const updateProductCategoryValidator = vine.object({
   file_image_id: vine.string().uuid().optional(),
   file_banner_id: vine.string().uuid().optional(),
+  file_icon_id: vine.string().uuid().optional(),
   name: vine.string().optional(),
   sub_name: vine.string().optional(),
   description: vine.string().optional(),
@@ -36,6 +53,16 @@ export const updateProductCategoryValidator = vine.object({
   seo_title: vine.string().optional(),
   seo_description: vine.string().optional(),
   seo_image_id: vine.string().uuid().optional(),
+
+  type: vine.enum(ProductCategoryType).optional(),
+  product_billing_type: vine.enum(ProductBillingType).optional(),
+  product_fullfillment_type: vine.enum(ProductFullfillmentType).optional(),
+
+  is_special_feature: vine.boolean().optional(),
+  special_feature_key: vine.string().optional(),
+
+  tags1: vine.array(vine.string()).optional(),
+  tags2: vine.array(vine.string()).optional(),
 })
 export type UpdateProductCategoryValidator = Infer<typeof updateProductCategoryValidator>
 

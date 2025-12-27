@@ -1,6 +1,6 @@
 // @ts-check
 import eslint from '@eslint/js';
-import drizzle from '@repo/eslint-config/drizzle';
+// import drizzle from '@repo/eslint-config/drizzle';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
@@ -14,7 +14,7 @@ export default tseslint.config(
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
   // Shared Drizzle plugin setup
-  ...drizzle,
+  // ...drizzle,
   {
     plugins: {
       'unused-imports': unusedImports,

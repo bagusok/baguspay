@@ -48,7 +48,7 @@ export default function ListProductPricePage() {
   const categoriesQuery = useQuery<ApiListResponse<ProductCategory>>({
     queryKey: ["product-categories"],
     queryFn: async () =>
-      apiClient.get("/product-categories").then((r) => r.data),
+      apiClient.get("/product-categories").then((r: any) => r.data),
   });
 
   const productsQuery = useQuery<ApiListResponse<Product>>({
@@ -70,7 +70,7 @@ export default function ListProductPricePage() {
             search: productQuery.search || undefined,
           },
         })
-        .then((r) => r.data),
+        .then((r: any) => r.data),
     staleTime: 30_000,
     placeholderData: (prev) => prev,
   });
@@ -87,9 +87,9 @@ export default function ListProductPricePage() {
   const selectedCategory = useMemo(
     () =>
       categoriesQuery.data?.data.find(
-        (c) => c.id === productQuery.category_id
+        (c) => c.id === productQuery.category_id,
       ) || null,
-    [categoriesQuery.data, productQuery.category_id]
+    [categoriesQuery.data, productQuery.category_id],
   );
 
   function setCategory(id: string) {
@@ -105,7 +105,7 @@ export default function ListProductPricePage() {
   return (
     <div className="md:max-w-7xl mx-auto">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
+      <section className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
         <div className="relative z-10">
           <p className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             <LayoutList className="size-4" />
@@ -127,7 +127,7 @@ export default function ListProductPricePage() {
         <div className="flex gap-2 overflow-x-auto pb-1">
           {categoriesQuery.isLoading &&
             Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-8 w-32 flex-shrink-0" />
+              <Skeleton key={i} className="h-8 w-32 shrink-0" />
             ))}
           {categoriesQuery.isSuccess && (
             <>
@@ -137,7 +137,7 @@ export default function ListProductPricePage() {
                 }
                 size="sm"
                 onClick={() => setCategory("")}
-                className="flex-shrink-0"
+                className="shrink-0"
               >
                 Semua
               </Button>
@@ -149,7 +149,7 @@ export default function ListProductPricePage() {
                   }
                   size="sm"
                   onClick={() => setCategory(c.id)}
-                  className="flex-shrink-0 flex items-center gap-2 pr-3"
+                  className="shrink-0 flex items-center gap-2 pr-3"
                 >
                   {c.image_url && (
                     <Image
@@ -159,7 +159,7 @@ export default function ListProductPricePage() {
                       className="h-6 w-6 object-cover rounded"
                     />
                   )}
-                  <span className="truncate max-w-[120px]">
+                  <span className="truncate max-w-30">
                     {c.sub_name || c.name}
                   </span>
                 </Button>

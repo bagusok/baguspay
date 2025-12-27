@@ -23,8 +23,7 @@ import {
 } from '~/components/tiptap/tiptap-ui-primitive/dropdown-menu'
 
 export interface HeadingDropdownMenuProps
-  extends Omit<ButtonProps, 'type'>,
-    UseHeadingDropdownMenuConfig {
+  extends Omit<ButtonProps, 'type'>, UseHeadingDropdownMenuConfig {
   /**
    * Whether to render the dropdown menu in a portal
    * @default false

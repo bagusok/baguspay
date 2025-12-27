@@ -5,17 +5,28 @@ import { and, asc, eq, gte, lte, ne, or } from '@repo/db';
 import { OfferType, tb } from '@repo/db/types';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
+import { StorageService } from 'src/storage/storage.service';
 
 @Injectable()
 export class ProductCategoriesService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getAllCategories() {
-    const categories =
+    let categories =
       await this.databaseService.db.query.productCategories.findMany({
         where: eq(tb.productCategories.is_available, true),
         orderBy: asc(tb.productCategories.name),
       });
+
+    categories = categories.map((category) => ({
+      ...category,
+      image_url: this.storageService.getFileUrl(category.image_url),
+      banner_url: this.storageService.getFileUrl(category.banner_url),
+      icon_url: this.storageService.getFileUrl(category.icon_url),
+    }));
 
     return {
       success: true,
@@ -55,6 +66,9 @@ export class ProductCategoriesService {
       success: true,
       data: {
         ...category,
+        image_url: this.storageService.getFileUrl(category.image_url),
+        banner_url: this.storageService.getFileUrl(category.banner_url),
+        icon_url: this.storageService.getFileUrl(category.icon_url),
         input_fields: inputFields,
       },
     };
@@ -684,6 +698,7 @@ export class ProductCategoriesService {
     return SendResponse.success(
       {
         ...category,
+        image_url: this.storageService.getFileUrl(category.image_url),
         input_fields: inputFields,
         product_sub_categories: buildDiscounts,
         flash_sales: buildProductFlashSale,

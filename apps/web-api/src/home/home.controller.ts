@@ -5,6 +5,21 @@ import { HomeService } from './home.service';
 export class HomeController {
   constructor(private readonly homeService: HomeService) {}
 
+  @Get('/banners')
+  async getBanners() {
+    return this.homeService.getBanners();
+  }
+
+  @Get('/fast-menus')
+  async getFastMenus() {
+    return this.homeService.getFastMenus();
+  }
+
+  @Get('/product-sections')
+  async getHomeProductSections() {
+    return this.homeService.getHomeProductSections();
+  }
+
   @Get('/products')
   async getProducts() {
     return this.homeService.getProducts();

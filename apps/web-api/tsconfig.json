@@ -13,6 +13,7 @@
     "incremental": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
+
     // "moduleResolution": "nodenext"
   }
 }

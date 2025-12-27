@@ -5,10 +5,7 @@ import { isbot } from "isbot";
 import type { RenderToPipeableStreamOptions } from "react-dom/server";
 import { renderToPipeableStream } from "react-dom/server";
 import { I18nextProvider } from "react-i18next";
-import type {
-  EntryContext,
-  unstable_RouterContextProvider,
-} from "react-router";
+import type { EntryContext, RouterContextProvider } from "react-router";
 import { ServerRouter } from "react-router";
 import { getInstance } from "./middlewares/i8n";
 
@@ -19,7 +16,7 @@ export default function handleRequest(
   responseStatusCode: number,
   responseHeaders: Headers,
   entryContext: EntryContext,
-  routerContext: unstable_RouterContextProvider,
+  routerContext: RouterContextProvider,
 ) {
   return new Promise((resolve, reject) => {
     let shellRendered = false;

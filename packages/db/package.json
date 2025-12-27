@@ -35,6 +35,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.8.4",
     "drizzle-kit": "^0.31.4",
+    "eslint-plugin-unused-imports": "^4.3.0",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3"
   },

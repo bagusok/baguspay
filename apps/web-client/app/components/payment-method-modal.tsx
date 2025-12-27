@@ -27,6 +27,7 @@ import type {
   DepositPaymentData,
   DepositPaymentMethod,
 } from "~/pages/protected/user/deposit";
+import Image from "./image";
 
 interface PaymentMethodModalProps {
   paymentData: DepositPaymentData[];
@@ -72,9 +73,9 @@ export default function PaymentMethodModal({
         >
           {selectedPaymentMethod ? (
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {selectedPaymentMethod.image_url ? (
-                  <img
+                  <Image
                     src={selectedPaymentMethod.image_url}
                     alt={selectedPaymentMethod.name}
                     className="w-8 h-8 object-contain rounded"
@@ -135,7 +136,7 @@ export default function PaymentMethodModal({
                 >
                   <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180">
                     <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         {getPaymentMethodIcon(
                           category.payment_methods[0]?.type || "default",
                         )}
@@ -170,9 +171,9 @@ export default function PaymentMethodModal({
                             onClick={() => handleSelectMethod(method)}
                           >
                             <div className="flex items-center gap-3">
-                              <div className="flex-shrink-0">
+                              <div className="shrink-0">
                                 {method.image_url ? (
-                                  <img
+                                  <Image
                                     src={method.image_url}
                                     alt={method.name}
                                     className="w-12 h-12 object-contain rounded"

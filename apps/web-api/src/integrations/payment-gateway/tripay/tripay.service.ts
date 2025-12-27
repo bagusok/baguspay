@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types';
+import crypto from 'crypto';
 import { ApiServiceException } from 'src/common/exceptions/api-service.exception';
 import {
   CreatePaymentGatewayRequest,
@@ -16,17 +17,27 @@ import { TripayPaymentMethodCode } from './tripay.type';
 
 @Injectable()
 export class TripayService implements PaymentGateway {
+  private PRIVATE_KEY: string;
+  private API_KEY: string;
+  private MERCHANT_CODE: string;
+  private RETURN_URL: string;
+  private CALLBACK_URL: string;
+
   constructor(
     private readonly configService: ConfigService,
     private readonly tripayApiService: TripayApiService,
-  ) {}
+  ) {
+    this.PRIVATE_KEY = configService.get<string>('TRIPAY_PRIVATE_KEY');
+    this.API_KEY = configService.get<string>('TRIPAY_APIKEY');
+    this.MERCHANT_CODE = configService.get<string>('TRIPAY_MERCHANT_CODE');
+  }
 
   async createTransaction(
     data: CreatePaymentGatewayRequest,
   ): Promise<CreatePaymentGatewayResponse> {
     const expiredTime = Math.floor(Date.now() / 1000) + data.expired_in;
 
-    let amount = data.amount;
+    const amount = data.amount;
     let fee = 0;
     let totalAmount = 0;
 
@@ -42,6 +53,11 @@ export class TripayService implements PaymentGateway {
     }
 
     try {
+      const signature = this.tripayApiService.generateClosedPaymentSignature(
+        data.id,
+        totalAmount,
+      );
+
       const response = await this.tripayApiService.createClosedPayment({
         amount: totalAmount,
         merchant_ref: data.id,
@@ -49,10 +65,13 @@ export class TripayService implements PaymentGateway {
         customer_email: data.customer_email,
         method: data.provider_code as TripayPaymentMethodCode,
         order_items: data.order_items,
-        callback_url: data.callback_url,
-        return_url: data.return_url,
+        callback_url: data.callback_url ?? this.CALLBACK_URL ?? '',
+        return_url:
+          data.return_url ??
+          (this.RETURN_URL ? this.RETURN_URL + '/' + data.id : ''),
         expired_time: expiredTime,
         customer_phone: data.customer_phone,
+        signature,
       });
 
       return {
@@ -91,11 +110,11 @@ export class TripayService implements PaymentGateway {
   }
 
   cancelTransaction(data: any): Promise<any> {
-    throw new Error('Method not implemented.');
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   handleCallback(data: any): Promise<any> {
-    throw new Error('Method not implemented.');
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   calculateFee(
@@ -107,5 +126,24 @@ export class TripayService implements PaymentGateway {
       amountReceived / (1 - feePercent) + feeFixed / (1 - feePercent);
     const fee = total - amountReceived;
     return Math.ceil(fee);
+  }
+
+  public generateCallbackSignature(data: object): string {
+    return crypto
+      .createHmac('sha256', this.PRIVATE_KEY)
+      .update(JSON.stringify(data))
+      .digest('hex');
+  }
+
+  public verifyCallbackSignature({
+    signature,
+    data,
+  }: {
+    signature: string;
+    data: object;
+  }): boolean {
+    const hash = this.generateCallbackSignature(data);
+
+    return signature === hash;
   }
 }

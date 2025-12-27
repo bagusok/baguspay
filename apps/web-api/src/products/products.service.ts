@@ -6,11 +6,15 @@ import { OfferType, tb } from '@repo/db/types';
 import { MetaPaginated } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
+import { StorageService } from 'src/storage/storage.service';
 import { GetAllProductsDto } from './products.dto';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getBySlug(slug: string): Promise<{ success: boolean; data: any }> {
     const category =
@@ -279,6 +283,7 @@ export class ProductsService {
           // Produk Flash Sale
 
           return {
+            image_url: this.storageService.getFileUrl(product.image_url),
             ...product,
             discount: discountPrice
               ? Math.round(product.price - (discountPrice || 0))
@@ -290,6 +295,7 @@ export class ProductsService {
 
         return {
           ...subCategory,
+          image_url: this.storageService.getFileUrl(subCategory.image_url),
           products: products,
         };
       },
@@ -386,8 +392,13 @@ export class ProductsService {
       )
       .where(and(...where));
 
+    const productsWithUrls = products.map((product) => ({
+      ...product,
+      image_url: this.storageService.getFileUrl(product.image_url),
+    }));
+
     return SendResponse.success<typeof products, MetaPaginated>(
-      products,
+      productsWithUrls,
       'Products retrieved successfully',
       {
         meta: {

@@ -16,14 +16,14 @@
     "db:seed": "npm run -w @repo/db db:seed"
   },
   "devDependencies": {
-    "prettier": "^3.6.2",
-    "turbo": "^2.5.4",
+    "prettier": "^3.7.4",
+    "turbo": "^2.7.2",
     "typescript": "5.8.3"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.0.0",
+  "packageManager": "pnpm@10.26.2",
   "workspaces": [
     "apps/*",
     "packages/*",
@@ -38,5 +38,8 @@
       "@nestjs/core",
       "@swc/core"
     ]
+  },
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3"
   }
 }

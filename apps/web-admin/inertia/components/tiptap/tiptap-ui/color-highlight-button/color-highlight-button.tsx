@@ -24,8 +24,7 @@ import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
 import '~/components/tiptap/tiptap-ui/color-highlight-button/color-highlight-button.scss'
 
 export interface ColorHighlightButtonProps
-  extends Omit<ButtonProps, 'type'>,
-    UseColorHighlightConfig {
+  extends Omit<ButtonProps, 'type'>, UseColorHighlightConfig {
   /**
    * Optional text to display alongside the icon.
    */

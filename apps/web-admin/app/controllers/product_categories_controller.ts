@@ -6,7 +6,7 @@ import {
 } from '#validators/product'
 import type { HttpContext } from '@adonisjs/core/http'
 import { and, count, db, desc, eq, ilike, inArray, InferSelectModel } from '@repo/db'
-import { tb } from '@repo/db/types'
+import { ProductBillingType, ProductCategoryType, tb } from '@repo/db/types'
 import slugify from '@sindresorhus/slugify'
 import vine from '@vinejs/vine'
 
@@ -104,6 +104,7 @@ export default class ProductsCategoriesController {
     })
 
     let seoImage: InferSelectModel<typeof tb.fileManager> | null = null
+    let iconImage: InferSelectModel<typeof tb.fileManager> | null = null
 
     if (data.seo_image_id) {
       const s = await db.query.fileManager.findFirst({
@@ -118,6 +119,19 @@ export default class ProductsCategoriesController {
       }
 
       seoImage = s
+    }
+
+    if (data.file_icon_id) {
+      const i = await db.query.fileManager.findFirst({
+        where: eq(tb.fileManager.id, data.file_icon_id),
+      })
+      if (!i) {
+        session.flashErrors({
+          file_icon_id: 'Icon image file not found',
+        })
+        return response.redirect().back()
+      }
+      iconImage = i
     }
 
     const productCategory = await db
@@ -138,11 +152,20 @@ export default class ProductsCategoriesController {
         seo_description: data.seo_description,
         seo_image: seoImage?.url,
         is_available: data.is_available,
+        product_billing_type: data.product_billing_type,
+        type: data.type,
+        is_special_feature: data.is_special_feature,
+        special_feature_key: data.special_feature_key,
+        tags1: data.tags1,
+        tags2: data.tags2,
+        product_fullfillment_type: data.product_fullfillment_type,
+        icon_url: iconImage?.url,
       })
       .returning()
 
     session.flash('success', 'Product category created successfully')
     return response.redirect().toRoute('productCategories.detail', {
+      type: data.type,
       id: productCategory[0].id,
     })
   }
@@ -247,6 +270,13 @@ export default class ProductsCategoriesController {
       is_seo_enabled: data.is_seo_enabled,
       seo_title: data.seo_title,
       seo_description: data.seo_description,
+      product_billing_type: data.product_billing_type,
+      type: data.type,
+      is_special_feature: data.is_special_feature,
+      special_feature_key: data.special_feature_key,
+      tags1: data.tags1,
+      tags2: data.tags2,
+      product_fullfillment_type: data.product_fullfillment_type,
     }
 
     if (data.file_image_id) {
@@ -294,6 +324,19 @@ export default class ProductsCategoriesController {
       updatedData.seo_image = seoImage.url
     }
 
+    if (data.file_icon_id) {
+      const iconImage = await db.query.fileManager.findFirst({
+        where: eq(tb.fileManager.id, data.file_icon_id),
+      })
+      if (!iconImage) {
+        ctx.session.flashErrors({
+          file_icon_id: 'Icon image file not found',
+        })
+        return ctx.response.redirect().back()
+      }
+      updatedData.icon_url = iconImage.url
+    }
+
     updatedData.slug = slugify(data.name ?? productCategory.name, {
       lowercase: true,
       separator: '-',
@@ -305,7 +348,7 @@ export default class ProductsCategoriesController {
       .where(eq(tb.productCategories.id, productCategoryId.id))
 
     ctx.session.flash('success', 'Product category updated successfully')
-    return ctx.response.redirect().back()
+    return ctx.response.redirect().withQs().back()
   }
 
   public async postDelete({ response, session, request }: HttpContext) {
@@ -313,19 +356,21 @@ export default class ProductsCategoriesController {
       data: request.params(),
     })
 
+    console.log(data)
+
     const productCategory = await db.query.productCategories.findFirst({
       where: eq(tb.productCategories.id, data.id),
     })
 
     if (!productCategory) {
       session.flash('error', 'Product category not found')
-      return response.redirect().back()
+      return response.redirect().withQs().back()
     }
 
     await db.delete(tb.productCategories).where(eq(tb.productCategories.id, data.id))
 
     session.flash('success', 'Product category deleted successfully')
-    return response.redirect().toRoute('productCategories.index')
+    return response.redirect().withQs().back()
   }
 
   public async getProductByCategoryNameJson(ctx: HttpContext) {
@@ -403,6 +448,318 @@ export default class ProductsCategoriesController {
         limit,
         total: total.count,
         totalPages: Math.ceil(total.count / limit),
+      },
+    })
+  }
+
+  public async indexGames(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.GAME),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/games/index', {
+      title: 'Product Categories - Games',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createGames({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/games/create', {
+      title: 'Create Game',
+      description: 'Add a new game to the system.',
+    })
+  }
+
+  public async editGames({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/games/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
+      },
+    })
+  }
+
+  public async indexPulsa(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.PULSA),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/pulsa/index', {
+      title: 'Product Categories - Pulsa',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createPulsa({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/pulsa/create', {
+      title: 'Create Pulsa',
+      description: 'Add a new pulsa to the system.',
+    })
+  }
+
+  public async editPulsa({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/pulsa/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
+      },
+    })
+  }
+
+  public async indexKuota(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.KUOTA),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/kuota/index', {
+      title: 'Product Categories - Kuota',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createKuota({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/kuota/create', {
+      title: 'Create Kuota',
+      description: 'Add a new kuota to the system.',
+    })
+  }
+
+  public async editKuota({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/kuota/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
       },
     })
   }

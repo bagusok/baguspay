@@ -20,8 +20,9 @@ const OfferController = () => import('#controllers/offer_controller')
 const DepositController = () => import('#controllers/deposits_controller')
 const OrderController = () => import('#controllers/orders_controller')
 const BalanceMutationController = () => import('#controllers/balance_mutations_controller')
-const ConfigHomesController = () => import('#controllers/config_homes_controller')
-const BannerController = () => import('#controllers/banners_controller')
+const ConfigHomesController = () => import('#controllers/configs/config_homes_controller')
+const ConfigFastMenuController = () => import('#controllers/configs/config_home_fast_menu')
+const BannerController = () => import('#controllers/configs/banners_controller')
 
 import router from '@adonisjs/core/services/router'
 import { UserRole } from '@repo/db/types'
@@ -67,19 +68,55 @@ router
 router
   .group(() => {
     router.get('/', [ProductCategoryController, 'index']).as('productCategories.index')
-    router.get('/create', [ProductCategoryController, 'create']).as('productCategories.create')
+
+    // Games
     router
-      .post('/create', [ProductCategoryController, 'postCreate'])
-      .as('productCategories.postCreate')
+      .get('/game', [ProductCategoryController, 'indexGames'])
+      .as('productCategories.indexGames')
+    router
+      .get('/game/create', [ProductCategoryController, 'createGames'])
+      .as('productCategories.createGame')
+    router
+      .get('/game/:id/edit', [ProductCategoryController, 'editGames'])
+      .as('productCategories.editGame')
+
+    // pulsa
+    router
+      .get('/pulsa', [ProductCategoryController, 'indexPulsa'])
+      .as('productCategories.indexPulsa')
+    router
+      .get('/pulsa/create', [ProductCategoryController, 'createPulsa'])
+      .as('productCategories.createPulsa')
+    router
+      .get('/pulsa/:id/edit', [ProductCategoryController, 'editPulsa'])
+      .as('productCategories.editPulsa')
+
+    // kuota
+    router
+      .get('/kuota', [ProductCategoryController, 'indexKuota'])
+      .as('productCategories.indexKuota')
+    router
+      .get('/kuota/create', [ProductCategoryController, 'createKuota'])
+      .as('productCategories.createKuota')
+    router
+      .get('/kuota/:id/edit', [ProductCategoryController, 'editKuota'])
+      .as('productCategories.editKuota')
 
     router
       .get('/get-json', [ProductCategoryController, 'getProductByCategoryNameJson'])
       .as('productCategories.getProductByCategoryNameJson')
 
-    router.get('/:id', [ProductCategoryController, 'detail']).as('productCategories.detail')
-    router.get('/:id/edit', [ProductCategoryController, 'edit'])
-    router.patch('/:id', [ProductCategoryController, 'postEdit']).as('productCategories.postEdit')
-    router.delete('/:id', [ProductCategoryController, 'postDelete']).as('productCategories.delete')
+    router.get('/:type/:id', [ProductCategoryController, 'detail']).as('productCategories.detail')
+
+    router
+      .post('/:type/create', [ProductCategoryController, 'postCreate'])
+      .as('productCategories.postCreate')
+    router
+      .patch('/:type/:id', [ProductCategoryController, 'postEdit'])
+      .as('productCategories.postEdit')
+    router
+      .delete('/:type/:id', [ProductCategoryController, 'postDelete'])
+      .as('productCategories.delete')
   })
   .prefix('/admin/product-categories')
   .middleware(middleware.role(UserRole.ADMIN))
@@ -268,6 +305,32 @@ router
   .group(() => {
     router
       .group(() => {
+        router
+          .group(() => {
+            router.get('/', [ConfigFastMenuController, 'index']).as('configFastMenu.index')
+            router
+              .post('/', [ConfigFastMenuController, 'createProductSection'])
+              .as('configFastMenu.postCreate')
+
+            router
+              .post('/:id/connect-product', [ConfigFastMenuController, 'connectProductToSection'])
+              .as('configFastMenu.connectProductToSection')
+
+            router.post('/:id/disconnect-product', [
+              ConfigFastMenuController,
+              'disconnectProductFromSection',
+            ])
+
+            router.get('/:id', [ConfigFastMenuController, 'detail']).as('configFastMenu.detail')
+            router
+              .patch('/:id', [ConfigFastMenuController, 'updateProductSection'])
+              .as('configFastMenu.postEdit')
+            router
+              .delete('/:id', [ConfigFastMenuController, 'deleteProductSection'])
+              .as('configFastMenu.postDelete')
+          })
+          .prefix('/fast-menu')
+
         router.get('/product-sections', [ConfigHomesController, 'index']).as('configHomes.index')
         router
           .post('/product-sections', [ConfigHomesController, 'createProductSection'])

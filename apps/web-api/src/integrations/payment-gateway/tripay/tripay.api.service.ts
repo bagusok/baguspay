@@ -60,28 +60,19 @@ export class TripayApiService {
       .digest('hex');
   }
 
-  public async createClosedPayment(_data: TripayCreateClosedPaymentRequest) {
+  public async createClosedPayment(data: TripayCreateClosedPaymentRequest) {
     try {
-      const signature = this.generateClosedPaymentSignature(
-        _data.merchant_ref,
-        _data.amount,
-      );
-
       const response =
         await this.apiClient.post<TripayCreateClosedPaymentResponse>(
           '/transaction/create',
-          {
-            ..._data,
-            signature,
-          },
+          data,
         );
 
-      const data = response.data;
-
-      return data;
+      return response.data;
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      this.logger.error('Error creating closed payment', error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Error creating closed payment', errorMessage);
       if (axios.isAxiosError<TripayApiErrorResponse>(error)) {
         this.logger.error(JSON.stringify(error.response.data));
 

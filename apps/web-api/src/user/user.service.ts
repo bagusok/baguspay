@@ -9,11 +9,15 @@ import {
 import { MetaPaginated, TUser } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
 import { DatabaseService } from 'src/database/database.service';
+import { StorageService } from 'src/storage/storage.service';
 import { GetBalanceMutationHistoryQuery } from './user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly databaseService: DatabaseService) {}
+  constructor(
+    private readonly databaseService: DatabaseService,
+    private readonly storageService: StorageService,
+  ) {}
 
   async getUserById(id: string) {
     const user = await this.databaseService.db.query.users.findFirst({
@@ -35,6 +39,10 @@ export class UserService {
 
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (user.image_url) {
+      user.image_url = this.storageService.getFileUrl(user.image_url);
     }
 
     return SendResponse.success(user, 'User profile retrieved successfully');
@@ -223,7 +231,7 @@ export class UserService {
         )
         .limit(1),
       // Total deposits
-      await this.databaseService.db
+      this.databaseService.db
         .select({
           totalDeposit: sum(tb.deposits.amount_received),
         })

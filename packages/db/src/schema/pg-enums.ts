@@ -53,6 +53,7 @@ export const depositStatusEnum = pgEnum(
   "deposit_status",
   enumToPgEnum(DepositStatus),
 );
+
 export enum InputFieldType {
   TEXT = "text",
   NUMBER = "number",
@@ -67,6 +68,7 @@ export enum InputFieldType {
 export type InputFieldOption = {
   label: string;
   value: string;
+  value_checker_mapping: string;
 };
 
 export const inputFieldTypeEnum = pgEnum(
@@ -112,6 +114,48 @@ export const refundStatusEnum = pgEnum(
   enumToPgEnum(RefundStatus),
 );
 
+// src/database/enums/inquiry-status.enum.ts
+
+export enum InquiryStatus {
+  /**
+   * Inquiry baru dibuat oleh user
+   * Biasanya setelah user memilih produk dan input data pelanggan,
+   * tapi belum dikonfirmasi atau dibayar.
+   */
+  AWAIT_CONFIRMATION = "AWAIT_CONFIRMATION",
+
+  /**
+   * Inquiry sudah dikonfirmasi user dan siap dilanjutkan ke order
+   * Biasanya untuk produk postpaid (setelah user lihat nominal tagihan).
+   */
+  CONFIRMED = "CONFIRMED",
+
+  /**
+   * Inquiry sudah diproses jadi order.
+   * Biasanya setelah user checkout, sistem membuat order dari inquiry ini.
+   */
+  USED = "USED",
+
+  /**
+   * Inquiry kedaluwarsa (melebihi expired_at).
+   * Biasanya otomatis dihapus oleh cron job kalau belum digunakan.
+   */
+  EXPIRED = "EXPIRED",
+
+  /**
+   * Inquiry gagal saat komunikasi dengan provider (misal provider down / invalid data).
+   */
+  FAILED = "FAILED",
+
+  /**
+   * Inquiry dibatalkan oleh user secara manual.
+   */
+  CANCELED = "CANCELED",
+}
+export const inquiryStatusEnum = pgEnum(
+  "inquiry_status",
+  enumToPgEnum(InquiryStatus),
+);
 export enum PaymentMethodFeeType {
   MERCHANT = "merchant",
   BUYER = "buyer",
@@ -182,14 +226,42 @@ export const loginIsFromEnum = pgEnum(
 export enum ProductCategoryType {
   GAME = "game",
   VOUCHER = "voucher",
+  AKTIVASI_PERDANA = "aktivasi_perdana",
+  AKTIVASI_VOUCHER = "aktivasi_voucher",
+
+  E_MONEY = "e_money",
+  E_WALLET = "e_wallet",
+  E_WALLET_BEBAS_NOMINAL = "e_wallet_bebas_nominal",
+
   PULSA = "pulsa",
   KUOTA = "kuota",
+  MASA_AKTIF = "masa_aktif",
+  TELEPON_DAN_SMS = "telepon_dan_sms",
+
+  PLN_PREPAID = "pln_prepaid",
+
+  // PASCABAYAR
+  PLN_POSTPAID = "pln_postpaid",
+  PLN_NON_TAGLIST = "pln_non_taglist",
+  PDAM = "pdam",
+  PULSA_POSTPAID = "pulsa_postpaid",
+  KUOTA_RECOMENDATION = "kuota_recomendation",
+
+  INTERNET_POSTPAID = "internet_postpaid",
+  BPJS_KESEHATAN_POSTPAID = "bpjs_keuangan_postpaid",
+  BPJS_KETENAGAKERJAAN_POSTPAID = "bpjs_ketenagakerjaan_postpaid",
+  MULTIFINANC_POSTPAID = "multifinanc_postpaid",
+  PBB_POSTPAID = "pbb_postpaid",
+  GAS_POSTPAID = "gas_postpaid",
+  INSURANCE_POSTPAID = "insurance_postpaid",
+
   ENTERTAINMENT = "entertainment",
   FINANCE = "finance",
   ECOMMERCE = "ecommerce",
   TOPUP = "topup",
   BILLING = "billing",
   SENDMONEY = "send_money",
+
   OTHER = "other",
 }
 
@@ -255,6 +327,7 @@ export const appPlatformEnum = pgEnum(
 export enum ProductGroupingType {
   REDIRECT = "redirect",
   MODAL = "modal",
+  CATEGORY = "category",
 }
 
 export const productGroupingTypeEnum = pgEnum(
@@ -265,9 +338,33 @@ export const productGroupingTypeEnum = pgEnum(
 export enum ProductGroupingMenuType {
   HOME_MENU = "home_menu",
   FAST_MENU = "fast_menu",
+  CATEGORY_MENU = "category_menu",
+  OTHER_MENU = "other_menu",
 }
 
 export const productGroupingMenuTypeEnum = pgEnum(
   "product_grouping_menu_type",
   enumToPgEnum(ProductGroupingMenuType),
 );
+
+export enum BannerLocation {
+  HOME_TOP = "home_top",
+  HOME_MIDDLE = "home_middle",
+  HOME_BOTTOM = "home_bottom",
+  CATEGORY_TOP = "category_top",
+  CATEGORY_MIDDLE = "category_middle",
+  CATEGORY_BOTTOM = "category_bottom",
+  PRODUCT_TOP = "product_top",
+  PRODUCT_MIDDLE = "product_middle",
+  PRODUCT_BOTTOM = "product_bottom",
+}
+
+export const bannerLocationEnum = pgEnum(
+  "banner_location",
+  enumToPgEnum(BannerLocation),
+);
+
+export type OfferAppliedOnInquiry = {
+  id: string;
+  type: OfferType;
+};

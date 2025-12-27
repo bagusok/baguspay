@@ -12,9 +12,11 @@ import { cn } from "@repo/ui/lib/utils";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import { ScrollRestoration } from "react-router";
 import { useChangeLanguage } from "remix-i18next/react";
 import type { Route } from "./+types/root";
 import "./app.css";
+import { RouterTopLoader } from "./components/top-loader";
 import {
   getInstance,
   i18nextMiddleware,
@@ -22,7 +24,7 @@ import {
 } from "./middlewares/i8n";
 import { getSession } from "./session.server";
 
-export const unstable_middleware = [i18nextMiddleware];
+export const middleware = [i18nextMiddleware];
 
 export async function loader({ context, request, params }: Route.LoaderArgs) {
   let i18next = getInstance(context);
@@ -99,7 +101,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className={cn("antialiased relative")}>
+        <RouterTopLoader />
         {children}
+        <ScrollRestoration />
         <Scripts />
       </body>
     </html>

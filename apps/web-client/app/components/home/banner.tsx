@@ -1,6 +1,7 @@
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
+import type { BannerLocation } from "@repo/db/types";
+// import "swiper/css";
+// import "swiper/css/navigation";
+// import "swiper/css/pagination";
 import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useWindowSize } from "usehooks-ts";
@@ -12,230 +13,150 @@ type Banner = {
   title: string;
   description: string;
   image_url: string;
+  href_url: string | null;
+  app_url: string | null;
+  banner_location: BannerLocation;
+  order: number;
+  is_available: boolean;
   created_at: string;
   is_featured?: boolean;
   isFeatured?: boolean;
 };
 
 type Props = {
-  banners: Banner[];
+  home_top: Banner[];
+  home_middle: Banner[];
+  home_bottom: Banner[];
 };
 
-export default function HomeBanner({ banners }: Props) {
+export default function HomeBanner({
+  home_top,
+  home_middle,
+  home_bottom,
+}: Props) {
   const { width } = useWindowSize();
 
-  if (!banners || banners.length === 0) {
-    return null;
-  }
+  const hasAny =
+    (home_top?.length ?? 0) +
+      (home_middle?.length ?? 0) +
+      (home_bottom?.length ?? 0) >
+    0;
 
-  const count = banners.length;
+  if (!hasAny) return null;
 
-  // Helpers
-  const isFeat = (b: Banner) => Boolean(b.isFeatured ?? b.is_featured);
+  const renderSwiper = (
+    banners: Banner[],
+    opts?: { slides?: number; loop?: boolean },
+  ) => {
+    if (!banners || banners.length === 0) return null;
+    const slidesPerView = opts?.slides ?? 1;
+    const loop = opts?.loop ?? banners.length > 1;
 
-  // 1 banner: slideable but simple (no coverflow)
-  if (count === 1) {
-    const item = banners[0];
     return (
-      <section className="w-full">
-        <Swiper
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={1}
-          spaceBetween={12}
-          pagination={{ clickable: true }}
-          loop={false}
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          modules={[Pagination, Autoplay]}
-        >
-          <SwiperSlide key={item.id ?? 0}>
+      <Swiper
+        grabCursor={true}
+        centeredSlides={slidesPerView === 1}
+        slidesPerView={slidesPerView}
+        spaceBetween={12}
+        pagination={{ clickable: true }}
+        loop={loop}
+        autoplay={{ delay: 3000, disableOnInteraction: false }}
+        modules={[Pagination, Autoplay]}
+        className="h-full"
+      >
+        {banners.map((item, index) => (
+          <SwiperSlide key={item.id ?? index} className="h-full">
             <Image
               src={item.image_url}
               alt={item.title}
-              className="w-full rounded-xl object-cover"
+              className="w-full h-full rounded-xl object-cover"
               loading="lazy"
             />
           </SwiperSlide>
-        </Swiper>
-      </section>
+        ))}
+      </Swiper>
     );
-  }
+  };
 
-  // 2 banners: simple swiper (no coverflow), show 1 on mobile, 2 on md+
-  if (count === 2) {
-    return (
-      <section className="w-full">
-        <Swiper
-          grabCursor={true}
-          centeredSlides={false}
-          slidesPerView={width < 768 ? 1 : 2}
-          spaceBetween={12}
-          pagination={{ clickable: true }}
-          loop={false}
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          modules={[Pagination, Autoplay]}
-        >
-          {banners.map((item, index) => (
-            <SwiperSlide key={item.id ?? index}>
-              <Image
-                src={item.image_url}
-                alt={item.title}
-                className="w-full rounded-xl object-cover"
-                loading="lazy"
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      </section>
-    );
-  }
-
-  // 3 or more banners: grid 2 rows
-  // Row 1 (full width): featured banners (if multiple -> slide). If none, use index 1 as fallback (or 0 if not exists)
-  // Row 2: two columns; right column is a slider of remaining banners; left column shows one static banner from the remaining.
-  const featuredIdx = banners
-    .map((b, i) => (isFeat(b) ? i : -1))
-    .filter((i) => i >= 0);
-
-  const topIndices: number[] =
-    featuredIdx.length > 0 ? featuredIdx : [banners[1] ? 1 : 0];
-
-  const usedTop = new Set(topIndices);
-  const restIndices = banners.map((_, i) => i).filter((i) => !usedTop.has(i));
-
-  const bottomLeftIndex = restIndices[0];
-  const bottomRightIndices = restIndices.slice(1);
-
-  // On mobile & tablet (width < 1024), collapse grid into a single slider (featured-first order)
+  // Mobile/tablet: collapse into single slider in order: top -> middle -> bottom
   if (width < 1024) {
-    const order = [...topIndices, ...restIndices];
+    const combined = [
+      ...(home_top || []),
+      ...(home_middle || []),
+      ...(home_bottom || []),
+    ];
+    if (combined.length === 0) return null;
+
     return (
       <section className="w-full">
-        <Swiper
-          grabCursor={true}
-          centeredSlides={true}
-          slidesPerView={1}
-          spaceBetween={12}
-          pagination={{ clickable: true }}
-          loop={order.length > 1}
-          autoplay={{ delay: 3000, disableOnInteraction: false }}
-          modules={[Pagination, Autoplay]}
-        >
-          {order.map((idx) => {
-            const item = banners[idx];
-            return (
-              <SwiperSlide key={item.id ?? idx}>
-                <Image
-                  src={item.image_url}
-                  alt={item.title}
-                  className="w-full rounded-xl object-cover"
-                  loading="lazy"
-                />
-              </SwiperSlide>
-            );
-          })}
-        </Swiper>
+        {renderSwiper(combined, { slides: 1 })}
       </section>
     );
   }
+
+  // Desktop: keep 3-box layout
+  const topHasMany = (home_top?.length ?? 0) > 1;
+  const middleHasMany = (home_middle?.length ?? 0) > 1;
+  const bottomHasMany = (home_bottom?.length ?? 0) > 1;
 
   return (
     <section className="w-full overflow-hidden">
       <div className="grid grid-cols-3 grid-rows-[auto_1fr] gap-3">
-        {/* Row 1: Featured area (span both columns) */}
+        {/* Top area spans two columns */}
         <div className="w-full col-span-2">
-          {topIndices.length > 1 ? (
-            <Swiper
-              grabCursor={true}
-              centeredSlides={true}
-              slidesPerView={1}
-              spaceBetween={12}
-              pagination={{ clickable: true }}
-              loop={false}
-              autoplay={{ delay: 3000, disableOnInteraction: false }}
-              modules={[Pagination, Autoplay]}
-            >
-              {topIndices.map((idx) => {
-                const item = banners[idx];
-                return (
-                  <SwiperSlide key={item.id ?? idx}>
-                    <Image
-                      src={item.image_url}
-                      alt={item.title}
-                      className="w-full rounded-xl object-cover"
-                      loading="lazy"
-                    />
-                  </SwiperSlide>
-                );
-              })}
-            </Swiper>
+          {home_top?.length ? (
+            topHasMany ? (
+              renderSwiper(home_top, { slides: 1, loop: home_top.length > 1 })
+            ) : (
+              <Image
+                src={home_top[0].image_url}
+                alt={home_top[0].title}
+                className="w-full rounded-xl object-cover"
+                loading="lazy"
+              />
+            )
           ) : (
-            (() => {
-              const item = banners[topIndices[0]];
-              return (
+            <div className="w-full" />
+          )}
+        </div>
+
+        {/* Right column (two rows): top uses home_middle, bottom uses home_bottom */}
+        <div className="w-full col-span-1 row-span-2 grid grid-rows-[1fr_auto] gap-1 min-h-0">
+          {/* Right-top: slider or single from middle */}
+          <div className="w-full h-full min-h-0 overflow-hidden">
+            {home_middle?.length ? (
+              middleHasMany ? (
+                renderSwiper(home_middle, { slides: 1 })
+              ) : (
                 <Image
-                  src={item.image_url}
-                  alt={item.title}
+                  src={home_middle[0].image_url}
+                  alt={home_middle[0].title}
+                  className="w-full h-full rounded-xl object-cover"
+                  loading="lazy"
+                />
+              )
+            ) : (
+              <div className="w-full" />
+            )}
+          </div>
+
+          {/* Right-bottom: static or slider from bottom */}
+          <div className="w-full overflow-hidden">
+            {home_bottom?.length ? (
+              bottomHasMany ? (
+                renderSwiper(home_bottom, { slides: 1 })
+              ) : (
+                <Image
+                  src={home_bottom[0].image_url}
+                  alt={home_bottom[0].title}
                   className="w-full rounded-xl object-cover"
                   loading="lazy"
                 />
-              );
-            })()
-          )}
-        </div>
-        {/* Right column: two rows (top slider, bottom static) */}
-        <div className="w-full col-span-1 row-span-2 grid grid-rows-[1fr_auto] gap-1 min-h-0">
-          {/* Right-bottom: formerly bottom-left static banner */}
-          {bottomLeftIndex !== undefined ? (
-            <div className="w-full overflow-hidden">
-              {(() => {
-                const item = banners[bottomLeftIndex];
-                return (
-                  <Image
-                    src={item.image_url}
-                    alt={item.title}
-                    className="w-full rounded-xl object-cover"
-                    loading="lazy"
-                  />
-                );
-              })()}
-            </div>
-          ) : (
-            <div className="w-full" />
-          )}
-
-          {/* Right-top: slider of remaining banners */}
-          {bottomRightIndices.length > 0 ? (
-            <div className="w-full h-full min-h-0 overflow-hidden">
-              <Swiper
-                grabCursor={true}
-                centeredSlides={false}
-                slidesPerView={1}
-                spaceBetween={12}
-                pagination={{ clickable: true }}
-                loop={bottomRightIndices.length > 1}
-                autoplay={{ delay: 3000, disableOnInteraction: false }}
-                modules={[Pagination, Autoplay]}
-                className="h-full"
-              >
-                {bottomRightIndices.map((idx) => {
-                  const item = banners[idx];
-                  return (
-                    <SwiperSlide key={item.id ?? idx} className="h-full">
-                      <Image
-                        src={item.image_url}
-                        alt={item.title}
-                        className="w-full h-full rounded-xl object-cover"
-                        loading="lazy"
-                      />
-                    </SwiperSlide>
-                  );
-                })}
-              </Swiper>
-            </div>
-          ) : (
-            <div className="w-full" />
-          )}
+              )
+            ) : (
+              <div className="w-full" />
+            )}
+          </div>
         </div>
       </div>
     </section>

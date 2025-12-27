@@ -31,18 +31,21 @@ export class DuitkuAPiService {
     data: DuitkuCreateTransactionPayload,
   ): Promise<DuitkuCreateTransactionResponseSuccess> {
     try {
-      const response = await this.API_CLIENT.post(
-        '/webapi/api/merchant/v2/inquiry',
-        data,
-      );
+      const response =
+        await this.API_CLIENT.post<DuitkuCreateTransactionResponseSuccess>(
+          '/webapi/api/merchant/v2/inquiry',
+          data,
+        );
 
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
-        console.log('Duitku ApiService: ', error.response.data);
+        const errorMessage =
+          (error.response?.data as { message?: string })?.message ||
+          'Duitku API Error';
         throw new ApiServiceException(
-          error.response.status,
-          error.response.data.Message,
+          error.response?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+          errorMessage,
         );
       } else {
         throw new ApiServiceException(

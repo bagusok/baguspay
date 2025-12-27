@@ -1,0 +1,1 @@
+ALTER TABLE "inquiries" ADD COLUMN "customer_input_merged" varchar DEFAULT '' NOT NULL;
