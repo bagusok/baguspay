@@ -61,7 +61,7 @@ const computeProfit = (cost: number) => {
       product.category.toLowerCase() === DF_PRODUCT_CATEGORY.toLowerCase() &&
       product.brand.toLowerCase() === DF_PRODUCT_BRAND.toLowerCase() &&
       DF_PRODUCT_TYPE.map((type) => type.toLowerCase()).includes(
-        product.type.toLowerCase()
+        product.type.toLowerCase(),
       )
     );
   });
@@ -70,17 +70,17 @@ const computeProfit = (cost: number) => {
   const productFromDB = await db.query.products.findMany({
     where: and(
       eq(tb.products.product_sub_category_id, DB_PRODUCT_SUB_CATEGORY_ID),
-      eq(tb.products.provider_name, ProductProvider.DIGIFLAZZ)
+      eq(tb.products.provider_name, ProductProvider.DIGIFLAZZ),
     ),
   });
 
   // Build quick lookup maps
   const dbByProviderCode = new Map(
-    productFromDB.map((p) => [p.provider_code, p])
+    productFromDB.map((p) => [p.provider_code, p]),
   );
 
   const nowListedProviderCodes = new Set(
-    filterProducts.map((p) => p.buyer_sku_code)
+    filterProducts.map((p) => p.buyer_sku_code),
   );
 
   // Helpers
@@ -128,7 +128,7 @@ const computeProfit = (cost: number) => {
             stock,
             notes: toDesc(item),
           })
-          .where(eq(tb.products.id, existing.id))
+          .where(eq(tb.products.id, existing.id)),
       );
     } else {
       // Insert new product
@@ -156,7 +156,7 @@ const computeProfit = (cost: number) => {
           provider_input_separator: "",
           billing_type: ProductBillingType.PREPAID, // use default
           fullfillment_type: ProductFullfillmentType.AUTOMATIC_DIRECT, // use default
-        })
+        }),
       );
     }
   }
@@ -171,7 +171,7 @@ const computeProfit = (cost: number) => {
       db
         .update(tb.products)
         .set({ is_available: false })
-        .where(inArray(tb.products.id, toDisable))
+        .where(inArray(tb.products.id, toDisable)),
     );
   }
 
@@ -184,15 +184,15 @@ const computeProfit = (cost: number) => {
         total_from_df: filterProducts.length,
         exists_in_db: productFromDB.length,
         created: filterProducts.filter(
-          (p) => !dbByProviderCode.has(p.buyer_sku_code)
+          (p) => !dbByProviderCode.has(p.buyer_sku_code),
         ).length,
         updated: filterProducts.filter((p) =>
-          dbByProviderCode.has(p.buyer_sku_code)
+          dbByProviderCode.has(p.buyer_sku_code),
         ).length,
         disabled: toDisable.length,
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 })();

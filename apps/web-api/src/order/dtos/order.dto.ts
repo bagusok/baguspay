@@ -194,3 +194,13 @@ export class OrderIdDto {
   @IsString()
   id: string;
 }
+
+export class CheckoutDto {
+  @ApiProperty()
+  @IsUUID()
+  inquiry_id: string;
+
+  @ApiProperty()
+  @IsString()
+  checkout_token: string;
+}

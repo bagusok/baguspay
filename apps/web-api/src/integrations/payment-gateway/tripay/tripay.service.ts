@@ -27,7 +27,6 @@ export class TripayService implements PaymentGateway {
     private readonly configService: ConfigService,
     private readonly tripayApiService: TripayApiService,
   ) {
-    const envMode = configService.get<string>('NODE_ENV');
     this.PRIVATE_KEY = configService.get<string>('TRIPAY_PRIVATE_KEY');
     this.API_KEY = configService.get<string>('TRIPAY_APIKEY');
     this.MERCHANT_CODE = configService.get<string>('TRIPAY_MERCHANT_CODE');
@@ -38,7 +37,7 @@ export class TripayService implements PaymentGateway {
   ): Promise<CreatePaymentGatewayResponse> {
     const expiredTime = Math.floor(Date.now() / 1000) + data.expired_in;
 
-    let amount = data.amount;
+    const amount = data.amount;
     let fee = 0;
     let totalAmount = 0;
 
@@ -111,11 +110,11 @@ export class TripayService implements PaymentGateway {
   }
 
   cancelTransaction(data: any): Promise<any> {
-    throw new Error('Method not implemented.');
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   handleCallback(data: any): Promise<any> {
-    throw new Error('Method not implemented.');
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   calculateFee(

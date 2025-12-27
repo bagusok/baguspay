@@ -23,7 +23,7 @@ import {
   GetPriceByDto,
   OrderIdDto,
   PreCheckoutPrepaidDto,
-} from './order.dto';
+} from './dtos/order.dto';
 import { OrderService } from './order.service';
 
 @ApiSecurity('access-token')

@@ -164,8 +164,8 @@ export class PaymentCallbackService {
         })
         .where(eq(tb.orders.order_id, data.merchant_ref));
 
-      this.revertProductStock(order);
-      this.revertOfferStock(order);
+      await this.revertProductStock(order);
+      await this.revertOfferStock(order);
     }
 
     return SendResponse.success({
@@ -175,7 +175,7 @@ export class PaymentCallbackService {
     });
   }
 
-  private async revertOfferStock(order) {
+  private async revertOfferStock(order: OrderWithRelations) {
     if (order.offer_on_orders.length > 0) {
       for (const offer of order.offer_on_orders) {
         await this.databaseService.db
@@ -188,7 +188,7 @@ export class PaymentCallbackService {
     }
   }
 
-  private async revertProductStock(order) {
+  private async revertProductStock(order: OrderWithRelations) {
     return await this.databaseService.db
       .update(tb.products)
       .set({
@@ -197,3 +197,18 @@ export class PaymentCallbackService {
       .where(eq(tb.products.id, order.product_snapshot.product_id));
   }
 }
+
+type OrderWithRelations = {
+  order_id: string;
+  payment_snapshot: {
+    provider_name: string;
+    provider_code: string;
+    expired_at: Date;
+  };
+  product_snapshot: {
+    product_id: string;
+  };
+  offer_on_orders: {
+    id: string;
+  }[];
+};

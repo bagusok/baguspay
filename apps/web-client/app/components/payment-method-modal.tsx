@@ -73,7 +73,7 @@ export default function PaymentMethodModal({
         >
           {selectedPaymentMethod ? (
             <div className="flex items-center gap-3">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 {selectedPaymentMethod.image_url ? (
                   <Image
                     src={selectedPaymentMethod.image_url}
@@ -136,9 +136,9 @@ export default function PaymentMethodModal({
                 >
                   <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180">
                     <div className="flex items-center gap-3">
-                      <div className="flex-shrink-0">
+                      <div className="shrink-0">
                         {getPaymentMethodIcon(
-                          category.payment_methods[0]?.type || "default"
+                          category.payment_methods[0]?.type || "default",
                         )}
                       </div>
                       <div className="text-left">
@@ -148,7 +148,7 @@ export default function PaymentMethodModal({
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           {
                             category.payment_methods.filter(
-                              (m) => m.is_available
+                              (m) => m.is_available,
                             ).length
                           }{" "}
                           methods available
@@ -171,7 +171,7 @@ export default function PaymentMethodModal({
                             onClick={() => handleSelectMethod(method)}
                           >
                             <div className="flex items-center gap-3">
-                              <div className="flex-shrink-0">
+                              <div className="shrink-0">
                                 {method.image_url ? (
                                   <Image
                                     src={method.image_url}

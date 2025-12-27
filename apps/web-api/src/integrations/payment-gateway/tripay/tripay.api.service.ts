@@ -70,7 +70,9 @@ export class TripayApiService {
 
       return response.data;
     } catch (error) {
-      this.logger.error('Error creating closed payment', error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Error creating closed payment', errorMessage);
       if (axios.isAxiosError<TripayApiErrorResponse>(error)) {
         this.logger.error(JSON.stringify(error.response.data));
 

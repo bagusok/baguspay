@@ -45,7 +45,8 @@ export interface ColorHighlightPopoverContentProps {
 }
 
 export interface ColorHighlightPopoverProps
-  extends Omit<ButtonProps, 'type'>,
+  extends
+    Omit<ButtonProps, 'type'>,
     Pick<UseColorHighlightConfig, 'editor' | 'hideWhenUnavailable' | 'onApplied'> {
   /**
    * Optional colors to use in the highlight popover.

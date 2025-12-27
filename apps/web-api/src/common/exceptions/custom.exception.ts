@@ -69,7 +69,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
       );
     }
 
-    this.logger.error(`Exception: ${exception}, Status: ${statusCode}`);
     // Kirim respons JSON yang konsisten
     response.status(statusCode).json(responseBody);
   }

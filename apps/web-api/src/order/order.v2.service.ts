@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
   Injectable,
@@ -6,9 +7,29 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { InquiryStatus, OfferType, tb } from '@repo/db/types';
+import {
+  InquiryStatus,
+  OfferType,
+  OrderStatus,
+  PaymentMethodAllowAccess,
+  PaymentMethodProvider,
+  PaymentMethodType,
+  PaymentStatus,
+  tb,
+} from '@repo/db/types';
 
-import { and, asc, eq } from '@repo/db';
+import {
+  and,
+  arrayContains,
+  asc,
+  eq,
+  gte,
+  inArray,
+  lte,
+  ne,
+  or,
+  sql,
+} from '@repo/db';
 import * as crypto from 'crypto';
 import { TUser } from 'src/common/types/meta.type';
 import { SendResponse } from 'src/common/utils/response';
@@ -17,7 +38,9 @@ import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-
 import { OffersService } from 'src/offers/offers.service';
 import { PaymentsService } from 'src/payments/payments.service';
 import { QueueService } from 'src/queue/queue.service';
+import { StorageService } from 'src/storage/storage.service';
 import { InquiryUniversalDto } from './dtos/inquiry.universal.dto';
+import { CheckoutDto } from './dtos/order.dto';
 
 @Injectable()
 export class OrderV2Service {
@@ -28,7 +51,215 @@ export class OrderV2Service {
     private readonly queueService: QueueService,
     private readonly offerService: OffersService,
     private readonly paymentService: PaymentsService,
+    private readonly storageService: StorageService,
   ) {}
+
+  async getPriceBy(
+    productId: string,
+    user: TUser,
+    voucherId: string | null = null,
+  ) {
+    const [product] = await this.databaseService.db
+      .select({
+        id: tb.products.id,
+        name: tb.products.name,
+        price: tb.products.price,
+        product_category: {
+          id: tb.productCategories.id,
+          name: tb.productCategories.name,
+          is_special_feature: tb.productCategories.is_special_feature,
+        },
+        product_sub_category: {
+          id: tb.productSubCategories.id,
+          name: tb.productSubCategories.name,
+        },
+      })
+      .from(tb.products)
+      .innerJoin(
+        tb.productSubCategories,
+        eq(tb.productSubCategories.id, tb.products.product_sub_category_id),
+      )
+      .innerJoin(
+        tb.productCategories,
+        eq(
+          tb.productCategories.id,
+          tb.productSubCategories.product_category_id,
+        ),
+      )
+      .where(
+        and(
+          eq(tb.products.id, productId),
+          eq(tb.products.is_available, true),
+          eq(tb.productCategories.is_available, true),
+          eq(tb.productSubCategories.is_available, true),
+          eq(tb.productCategories.is_special_feature, false),
+        ),
+      )
+      .limit(1);
+
+    if (!product) {
+      throw new NotFoundException(
+        `Product with ID ${productId} not found OR not available.`,
+      );
+    }
+
+    const offers = await this.offerService.getApplicableOffers(
+      product.id,
+      user,
+      product.price,
+    );
+
+    const selectedOffer =
+      offers.find((o) => o.type === OfferType.FLASH_SALE) || offers[0] || null;
+
+    let selectedVoucher: any = null;
+    if (voucherId) {
+      selectedVoucher = await this.offerService.getVoucher(
+        voucherId,
+        product.id,
+        user,
+      );
+      this.offerService.validateCombinable(selectedOffer, selectedVoucher);
+    }
+
+    const { totalDiscount, offerDiscount, voucherDiscount } =
+      this.offerService.calculateDiscount(
+        product.price,
+        selectedOffer,
+        selectedVoucher,
+      );
+
+    const totalPrice = product.price - totalDiscount;
+    if (totalPrice < 1000) {
+      throw new NotAcceptableException(
+        'Total price after discount cannot be less than 1000.',
+      );
+    }
+
+    let voucherPaymentMethod: string[] = [];
+    if (selectedVoucher && !selectedVoucher.is_all_payment_methods) {
+      const allowedMethods = await this.databaseService.db
+        .select({ id: tb.offerPaymentMethods.payment_method_id })
+        .from(tb.offerPaymentMethods)
+        .where(eq(tb.offerPaymentMethods.offer_id, selectedVoucher.id));
+
+      voucherPaymentMethod = allowedMethods.map((m) => m.id);
+    }
+
+    const paymentCategories =
+      await this.databaseService.db.query.paymentMethodCategories.findMany({
+        columns: {
+          id: true,
+          name: true,
+        },
+        with: {
+          payment_methods: {
+            where: and(
+              eq(tb.paymentMethods.is_available, true),
+              arrayContains(tb.paymentMethods.allow_access, [
+                PaymentMethodAllowAccess.ORDER,
+              ]),
+              lte(tb.paymentMethods.min_amount, totalPrice),
+              gte(tb.paymentMethods.max_amount, totalPrice),
+              ...(voucherPaymentMethod.length > 0
+                ? [inArray(tb.paymentMethods.id, voucherPaymentMethod)]
+                : []),
+              ...(!user
+                ? [
+                    or(
+                      ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
+                      ne(
+                        tb.paymentMethods.provider_name,
+                        PaymentMethodProvider.BALANCE,
+                      ),
+                    ),
+                  ]
+                : []),
+            ),
+            columns: {
+              id: true,
+              name: true,
+              type: true,
+              fee_percentage: true,
+              fee_static: true,
+              min_amount: true,
+              max_amount: true,
+              label: true,
+              image_url: true,
+              is_featured: true,
+              is_need_email: true,
+              is_need_phone_number: true,
+              cut_off_start: true,
+              cut_off_end: true,
+              is_available: true,
+            },
+          },
+        },
+      });
+
+    const payment_methods = paymentCategories.map((category) => {
+      const { payment_methods: methods, ...rest } = category;
+      return {
+        ...rest,
+        items: methods.map((method) => {
+          let isAvailable = method.is_available;
+
+          if (selectedVoucher && voucherPaymentMethod.length > 0) {
+            if (!voucherPaymentMethod.includes(method.id)) {
+              isAvailable = false;
+            }
+          }
+
+          if (
+            totalPrice < method.min_amount ||
+            totalPrice > method.max_amount
+          ) {
+            isAvailable = false;
+          }
+
+          const paymentFee = this.calculateFee(
+            totalPrice,
+            method.fee_percentage / 100,
+            method.fee_static,
+          );
+
+          return {
+            ...method,
+            is_available: isAvailable,
+            payment_fee: paymentFee,
+            product_price: product.price,
+            discount: totalDiscount,
+            total: totalPrice + paymentFee,
+            image_url: this.storageService.getFileUrl(method.image_url),
+          };
+        }),
+      };
+    });
+
+    return SendResponse.success({
+      payment_methods,
+      offers: selectedOffer
+        ? {
+            name: selectedOffer.name,
+            type: selectedOffer.type,
+            discount_percentage: selectedOffer.discount_percentage,
+            discount_static: selectedOffer.discount_static,
+            discount_maximum: selectedOffer.discount_maximum,
+            total_discount: offerDiscount,
+          }
+        : null,
+      voucher: selectedVoucher
+        ? {
+            name: selectedVoucher.name,
+            type: selectedVoucher.type,
+            discount_percentage: selectedVoucher.discount_percentage,
+            discount_static: selectedVoucher.discount_static,
+            discount_maximum: selectedVoucher.discount_maximum,
+            total_discount: voucherDiscount,
+          }
+        : null,
+    });
+  }
 
   async inquiry(data: InquiryUniversalDto, timestamp: number, user: TUser) {
     const [product] = await this.databaseService.db
@@ -160,15 +391,6 @@ export class OrderV2Service {
         payment_phone_number: data.payment_phone_number,
       });
 
-    const rawToken = `PREPAID:${JSON.stringify(data)}:${timestamp}:${user.id}`;
-    const hashedToken = crypto
-      .createHmac(
-        'sha256',
-        this.configService.get<string>('CHECKOUT_TOKEN_SECRET'),
-      )
-      .update(rawToken)
-      .digest('base64url');
-
     const buildResponse = {
       product: {
         category: product.product_category.name,
@@ -213,7 +435,6 @@ export class OrderV2Service {
       fee: fee,
       discount: totalDiscount,
       total_price: totalPrice + fee,
-      checkout_token: hashedToken,
     };
 
     const [paymentSnapshot] = await this.databaseService.db
@@ -230,7 +451,12 @@ export class OrderV2Service {
         provider_name: paymentMethod.provider_name,
         allow_access: paymentMethod.allow_access,
         email: user.email,
+
+        expired_in: paymentMethod.expired_in,
         expired_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // 24 hours
+
+        is_need_email: paymentMethod.is_need_email,
+        is_need_phone_number: paymentMethod.is_need_phone_number,
         phone_number: data.payment_phone_number,
       })
       .returning({
@@ -269,7 +495,7 @@ export class OrderV2Service {
     const [inquiry] = await this.databaseService.db
       .insert(tb.inquiries)
       .values({
-        status: InquiryStatus.AWAIT_CONFIRMATION,
+        status: InquiryStatus.CONFIRMED,
 
         cost_price: product.provider_price,
         discount_price: buildResponse.discount,
@@ -286,16 +512,236 @@ export class OrderV2Service {
         payment_snapshot_id: paymentSnapshot.id,
 
         user_id: user.id,
+        customer_email: user.email,
 
+        customer_input: raw,
+        customer_input_merged: merged,
+        customer_name: '',
+        customer_phone: data.phone_number,
+        inquiry_provider: product.provider_name,
+        offer_applied: [
+          ...(selectedOffer
+            ? [
+                {
+                  id: selectedOffer.id,
+                  type: selectedOffer.type,
+                },
+              ]
+            : []),
+          ...(selectedVoucher
+            ? [
+                {
+                  id: selectedVoucher.id,
+                  type: OfferType.VOUCHER,
+                },
+              ]
+            : []),
+        ],
         expired_at: new Date(inquiryExpired),
       })
       .returning({
         id: tb.inquiries.id,
       });
 
+    const checkoutTokenData = {
+      inquiry_id: inquiry.id,
+      product_id: product.id,
+      payment_method_id: paymentMethod.id,
+      input_fields: raw,
+      product_price: product.price,
+      fee: fee,
+      discount: totalDiscount,
+      total_price: totalPrice + fee,
+      offers: [
+        ...(selectedOffer
+          ? [
+              {
+                id: selectedOffer.id,
+                type: selectedOffer.type,
+              },
+            ]
+          : []),
+        ...(selectedVoucher
+          ? [
+              {
+                id: selectedVoucher.id,
+                type: OfferType.VOUCHER,
+              },
+            ]
+          : []),
+      ],
+    };
+    const rawToken = `PREPAID:${JSON.stringify(checkoutTokenData)}:${timestamp}:${user.id}`;
+    const hashedToken = crypto
+      .createHmac(
+        'sha256',
+        this.configService.get<string>('CHECKOUT_TOKEN_SECRET'),
+      )
+      .update(rawToken)
+      .digest('base64url');
+
     return SendResponse.success({
       inquiry_id: inquiry.id,
       ...buildResponse,
+      checkout_token: hashedToken,
+    });
+  }
+
+  async checkout(
+    data: CheckoutDto,
+    timestamp: number,
+    user: TUser,
+    ip: string | null = null,
+    userAgent: string | null = null,
+  ) {
+    const inquiryData = await this.databaseService.db.query.inquiries.findFirst(
+      {
+        where: and(
+          eq(tb.inquiries.id, data.inquiry_id),
+          eq(tb.inquiries.user_id, user.id),
+          eq(tb.inquiries.status, InquiryStatus.CONFIRMED),
+        ),
+        with: {
+          payment_snapshot: true,
+          product_snapshot: true,
+        },
+      },
+    );
+
+    if (!inquiryData) {
+      throw new NotFoundException(
+        `Inquiry with ID ${data.inquiry_id} not found or not valid for checkout.`,
+      );
+    }
+
+    const checkoutTokenData = {
+      inquiry_id: inquiryData.id,
+      product_id: inquiryData.product_snapshot.product_id,
+      payment_method_id: inquiryData.payment_snapshot.payment_method_id,
+      input_fields: inquiryData.customer_input,
+      product_price: inquiryData.price,
+      fee: inquiryData.fee,
+      discount: inquiryData.discount_price,
+      total_price: inquiryData.total_price,
+      offers: inquiryData.offer_applied,
+    };
+    const rawToken = `PREPAID:${JSON.stringify(checkoutTokenData)}:${timestamp}:${user.id}`;
+    const hashedToken = crypto
+      .createHmac(
+        'sha256',
+        this.configService.get<string>('CHECKOUT_TOKEN_SECRET'),
+      )
+      .update(rawToken)
+      .digest('base64url');
+    if (hashedToken !== data.checkout_token) {
+      throw new BadRequestException('Invalid checkout token.');
+    }
+
+    // --- Order ID ---
+    const orderId = this.generateOrderId(user?.id);
+
+    const { createPayment } = await this.databaseService.db.transaction(
+      async (tx) => {
+        const createPayment = await this.pgService.createPayment({
+          user_id: user.id,
+          amount: inquiryData.price,
+          customer_email: user.email,
+          customer_phone: inquiryData.customer_phone,
+          customer_name: user.name,
+          expired_in: inquiryData.payment_snapshot.expired_in,
+          provider_code: inquiryData.payment_snapshot.provider_code,
+          fee_in_percent: inquiryData.payment_snapshot.fee_percentage,
+          fee_static: inquiryData.payment_snapshot.fee_static,
+          fee_type: inquiryData.payment_snapshot.fee_type,
+          provider_name: inquiryData.payment_snapshot.provider_name,
+          id: orderId,
+          order_items: [
+            {
+              name: `${inquiryData.product_snapshot.category_name} - ${inquiryData.product_snapshot.name}`,
+              price: inquiryData.total_price,
+              quantity: 1,
+              product_id: inquiryData.product_snapshot.product_id,
+              customer_input: inquiryData.customer_input_merged,
+            },
+          ],
+        });
+
+        const [updatePaymentSnapshot] = await tx
+          .update(tb.paymentSnapshots)
+          .set({
+            provider_ref_id: createPayment.ref_id,
+            qr_code: createPayment.qr_code,
+            pay_code: createPayment.pay_code,
+            pay_url: createPayment.pay_url,
+            expired_at: createPayment.expired_at,
+          })
+          .where(eq(tb.paymentSnapshots.id, inquiryData.payment_snapshot_id))
+          .returning({
+            id: tb.paymentSnapshots.id,
+          });
+
+        await tx
+          .insert(tb.orders)
+          .values({
+            inquiry_id: inquiryData.id,
+            payment_snapshot_id: updatePaymentSnapshot.id,
+            product_snapshot_id: inquiryData.product_snapshot_id,
+            user_id: user.id,
+            price: inquiryData.price,
+            total_price: createPayment.amount,
+            discount_price: inquiryData.discount_price,
+            cost_price: inquiryData.product_snapshot.provider_price,
+            fee: createPayment.total_fee,
+            profit: inquiryData.profit,
+            sn_number: '',
+            order_id: orderId,
+            payment_status: createPayment.status,
+            order_status:
+              createPayment.status == PaymentStatus.SUCCESS
+                ? OrderStatus.PENDING
+                : OrderStatus.NONE,
+            customer_input: inquiryData.customer_input_merged,
+            customer_phone: inquiryData.customer_phone,
+            customer_email: inquiryData.customer_email,
+            customer_ip: ip,
+            customer_ua: userAgent,
+          })
+          .returning({
+            id: tb.orders.id,
+          });
+
+        if (createPayment.status == PaymentStatus.SUCCESS) {
+          await this.queueService.addOrderJob(orderId);
+        }
+
+        if (createPayment.status == PaymentStatus.PENDING) {
+          const delay =
+            new Date(createPayment.expired_at).getTime() - Date.now();
+          await this.queueService.addExpiredOrderJob(orderId, delay);
+        }
+
+        await tx
+          .update(tb.products)
+          .set({
+            stock: sql`${tb.products.stock} - 1`,
+          })
+          .where(eq(tb.products.id, inquiryData.product_snapshot.product_id));
+
+        await tx
+          .update(tb.inquiries)
+          .set({
+            status: InquiryStatus.USED,
+          })
+          .where(eq(tb.inquiries.id, inquiryData.id));
+        return { createPayment };
+      },
+    );
+
+    return SendResponse.success({
+      order_id: orderId,
+      product_name: `${inquiryData.product_snapshot.category_name} - ${inquiryData.product_snapshot.name}`,
+      payment_method: `${inquiryData.payment_snapshot.type} - ${inquiryData.payment_snapshot.name}`,
+      amount: createPayment.amount,
     });
   }
 

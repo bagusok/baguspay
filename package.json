@@ -23,7 +23,7 @@
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "pnpm@10.0.0",
+  "packageManager": "pnpm@10.26.2",
   "workspaces": [
     "apps/*",
     "packages/*",
@@ -40,7 +40,6 @@
     ]
   },
   "dependencies": {
-    "@tanstack/react-table": "^8.21.3",
-    "web-admin": "0.0.1-security"
+    "@tanstack/react-table": "^8.21.3"
   }
 }

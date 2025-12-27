@@ -13,7 +13,7 @@ export class DigiFlazzService {
   constructor() {
     if (!process.env.DIGIFLAZZ_API_KEY || !process.env.DIGIFLAZZ_USERNAME) {
       throw new Error(
-        "DIGIFLAZZ_API_KEY and DIGIFLAZZ_USERNAME must be set in environment variables."
+        "DIGIFLAZZ_API_KEY and DIGIFLAZZ_USERNAME must be set in environment variables.",
       );
     }
     this.apiKey = process.env.DIGIFLAZZ_API_KEY;
@@ -45,19 +45,19 @@ export class DigiFlazzService {
           brand: data.brand,
           type: data.type,
           sign: sign,
-        }
+        },
       );
 
       return response.data;
     } catch (error) {
       if (isAxiosError(error)) {
         throw new Error(
-          `DigiFlazz API error: ${error.response?.data?.message}`
+          `DigiFlazz API error: ${error.response?.data?.message}`,
         );
       }
 
       throw new Error(
-        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`
+        `Unexpected error: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

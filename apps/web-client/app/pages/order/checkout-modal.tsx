@@ -24,6 +24,7 @@ type Props = {
 export const isOpenModalCheckout = atom(false);
 export const preCheckoutTimeAtom = atom<number>(Date.now());
 export const checkoutTokenAtom = atom<string | null>(null);
+export const inquiryIdAtom = atom<string | null>(null);
 export const preCheckoutRequestDataAtom = atom<PreCheckoutForm | null>(null);
 
 export default function CheckoutModal({ data }: Props) {
@@ -31,8 +32,7 @@ export default function CheckoutModal({ data }: Props) {
   const preCheckoutTime = useAtomValue(preCheckoutTimeAtom);
   const [timeLeft, setTimeLeft] = useState(360);
   const checkoutToken = useAtomValue(checkoutTokenAtom);
-  const preCheckoutRequestData = useAtomValue(preCheckoutRequestDataAtom);
-
+  const inquiryId = useAtomValue(inquiryIdAtom);
   const navigate = useNavigate();
 
   // Countdown timer
@@ -57,9 +57,9 @@ export default function CheckoutModal({ data }: Props) {
     mutationFn: async () =>
       apiClient
         .post(
-          "/order/prepaid/checkout",
+          "/v2/order/checkout",
           {
-            ...preCheckoutRequestData,
+            inquiry_id: inquiryId,
             checkout_token: checkoutToken,
           },
           {
@@ -137,7 +137,7 @@ export default function CheckoutModal({ data }: Props) {
                 className="flex justify-between text-sm"
               >
                 <span className="text-gray-600 capitalize">{field.name}:</span>
-                <span className="font-medium text-right max-w-[60%] break-words">
+                <span className="font-medium text-right max-w-[60%] wrap-break-word">
                   {field.value}
                 </span>
               </div>
@@ -229,6 +229,7 @@ export interface PreCheckoutResponse {
 }
 
 export interface PreCheckoutData {
+  inquiry_id: string;
   product: Product;
   payment_method: PaymentMethod;
   offers: Offer[];

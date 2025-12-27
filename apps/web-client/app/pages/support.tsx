@@ -40,7 +40,7 @@ export default function Support() {
     setTimeout(() => {
       setLoading(null);
       setStatusNote(
-        `Status pesanan ${orderId} sedang diproses. Jika pembayaran sudah dilakukan, mohon tunggu beberapa menit.`
+        `Status pesanan ${orderId} sedang diproses. Jika pembayaran sudah dilakukan, mohon tunggu beberapa menit.`,
       );
       toast.success("Status diperbarui.");
     }, 700);

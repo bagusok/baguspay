@@ -24,7 +24,7 @@ export const banners = pgTable("banners", {
   order: integer("order").notNull().default(0),
   is_available: boolean("is_available").default(true),
   product_category_id: uuid("product_category_id").references(
-    () => productCategories.id
+    () => productCategories.id,
   ),
   created_at: timestamp("created_at", {
     withTimezone: true,

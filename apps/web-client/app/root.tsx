@@ -24,7 +24,7 @@ import {
 } from "./middlewares/i8n";
 import { getSession } from "./session.server";
 
-export const unstable_middleware = [i18nextMiddleware];
+export const middleware = [i18nextMiddleware];
 
 export async function loader({ context, request, params }: Route.LoaderArgs) {
   let i18next = getInstance(context);
@@ -72,7 +72,7 @@ export async function loader({ context, request, params }: Route.LoaderArgs) {
         error: flashError,
       },
     },
-    { headers: { "Set-Cookie": await localeCookie.serialize(localeParam) } }
+    { headers: { "Set-Cookie": await localeCookie.serialize(localeParam) } },
   );
 }
 

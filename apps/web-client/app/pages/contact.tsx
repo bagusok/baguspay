@@ -35,12 +35,12 @@ export default function Contact() {
     }
     setLoading(true);
     const body = `Halo Baguspay,%0D%0A%0D%0A${encodeURIComponent(
-      message
+      message,
     )}%0D%0A%0D%0A--%0D%0ANama: ${encodeURIComponent(
-      name
+      name,
     )}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0ADikirim dari halaman Kontak`;
     const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-      subject
+      subject,
     )}&body=${body}`;
     // Buka aplikasi email default
     window.location.href = mailto;

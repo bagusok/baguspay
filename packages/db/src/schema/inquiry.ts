@@ -12,10 +12,10 @@ import { orders } from "./orders";
 import {
   InquiryStatus,
   inquiryStatusEnum,
+  OfferAppliedOnInquiry,
   ProductProvider,
   productProviderEnum,
 } from "./pg-enums";
-import { products } from "./products";
 import { paymentSnapshots, productSnapshots } from "./snapshots";
 import { users } from "./users";
 
@@ -28,12 +28,11 @@ export const inquiries = pgTable(
       .notNull()
       .references(() => users.id),
 
-    product_id: uuid("product_id").references(() => products.id),
     product_snapshot_id: uuid("product_snapshot_id").references(
-      () => productSnapshots.id
+      () => productSnapshots.id,
     ),
     payment_snapshot_id: uuid("payment_snapshot_id").references(
-      () => paymentSnapshots.id
+      () => paymentSnapshots.id,
     ),
 
     // pricing details
@@ -53,25 +52,32 @@ export const inquiries = pgTable(
     inquiry_response: jsonb("inquiry_response").$type<Record<string, any>>(),
 
     customer_input: jsonb("customer_input").notNull().default({}),
+    customer_input_merged: varchar("customer_input_merged")
+      .notNull()
+      .default(""),
     customer_name: varchar("customer_name", { length: 150 }),
     customer_phone: varchar("customer_phone", { length: 50 }),
     customer_email: varchar("customer_email", { length: 150 }),
 
+    offer_applied: jsonb("offer_applied")
+      .$type<OfferAppliedOnInquiry[]>()
+      .default([]),
+
     status: inquiryStatusEnum("status").default(
-      InquiryStatus.AWAIT_CONFIRMATION
+      InquiryStatus.AWAIT_CONFIRMATION,
     ),
     expired_at: timestamp("expired_at", { withTimezone: true }), // batas validasi inquiry
 
     // timestamps
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
+      () => new Date(),
     ),
   },
   (table) => [
     index("inquiries_user_idx").on(table.user_id),
     index("inquiries_status_idx").on(table.status),
-  ]
+  ],
 );
 
 export const inquiryRelations = relations(inquiries, ({ one, many }) => ({

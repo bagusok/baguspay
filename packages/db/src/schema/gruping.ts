@@ -54,7 +54,7 @@ export const productGroupingRelations = relations(
   productGroupings,
   ({ many }) => ({
     productCategories: many(productGroupingToProductCategories),
-  })
+  }),
 );
 
 export const productGroupingToProductCategories = pgTable(
@@ -63,11 +63,11 @@ export const productGroupingToProductCategories = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     product_grouping_id: uuid("product_grouping_id").references(
       () => productGroupings.id,
-      { onDelete: "cascade" }
+      { onDelete: "cascade" },
     ),
     product_category_id: uuid("product_category_id").references(
       () => productCategories.id,
-      { onDelete: "cascade" }
+      { onDelete: "cascade" },
     ),
     created_at: timestamp("created_at", {
       withTimezone: true,
@@ -75,7 +75,7 @@ export const productGroupingToProductCategories = pgTable(
     updated_at: timestamp("updated_at", {
       withTimezone: true,
     }).$onUpdate(() => new Date()),
-  }
+  },
 );
 
 export const productGroupingToProductCategoriesRelations = relations(
@@ -89,5 +89,5 @@ export const productGroupingToProductCategoriesRelations = relations(
       fields: [productGroupingToProductCategories.product_category_id],
       references: [productCategories.id],
     }),
-  })
+  }),
 );

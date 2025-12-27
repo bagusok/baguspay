@@ -47,7 +47,7 @@ export default function Locale({ params, matches }: Route.ComponentProps) {
 
   if (user.isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-br from-blue-100 to-indigo-200">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-6"></div>
         <h2 className="text-xl font-semibold text-indigo-700 mb-2">
           Loading...

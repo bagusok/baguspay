@@ -35,7 +35,7 @@ export class DuitkuService implements PaymentGateway {
       const expiredAt = new Date(Date.now() + data.expired_in * 1000);
 
       //   hitung fee
-      let amount = data.amount;
+      const amount = data.amount;
 
       let totalAmount = 0;
 
@@ -74,7 +74,7 @@ export class DuitkuService implements PaymentGateway {
       // Data Setelah Revisi Create Payment
       let r_fee = 0;
       let r_amount_received = 0;
-      let r_amount_total = response.amount;
+      const r_amount_total = response.amount;
 
       if (data.fee_type == PaymentMethodFeeType.BUYER) {
         r_fee = response.amount - data.amount;
@@ -114,11 +114,11 @@ export class DuitkuService implements PaymentGateway {
   }
 
   cancelTransaction(data: any): Promise<any> {
-    return null;
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   handleCallback(data: any): Promise<any> {
-    return null;
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   calculateFee(
@@ -126,7 +126,9 @@ export class DuitkuService implements PaymentGateway {
     feePercent: number,
     feeFixed: number,
   ): number {
-    return 0;
+    throw new Error(
+      `Method not implemented. ${amountReceived}, ${feePercent}, ${feeFixed}`,
+    );
   }
 
   public verifyCallbackSignature(data: {

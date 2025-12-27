@@ -310,7 +310,7 @@ export default function PaymentSection({ products, form }: Props) {
                     >
                       <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180">
                         <div className="flex items-center gap-3 w-full">
-                          <div className="p-2 rounded-full bg-primary/10 text-primary flex-shrink-0">
+                          <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
                             {getPaymentIcon(method.name)}
                           </div>
                           <div className="text-left flex-1">
@@ -329,7 +329,7 @@ export default function PaymentSection({ products, form }: Props) {
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center gap-1 flex-shrink-0">
+                          <div className="flex items-center gap-1 shrink-0">
                             {method.items.some((item) => item.is_featured) && (
                               <Badge variant="secondary" className="text-xs">
                                 <StarIcon className="w-3 h-3 mr-1" />
@@ -388,7 +388,7 @@ export default function PaymentSection({ products, form }: Props) {
                                   )}
 
                                   <div className="flex items-center gap-3">
-                                    <div className="relative flex-shrink-0">
+                                    <div className="relative shrink-0">
                                       <img
                                         src={
                                           item.image_url.startsWith("http")
@@ -413,7 +413,7 @@ export default function PaymentSection({ products, form }: Props) {
                                         {item.label && (
                                           <Badge
                                             variant="outline"
-                                            className="text-xs flex-shrink-0 dark:border-gray-500 dark:text-gray-300"
+                                            className="text-xs shrink-0 dark:border-gray-500 dark:text-gray-300"
                                           >
                                             {item.label}
                                           </Badge>
@@ -444,7 +444,7 @@ export default function PaymentSection({ products, form }: Props) {
                                       )}
                                     </div>
 
-                                    <div className="flex flex-col items-end justify-center text-right flex-shrink-0">
+                                    <div className="flex flex-col items-end justify-center text-right shrink-0">
                                       {/* Show original price if there's discount */}
                                       {item.discount > 0 && (
                                         <p className="text-xs line-through text-muted-foreground">

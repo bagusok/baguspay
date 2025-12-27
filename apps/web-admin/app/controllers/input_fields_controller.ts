@@ -28,7 +28,16 @@ export default class InputFieldsController {
   async postCreate(ctx: HttpContext) {
     const data = await ctx.request.validateUsing(vine.compile(createInputFieldValidator))
 
-    await db.insert(tb.inputFields).values(data)
+    const transformedData = {
+      ...data,
+      options:
+        data.options?.map((option) => ({
+          ...option,
+          value_checker_mapping: option.value,
+        })) || null,
+    }
+
+    await db.insert(tb.inputFields).values(transformedData)
 
     ctx.session.flash({
       success: 'Input field created successfully.',
@@ -41,7 +50,16 @@ export default class InputFieldsController {
     const id = ctx.params.id
     const data = await ctx.request.validateUsing(vine.compile(updateInputFieldValidator))
 
-    await db.update(tb.inputFields).set(data).where(eq(tb.inputFields.id, id))
+    const transformedData = {
+      ...data,
+      options:
+        data.options?.map((option) => ({
+          ...option,
+          value_checker_mapping: option.value,
+        })) || null,
+    }
+
+    await db.update(tb.inputFields).set(transformedData).where(eq(tb.inputFields.id, id))
 
     ctx.session.flash({
       success: 'Input field updated successfully.',

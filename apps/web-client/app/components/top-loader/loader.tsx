@@ -106,7 +106,7 @@ const Loader = ({
       if (states.every((state) => state === "idle")) return "idle";
       return "loading";
     },
-    [transition.state, fetchers]
+    [transition.state, fetchers],
   );
 
   const boxShadow =

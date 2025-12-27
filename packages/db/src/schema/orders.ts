@@ -84,12 +84,12 @@ export const orders = pgTable(
 
     created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
     updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date()
+      () => new Date(),
     ),
     order_success_at: timestamp("order_success_at", { withTimezone: true }),
     payment_success_at: timestamp("payment_success_at", { withTimezone: true }),
   },
-  (table) => [index("orders_order_id_index").on(table.order_id)]
+  (table) => [index("orders_order_id_index").on(table.order_id)],
 );
 
 export const orderRelations = relations(orders, ({ one, many }) => ({

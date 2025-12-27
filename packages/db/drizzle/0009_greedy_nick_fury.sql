@@ -1,0 +1,1 @@
+ALTER TABLE "payment_snapshots" ADD COLUMN "expired_in" integer DEFAULT 0 NOT NULL;

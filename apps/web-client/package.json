@@ -44,11 +44,11 @@
     "remix-i18next": "^7.2.1",
     "scheduler": "^0.26.0",
     "set-cookie-parser": "^2.7.1",
-    "swiper": "^11.2.10",
+    "swiper": "^12.0.3",
     "usehooks-ts": "^3.1.1",
     "useismobile": "^1.0.5",
     "uuid": "^9.0.1",
-    "zod": "^4.0.14",
+    "zod": "4.0.5",
     "zustand": "^5.0.7"
   },
   "devDependencies": {

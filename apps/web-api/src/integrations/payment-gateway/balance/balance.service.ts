@@ -23,6 +23,10 @@ import { PaymentGateway } from '../payment.interface';
 export class BalanceService implements PaymentGateway {
   private readonly logger = new Logger(BalanceService.name);
   constructor(private readonly databaseService: DatabaseService) {}
+  handleCallback(data: any): Promise<any> {
+    console.log(data);
+    throw new Error('Method not implemented.');
+  }
 
   async createTransaction(
     data: CreatePaymentGatewayRequest,
@@ -64,20 +68,18 @@ export class BalanceService implements PaymentGateway {
     };
   }
 
-  handleCallback(data: any): Promise<any> {
-    return null;
-  }
-
   calculateFee(
     amountReceived: number,
     feePercent: number,
     feeFixed: number,
   ): number {
-    return null;
+    throw new Error(
+      `Method not implemented. ${amountReceived}, ${feePercent}, ${feeFixed}`,
+    );
   }
 
   cancelTransaction(data: any): Promise<any> {
-    return null;
+    throw new Error(`Method not implemented. ${data}`);
   }
 
   async addBalance(data: AddBalanceRequest, dbInstance?: DBInstance) {

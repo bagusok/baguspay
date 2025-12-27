@@ -46,7 +46,7 @@ import {
   GetOrderHistoryQueryDto,
   OrderIdDto,
   PreCheckoutPrepaidDto,
-} from './order.dto';
+} from './dtos/order.dto';
 
 @Injectable()
 export class OrderService {

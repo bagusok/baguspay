@@ -38,6 +38,7 @@ import { formatPrice } from "~/utils/format";
 import type { Route } from "./+types/slug";
 import CheckoutModal, {
   checkoutTokenAtom,
+  inquiryIdAtom,
   isOpenModalCheckout,
   preCheckoutRequestDataAtom,
   preCheckoutTimeAtom,
@@ -57,7 +58,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 
     console.log(
       "Order slug page loaded successfully:",
-      response.data.data.product_sub_categories[0]
+      response.data.data.product_sub_categories[0],
     );
 
     return data({
@@ -87,7 +88,7 @@ const preCheckoutSchema = z.object({
       z.object({
         name: z.string().min(1, "Name is required"),
         value: z.string().min(1, "Value is required"),
-      })
+      }),
     )
     .min(1, "At least one input field is required"),
 });
@@ -100,6 +101,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
   const [preCheckoutTime, setPreCheckoutTime] = useAtom(preCheckoutTimeAtom);
   const setIsOpenModalConfirmation = useSetAtom(isOpenModalCheckout);
   const setCheckoutToken = useSetAtom(checkoutTokenAtom);
+  const setInquiryId = useSetAtom(inquiryIdAtom);
   const setPreCheckoutRequestData = useSetAtom(preCheckoutRequestDataAtom);
 
   const form = useForm<PreCheckoutForm>({
@@ -120,7 +122,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
   });
 
   const [selectedItem, setSelectedItem] = useState<OrderProducts | null>(
-    data.product_sub_categories[0]?.products[0] || null
+    data.product_sub_categories[0]?.products[0] || null,
   );
 
   const { update } = useFieldArray({
@@ -143,7 +145,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
     ],
     mutationFn: async (formData: PreCheckoutForm) =>
       apiClient
-        .post<PreCheckoutResponse>("/order/prepaid/pre-checkout", formData, {
+        .post<PreCheckoutResponse>("/v2/order/inquiry", formData, {
           headers: {
             "X-Time": preCheckoutTime,
           },
@@ -155,6 +157,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
     onSuccess: (data) => {
       setIsOpenModalConfirmation(true);
       setCheckoutToken(data.data.checkout_token);
+      setInquiryId(data.data.inquiry_id);
     },
   });
 
@@ -328,7 +331,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                         <div key={item.id} className="relative pt-4 h-full">
                           {/* Label Text - Positioned above the card */}
                           {item.label_text && (
-                            <div className="absolute top-0 left-0 z-20 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+                            <div className="absolute top-0 left-0 z-20 bg-linear-to-r from-green-500 to-emerald-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
                               {item.label_text}
                             </div>
                           )}
@@ -368,7 +371,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                             )}
 
                             {/* Hover Glow Effect */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
+                            <div className="absolute inset-0 bg-linear-to-r from-primary/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
 
                             <div className="p-3">
                               <div className="flex items-center gap-2 mb-2">
@@ -408,7 +411,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                                       className="text-xs px-1 py-0"
                                     >
                                       {Math.round(
-                                        (item.discount / item.price) * 100
+                                        (item.discount / item.price) * 100,
                                       )}
                                       %
                                     </Badge>
