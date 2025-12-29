@@ -1,19 +1,19 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
-import drive from '@adonisjs/drive/services/main'
-import { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
+import env from '#start/env'
 import {
   deleteFileValidator,
   listFileQueryValidator,
   uploadFileValidator,
 } from '#validators/file_manager'
-import sharp from 'sharp'
-import fs from 'node:fs/promises'
-import crypto from 'node:crypto'
-import env from '#start/env'
+import { HttpContext } from '@adonisjs/core/http'
+import drive from '@adonisjs/drive/services/main'
 import { db, desc, eq } from '@repo/db'
 import { tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
+import crypto from 'node:crypto'
+import fs from 'node:fs/promises'
+import sharp from 'sharp'
 
 export default class FileManagersController {
   public async upload(ctx: HttpContext) {
@@ -27,7 +27,7 @@ export default class FileManagersController {
 
         const fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex')
 
-        const exist = await disk.exists(`storage/images/${fileHash}.avif`)
+        const exist = await disk.exists(`storage/images/${fileHash}.webp`)
 
         if (exist) {
           return ctx.response.status(400).json({
@@ -35,22 +35,21 @@ export default class FileManagersController {
           })
         }
 
-        const convertedImage = await sharp(data.file.tmpPath).toFormat('avif').toBuffer()
+        const convertedImage = await sharp(data.file.tmpPath).toFormat('webp').toBuffer()
 
-        await disk.put(`storage/images/${fileHash}.avif`, convertedImage, {
+        await disk.put(`storage/images/${fileHash}.webp`, convertedImage, {
           visibility: 'public',
         })
 
-        const fileSize = await disk.getBytes(`storage/images/${fileHash}.avif`)
-
+        const fileSize = await disk.getBytes(`storage/images/${fileHash}.webp`)
         // save to db
         const save = await db
           .insert(tb.fileManager)
           .values({
-            name: `${fileHash}.avif`,
-            url: `/storage/images/${fileHash}.avif`,
+            name: `${fileHash}.webp`,
+            url: `/storage/images/${fileHash}.webp`,
             size: fileSize.byteLength,
-            mime_type: 'image/avif',
+            mime_type: 'image/webp',
           })
           .returning()
 
@@ -60,11 +59,11 @@ export default class FileManagersController {
           message: 'File uploaded successfully',
           file: {
             id: save[0].id,
-            name: `${fileHash}.avif`,
+            name: `${fileHash}.webp`,
             url:
               env.get('S3_ENDPOINT') +
               env.get('S3_BUCKET_NAME') +
-              `/storage/images/${fileHash}.avif`,
+              `/storage/images/${fileHash}.webp`,
           },
         })
       } else {
