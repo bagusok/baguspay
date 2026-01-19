@@ -3,7 +3,7 @@ import vine from '@vinejs/vine'
 export const uploadFileValidator = vine.object({
   file: vine.file({
     size: '5mb',
-    extnames: ['jpg', 'png', 'webp', 'avif'],
+    extnames: ['jpg', 'jpeg', 'heic', 'heif', 'png', 'webp', 'avif'],
   }),
 })
 

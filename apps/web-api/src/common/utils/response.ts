@@ -9,7 +9,7 @@ export class SendResponse {
       ...(message ? { message } : { message: 'Successful' }),
       data,
       ...(additional || {}),
-    };
+    }
   }
 
   static error<T = any, A extends Record<string, any> = object>(
@@ -22,6 +22,6 @@ export class SendResponse {
       ...(message ? { message } : { message: 'Error' }),
       error,
       ...(additional || {}),
-    };
+    }
   }
 }

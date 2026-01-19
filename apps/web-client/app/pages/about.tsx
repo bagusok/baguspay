@@ -1,12 +1,5 @@
-import {
-  Clock,
-  Headphones,
-  ShieldCheck,
-  Sparkles,
-  Wallet,
-  Zap,
-} from "lucide-react";
-import { Link } from "react-router";
+import { Clock, Headphones, ShieldCheck, Sparkles, Wallet, Zap } from 'lucide-react'
+import { Link } from 'react-router'
 
 export default function About() {
   return (
@@ -22,17 +15,12 @@ export default function About() {
             Tentang Baguspay
           </h1>
           <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground max-w-3xl">
-            Satu platform untuk topup game, pulsa, paket data, voucher digital,
-            dan berbagai pembayaran tagihan. Cepat, aman, dan harga bersahabat.
+            Satu platform untuk topup game, pulsa, paket data, voucher digital, dan berbagai
+            pembayaran tagihan. Cepat, aman, dan harga bersahabat.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-2">
-            {[
-              "Topup Game",
-              "Pulsa & Data",
-              "E-Wallet & Tagihan",
-              "Voucher Digital",
-            ].map((chip) => (
+            {['Topup Game', 'Pulsa & Data', 'E-Wallet & Tagihan', 'Voucher Digital'].map((chip) => (
               <span
                 key={chip}
                 className="text-xs md:text-sm bg-secondary text-foreground px-3 py-1 rounded-full border border-border"
@@ -88,9 +76,7 @@ export default function About() {
 
       {/* How it works */}
       <section className="mt-12 rounded-2xl border border-border p-6 md:p-8 bg-card/50">
-        <h2 className="text-lg md:text-xl font-semibold text-foreground">
-          Cara Kerja
-        </h2>
+        <h2 className="text-lg md:text-xl font-semibold text-foreground">Cara Kerja</h2>
         <p className="text-sm text-muted-foreground mt-1">
           4 langkah mudah untuk menyelesaikan transaksi Anda.
         </p>
@@ -101,21 +87,9 @@ export default function About() {
             title="Pilih Produk"
             desc="Cari game/layanan PPOB yang Anda butuhkan."
           />
-          <StepItem
-            index={2}
-            title="Isi Data"
-            desc="Masukkan ID/nomor dan pilih nominal."
-          />
-          <StepItem
-            index={3}
-            title="Bayar"
-            desc="Pilih metode pembayaran favorit Anda."
-          />
-          <StepItem
-            index={4}
-            title="Selesai"
-            desc="Pesanan diproses otomatis dan cepat."
-          />
+          <StepItem index={2} title="Isi Data" desc="Masukkan ID/nomor dan pilih nominal." />
+          <StepItem index={3} title="Bayar" desc="Pilih metode pembayaran favorit Anda." />
+          <StepItem index={4} title="Selesai" desc="Pesanan diproses otomatis dan cepat." />
         </ol>
       </section>
 
@@ -126,18 +100,13 @@ export default function About() {
             <Headphones className="size-5" />
           </div>
           <div>
-            <h3 className="text-base md:text-lg font-semibold text-foreground">
-              Butuh bantuan?
-            </h3>
+            <h3 className="text-base md:text-lg font-semibold text-foreground">Butuh bantuan?</h3>
             <p className="text-sm text-muted-foreground mt-1">
-              Tim support kami siap membantu. Kunjungi halaman kontak untuk
-              pertanyaan, masukan, atau kerja sama.
+              Tim support kami siap membantu. Kunjungi halaman kontak untuk pertanyaan, masukan,
+              atau kerja sama.
             </p>
             <div className="mt-3">
-              <Link
-                to="/contact"
-                className="text-sm font-medium text-primary hover:underline"
-              >
+              <Link to="/contact" className="text-sm font-medium text-primary hover:underline">
                 Buka Halaman Kontak →
               </Link>
             </div>
@@ -145,7 +114,7 @@ export default function About() {
         </div>
       </section>
     </div>
-  );
+  )
 }
 
 function FeatureCard({
@@ -153,9 +122,9 @@ function FeatureCard({
   title,
   desc,
 }: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
+  icon: React.ReactNode
+  title: string
+  desc: string
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
@@ -169,18 +138,10 @@ function FeatureCard({
         </div>
       </div>
     </div>
-  );
+  )
 }
 
-function StepItem({
-  index,
-  title,
-  desc,
-}: {
-  index: number;
-  title: string;
-  desc: string;
-}) {
+function StepItem({ index, title, desc }: { index: number; title: string; desc: string }) {
   return (
     <li className="rounded-xl border border-border bg-background p-4">
       <div className="flex items-start gap-3">
@@ -193,5 +154,5 @@ function StepItem({
         </div>
       </div>
     </li>
-  );
+  )
 }

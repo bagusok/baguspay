@@ -1,31 +1,19 @@
-import {
-  Injectable,
-  Logger,
-  UnprocessableEntityException,
-} from '@nestjs/common';
-import { eq, sql } from '@repo/db';
-import {
-  BalanceMutationRefType,
-  BalanceMutationType,
-  PaymentStatus,
-  tb,
-} from '@repo/db/types';
-import { DBInstance } from 'src/common/types/db-instance';
-import { SendResponse } from 'src/common/utils/response';
-import { DatabaseService } from 'src/database/database.service';
-import {
-  CreatePaymentGatewayRequest,
-  CreatePaymentGatewayResponse,
-} from '../payment-gateway.type';
-import { PaymentGateway } from '../payment.interface';
+import { Injectable, Logger, UnprocessableEntityException } from '@nestjs/common'
+import { eq, sql } from '@repo/db'
+import { BalanceMutationRefType, BalanceMutationType, PaymentStatus, tb } from '@repo/db/types'
+import { DBInstance } from 'src/common/types/db-instance'
+import { SendResponse } from 'src/common/utils/response'
+import { DatabaseService } from 'src/database/database.service'
+import { CreatePaymentGatewayRequest, CreatePaymentGatewayResponse } from '../payment-gateway.type'
+import { PaymentGateway } from '../payment.interface'
 
 @Injectable()
 export class BalanceService implements PaymentGateway {
-  private readonly logger = new Logger(BalanceService.name);
+  private readonly logger = new Logger(BalanceService.name)
   constructor(private readonly databaseService: DatabaseService) {}
   handleCallback(data: any): Promise<any> {
-    console.log(data);
-    throw new Error('Method not implemented.');
+    console.log(data)
+    throw new Error('Method not implemented.')
   }
 
   async createTransaction(
@@ -43,7 +31,7 @@ export class BalanceService implements PaymentGateway {
         notes: `Payment for order ${data.id}`,
       },
       dbInstance,
-    );
+    )
 
     return {
       amount: data.amount,
@@ -65,25 +53,19 @@ export class BalanceService implements PaymentGateway {
       qr_code: null,
       qr_url: null,
       status: PaymentStatus.SUCCESS,
-    };
+    }
   }
 
-  calculateFee(
-    amountReceived: number,
-    feePercent: number,
-    feeFixed: number,
-  ): number {
-    throw new Error(
-      `Method not implemented. ${amountReceived}, ${feePercent}, ${feeFixed}`,
-    );
+  calculateFee(amountReceived: number, feePercent: number, feeFixed: number): number {
+    throw new Error(`Method not implemented. ${amountReceived}, ${feePercent}, ${feeFixed}`)
   }
 
   cancelTransaction(data: any): Promise<any> {
-    throw new Error(`Method not implemented. ${data}`);
+    throw new Error(`Method not implemented. ${data}`)
   }
 
   async addBalance(data: AddBalanceRequest, dbInstance?: DBInstance) {
-    const db = dbInstance || this.databaseService.db;
+    const db = dbInstance || this.databaseService.db
 
     const [, addMutation, updatedUser] = await db.transaction(
       async (tx) => {
@@ -91,12 +73,10 @@ export class BalanceService implements PaymentGateway {
           .select()
           .from(tb.users)
           .where(eq(tb.users.id, data.userId))
-          .for('update');
+          .for('update')
 
         if (!user) {
-          throw new UnprocessableEntityException(
-            `User with ID ${data.userId} not found`,
-          );
+          throw new UnprocessableEntityException(`User with ID ${data.userId} not found`)
         }
 
         const [addMutation] = await tx
@@ -112,7 +92,7 @@ export class BalanceService implements PaymentGateway {
             balance_after: sql`${user.balance}::int + ${data.amount}::int`,
             balance_before: user.balance,
           })
-          .returning();
+          .returning()
 
         const [updatedUser] = await tx
           .update(tb.users)
@@ -120,24 +100,24 @@ export class BalanceService implements PaymentGateway {
             balance: sql`${user.balance}::int + ${data.amount}::int`,
           })
           .where(eq(tb.users.id, data.userId))
-          .returning();
+          .returning()
 
-        return [user, addMutation, updatedUser];
+        return [user, addMutation, updatedUser]
       },
       {
         isolationLevel: 'read committed',
         accessMode: 'read write',
       },
-    );
+    )
 
     return SendResponse.success({
       updatedUser: updatedUser,
       mutation: addMutation,
-    });
+    })
   }
 
   async deductBalance(data: AddBalanceRequest, dbInstance?: DBInstance) {
-    const db = dbInstance || this.databaseService.db;
+    const db = dbInstance || this.databaseService.db
 
     const [, deductMutation, updatedUser] = await db.transaction(
       async (tx) => {
@@ -145,18 +125,16 @@ export class BalanceService implements PaymentGateway {
           .select()
           .from(tb.users)
           .where(eq(tb.users.id, data.userId))
-          .for('update');
+          .for('update')
 
         if (!user) {
-          throw new UnprocessableEntityException(
-            `User with ID ${data.userId} not found`,
-          );
+          throw new UnprocessableEntityException(`User with ID ${data.userId} not found`)
         }
 
         if (user.balance < data.amount) {
           throw new UnprocessableEntityException(
             `Insufficient balance for user with ID ${data.userId}`,
-          );
+          )
         }
 
         const [deductMutation] = await tx
@@ -172,7 +150,7 @@ export class BalanceService implements PaymentGateway {
             balance_after: sql`${user.balance}::int - ${data.amount}::int`,
             balance_before: user.balance,
           })
-          .returning();
+          .returning()
 
         const [updatedUser] = await tx
           .update(tb.users)
@@ -180,29 +158,29 @@ export class BalanceService implements PaymentGateway {
             balance: sql`${user.balance}::int - ${data.amount}::int`,
           })
           .where(eq(tb.users.id, data.userId))
-          .returning();
+          .returning()
 
-        return [user, deductMutation, updatedUser];
+        return [user, deductMutation, updatedUser]
       },
       {
         isolationLevel: 'read committed',
         accessMode: 'read write',
       },
-    );
+    )
 
     return SendResponse.success({
       updatedUser: updatedUser,
       mutation: deductMutation,
-    });
+    })
   }
 }
 
 type AddBalanceRequest = {
-  name: string;
-  userId: string;
-  amount: number;
-  ref_type: BalanceMutationRefType;
-  ref_id?: string;
-  type: BalanceMutationType;
-  notes?: string;
-};
+  name: string
+  userId: string
+  amount: number
+  ref_type: BalanceMutationRefType
+  ref_id?: string
+  type: BalanceMutationType
+  notes?: string
+}

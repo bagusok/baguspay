@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui/components/ui/button";
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -6,90 +6,90 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@repo/ui/components/ui/dialog";
-import { useMutation } from "@tanstack/react-query";
-import { atom, useAtom, useAtomValue } from "jotai";
-import { CircleCheckIcon, Clock, XIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router";
-import { apiClient } from "~/utils/axios";
-import { formatPrice, formatTime } from "~/utils/format";
-import type { PreCheckoutForm } from "./slug";
+} from '@repo/ui/components/ui/dialog'
+import { useMutation } from '@tanstack/react-query'
+import { atom, useAtom, useAtomValue } from 'jotai'
+import { CircleCheckIcon, Clock, XIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { useNavigate } from 'react-router'
+import { apiClient } from '~/utils/axios'
+import { formatPrice, formatTime } from '~/utils/format'
+import type { PreCheckoutForm } from './slug'
 
 type Props = {
-  data: PreCheckoutData;
-};
+  data: PreCheckoutData
+}
 
-export const isOpenModalCheckout = atom(false);
-export const preCheckoutTimeAtom = atom<number>(Date.now());
-export const checkoutTokenAtom = atom<string | null>(null);
-export const inquiryIdAtom = atom<string | null>(null);
-export const preCheckoutRequestDataAtom = atom<PreCheckoutForm | null>(null);
+export const isOpenModalCheckout = atom(false)
+export const preCheckoutTimeAtom = atom<number>(Date.now())
+export const checkoutTokenAtom = atom<string | null>(null)
+export const inquiryIdAtom = atom<string | null>(null)
+export const preCheckoutRequestDataAtom = atom<PreCheckoutForm | null>(null)
 
 export default function CheckoutModal({ data }: Props) {
-  const [isOpen, setIsOpen] = useAtom(isOpenModalCheckout);
-  const preCheckoutTime = useAtomValue(preCheckoutTimeAtom);
-  const [timeLeft, setTimeLeft] = useState(360);
-  const checkoutToken = useAtomValue(checkoutTokenAtom);
-  const inquiryId = useAtomValue(inquiryIdAtom);
-  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useAtom(isOpenModalCheckout)
+  const preCheckoutTime = useAtomValue(preCheckoutTimeAtom)
+  const [timeLeft, setTimeLeft] = useState(360)
+  const checkoutToken = useAtomValue(checkoutTokenAtom)
+  const inquiryId = useAtomValue(inquiryIdAtom)
+  const navigate = useNavigate()
 
   // Countdown timer
   useEffect(() => {
-    if (!isOpen || timeLeft <= 0) return;
+    if (!isOpen || timeLeft <= 0) return
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          setIsOpen(false);
-          return 0;
+          setIsOpen(false)
+          return 0
         }
-        return prev - 1;
-      });
-    }, 1000);
+        return prev - 1
+      })
+    }, 1000)
 
-    return () => clearInterval(timer);
-  }, [isOpen, timeLeft, setIsOpen]);
+    return () => clearInterval(timer)
+  }, [isOpen, timeLeft, setIsOpen])
 
   const checkout = useMutation({
-    mutationKey: ["checkout"],
+    mutationKey: ['checkout'],
     mutationFn: async () =>
       apiClient
         .post(
-          "/v2/order/checkout",
+          '/v2/order/checkout',
           {
             inquiry_id: inquiryId,
             checkout_token: checkoutToken,
           },
           {
             headers: {
-              "X-Time": preCheckoutTime,
+              'X-Time': preCheckoutTime,
             },
           },
         )
         .then((res) => res.data)
         .catch((error) => {
-          toast.error(error.response?.data?.message || "Checkout failed");
-          throw error;
+          toast.error(error.response?.data?.message || 'Checkout failed')
+          throw error
         }),
     onSuccess: (data) => {
-      toast.success("Checkout successful!");
-      setIsOpen(false);
-      navigate(`/order/detail/${data.data.order_id}`);
+      toast.success('Checkout successful!')
+      setIsOpen(false)
+      navigate(`/order/detail/${data.data.order_id}`)
     },
-  });
+  })
 
   // Reset timer when modal opens
   useEffect(() => {
     if (isOpen) {
-      setTimeLeft(360);
+      setTimeLeft(360)
     }
-  }, [isOpen]);
+  }, [isOpen])
 
-  if (!data) return null;
+  if (!data) return null
 
-  const isTimeRunningOut = timeLeft <= 60; // Last minute warning
+  const isTimeRunningOut = timeLeft <= 60 // Last minute warning
 
   return (
     <Dialog
@@ -98,10 +98,7 @@ export default function CheckoutModal({ data }: Props) {
       aria-labelledby="dialog-title"
       aria-describedby="dialog-description"
     >
-      <DialogContent
-        className="max-w-sm mx-auto p-6 gap-0"
-        showCloseButton={false}
-      >
+      <DialogContent className="max-w-sm mx-auto p-6 gap-0" showCloseButton={false}>
         {/* Header */}
         <DialogHeader className="flex-row items-center justify-between">
           <DialogTitle className="text-start">Konfirmasi Pesanan</DialogTitle>
@@ -109,9 +106,7 @@ export default function CheckoutModal({ data }: Props) {
             role="timer"
             aria-live="polite"
             className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${
-              isTimeRunningOut
-                ? "bg-red-100 text-red-700"
-                : "bg-amber-100 text-amber-700"
+              isTimeRunningOut ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
             }`}
           >
             <Clock className="w-3 h-3" aria-hidden="true" />
@@ -132,10 +127,7 @@ export default function CheckoutModal({ data }: Props) {
 
             {/* Input Fields - compact */}
             {(data.input_fields ?? []).map((field, index) => (
-              <div
-                key={field.name ?? index}
-                className="flex justify-between text-sm"
-              >
+              <div key={field.name ?? index} className="flex justify-between text-sm">
                 <span className="text-gray-600 capitalize">{field.name}:</span>
                 <span className="font-medium text-right max-w-[60%] wrap-break-word">
                   {field.value}
@@ -168,21 +160,14 @@ export default function CheckoutModal({ data }: Props) {
             {data.discount > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Diskon:</span>
-                <span className="text-green-600">
-                  -{formatPrice(data.discount)}
-                </span>
+                <span className="text-green-600">-{formatPrice(data.discount)}</span>
               </div>
             )}
 
             {(data.offers ?? []).map((offer, index) => (
-              <div
-                key={offer.name ?? index}
-                className="flex justify-between text-xs"
-              >
+              <div key={offer.name ?? index} className="flex justify-between text-xs">
                 <span className="text-gray-600">&nbsp; - {offer.name}:</span>
-                <span className="text-green-600">
-                  -{formatPrice(offer.total_discount)}
-                </span>
+                <span className="text-green-600">-{formatPrice(offer.total_discount)}</span>
               </div>
             ))}
 
@@ -198,12 +183,7 @@ export default function CheckoutModal({ data }: Props) {
         </div>
         <DialogFooter className="mt-4 grid grid-cols-2">
           <DialogClose asChild>
-            <Button
-              type="button"
-              className="w-full"
-              variant="destructive"
-              size="sm"
-            >
+            <Button type="button" className="w-full" variant="destructive" size="sm">
               <XIcon /> Batalkan
             </Button>
           </DialogClose>
@@ -215,56 +195,56 @@ export default function CheckoutModal({ data }: Props) {
             disabled={checkout.isPending}
           >
             <CircleCheckIcon />
-            {checkout.isPending ? "Memproses..." : "Konfirmasi"}
+            {checkout.isPending ? 'Memproses...' : 'Konfirmasi'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
 export interface PreCheckoutResponse {
-  success: boolean;
-  message: string;
-  data: PreCheckoutData;
+  success: boolean
+  message: string
+  data: PreCheckoutData
 }
 
 export interface PreCheckoutData {
-  inquiry_id: string;
-  product: Product;
-  payment_method: PaymentMethod;
-  offers: Offer[];
-  input_fields: InputField[];
-  merged_input: string;
-  product_price: number;
-  fee: number;
-  discount: number;
-  total_price: number;
-  checkout_token: string;
+  inquiry_id: string
+  product: Product
+  payment_method: PaymentMethod
+  offers: Offer[]
+  input_fields: InputField[]
+  merged_input: string
+  product_price: number
+  fee: number
+  discount: number
+  total_price: number
+  checkout_token: string
 }
 
 export interface Product {
-  category: string;
-  sub_category: string;
-  name: string;
-  price: number;
+  category: string
+  sub_category: string
+  name: string
+  price: number
 }
 
 export interface PaymentMethod {
-  id: string;
-  name: string;
-  type: string;
+  id: string
+  name: string
+  type: string
 }
 
 export interface Offer {
-  name: string;
-  type: string;
-  discount_percentage: number;
-  discount_static: number;
-  discount_maximum: number;
-  total_discount: number;
+  name: string
+  type: string
+  discount_percentage: number
+  discount_static: number
+  discount_maximum: number
+  total_discount: number
 }
 
 export interface InputField {
-  name: string;
-  value: string;
+  name: string
+  value: string
 }

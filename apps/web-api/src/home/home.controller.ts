@@ -1,5 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
-import { HomeService } from './home.service';
+import { Controller, Get } from '@nestjs/common'
+import { HomeService } from './home.service'
 
 @Controller('home')
 export class HomeController {
@@ -7,21 +7,21 @@ export class HomeController {
 
   @Get('/banners')
   async getBanners() {
-    return this.homeService.getBanners();
+    return this.homeService.getBanners()
   }
 
   @Get('/fast-menus')
   async getFastMenus() {
-    return this.homeService.getFastMenus();
+    return this.homeService.getFastMenus()
   }
 
   @Get('/product-sections')
   async getHomeProductSections() {
-    return this.homeService.getHomeProductSections();
+    return this.homeService.getHomeProductSections()
   }
 
   @Get('/products')
   async getProducts() {
-    return this.homeService.getProducts();
+    return this.homeService.getProducts()
   }
 }

@@ -1,17 +1,8 @@
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Button } from "@repo/ui/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@repo/ui/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@repo/ui/components/ui/tooltip";
-import { useQuery } from "@tanstack/react-query";
+import { Badge } from '@repo/ui/components/ui/badge'
+import { Button } from '@repo/ui/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@repo/ui/components/ui/tooltip'
+import { useQuery } from '@tanstack/react-query'
 import {
   BadgeAlertIcon,
   BadgeCheckIcon,
@@ -24,31 +15,29 @@ import {
   ShieldIcon,
   UserIcon,
   XIcon,
-} from "lucide-react";
-import { apiClient } from "~/utils/axios";
-import { formatDate, formatPrice } from "~/utils/format";
-import type { Route } from "./+types/profile";
+} from 'lucide-react'
+import { apiClient } from '~/utils/axios'
+import { formatDate, formatPrice } from '~/utils/format'
+import type { Route } from './+types/profile'
 
 export default function UserProfile({ loaderData }: Route.ComponentProps) {
   const profile = useQuery<UserProfileResponse>({
-    queryKey: ["userProfile"],
+    queryKey: ['userProfile'],
     queryFn: async () =>
       apiClient
-        .get("/user/profile")
+        .get('/user/profile')
         .then((res) => res.data)
         .catch((err) => {
-          throw err;
+          throw err
         }),
-  });
+  })
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Profil Pengguna</h1>
-          <p className="text-muted-foreground">
-            Kelola informasi profil dan pengaturan akun Anda
-          </p>
+          <p className="text-muted-foreground">Kelola informasi profil dan pengaturan akun Anda</p>
         </div>
       </div>
 
@@ -70,14 +59,9 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                 Gagal Memuat Profil
               </h4>
               <p className="text-red-700 dark:text-red-300 text-sm text-center mb-4">
-                {profile.error?.message ||
-                  "Terjadi kesalahan saat memuat profil"}
+                {profile.error?.message || 'Terjadi kesalahan saat memuat profil'}
               </p>
-              <Button
-                variant="outline"
-                onClick={() => profile.refetch()}
-                className="gap-2"
-              >
+              <Button variant="outline" onClick={() => profile.refetch()} className="gap-2">
                 <RefreshCwIcon className="w-4 h-4" />
                 Coba Lagi
               </Button>
@@ -112,38 +96,22 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                   )}
                 </div>
                 <div className="flex-1 text-center md:text-left">
-                  <h3 className="font-semibold text-lg">
-                    {profile.data.data.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    ID: {profile.data.data.id}
-                  </p>
+                  <h3 className="font-semibold text-lg">{profile.data.data.name}</h3>
+                  <p className="text-sm text-muted-foreground">ID: {profile.data.data.id}</p>
                   <div className="flex items-center justify-center md:justify-start gap-2 mt-2">
-                    <Badge
-                      variant={
-                        profile.data.data.role === "admin"
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
+                    <Badge variant={profile.data.data.role === 'admin' ? 'default' : 'secondary'}>
                       {profile.data.data.role}
                     </Badge>
                     <Badge
                       variant={
-                        profile.data.data.registered_type === "local"
-                          ? "outline"
-                          : "secondary"
+                        profile.data.data.registered_type === 'local' ? 'outline' : 'secondary'
                       }
                     >
                       {profile.data.data.registered_type}
                     </Badge>
                   </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 border-border"
-                >
+                <Button variant="outline" size="sm" className="gap-2 border-border">
                   <EditIcon className="w-4 h-4" />
                   Edit
                 </Button>
@@ -157,7 +125,7 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium flex gap-2">
-                      Email{" "}
+                      Email{' '}
                       <span className="flex items-center gap-2">
                         {profile.data.data.is_email_verified ? (
                           <BadgeCheckIcon className="w-4 h-4 text-green-600 dark:text-green-400" />
@@ -173,9 +141,7 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                         )}
                       </span>
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {profile.data.data.email}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{profile.data.data.email}</p>
                   </div>
                 </div>
 
@@ -185,9 +151,7 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Nomor Telepon</p>
-                    <p className="text-sm text-muted-foreground">
-                      {profile.data.data.phone}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{profile.data.data.phone}</p>
                   </div>
                 </div>
               </div>
@@ -227,25 +191,17 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                   <div>
                     <p className="text-sm font-medium">Status Akun</p>
-                    <p className="text-xs text-muted-foreground">
-                      Kondisi akun saat ini
-                    </p>
+                    <p className="text-xs text-muted-foreground">Kondisi akun saat ini</p>
                   </div>
-                  <Badge
-                    variant={
-                      profile.data.data.is_banned ? "destructive" : "default"
-                    }
-                  >
-                    {profile.data.data.is_banned ? "Diblokir" : "Aktif"}
+                  <Badge variant={profile.data.data.is_banned ? 'destructive' : 'default'}>
+                    {profile.data.data.is_banned ? 'Diblokir' : 'Aktif'}
                   </Badge>
                 </div>
 
                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                   <div>
                     <p className="text-sm font-medium">Verifikasi Email</p>
-                    <p className="text-xs text-muted-foreground">
-                      Status verifikasi email
-                    </p>
+                    <p className="text-xs text-muted-foreground">Status verifikasi email</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {profile.data.data.is_email_verified ? (
@@ -258,11 +214,7 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
                     ) : (
                       <>
                         <Badge variant="destructive">Belum Terverifikasi</Badge>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="border-border"
-                        >
+                        <Button variant="outline" size="sm" className="border-border">
                           Verifikasi
                         </Button>
                       </>
@@ -287,25 +239,25 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 export interface UserProfileResponse {
-  success: boolean;
-  message: string;
-  data: UserProfileData;
+  success: boolean
+  message: string
+  data: UserProfileData
 }
 
 export interface UserProfileData {
-  id: string;
-  email: string;
-  name: string;
-  phone: string;
-  role: string;
-  balance: number;
-  registered_type: string;
-  is_banned: boolean;
-  image_url: string | null;
-  is_email_verified: boolean;
-  created_at: string;
+  id: string
+  email: string
+  name: string
+  phone: string
+  role: string
+  balance: number
+  registered_type: string
+  is_banned: boolean
+  image_url: string | null
+  is_email_verified: boolean
+  created_at: string
 }

@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+coverage
+public
+.tmp
+.cache
+.env
+adonisrc.json
+pnpm-lock.yaml
+yarn.lock
+package-lock.json

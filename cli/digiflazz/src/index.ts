@@ -1,1 +1,1 @@
-console.log("DigiFlazz CLI is running...");
+console.log('DigiFlazz CLI is running...')

@@ -1,8 +1,4 @@
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,31 +6,31 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@repo/ui/components/ui/dropdown-menu";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSetAtom } from "jotai";
-import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router";
-import { useLocale } from "remix-i18next/react";
-import { authTokenAtom } from "~/store/token";
-import type { UserMe } from "~/store/user";
+} from '@repo/ui/components/ui/dropdown-menu'
+import { useQueryClient } from '@tanstack/react-query'
+import { useSetAtom } from 'jotai'
+import toast from 'react-hot-toast'
+import { Link, useNavigate } from 'react-router'
+import { useLocale } from 'remix-i18next/react'
+import { authTokenAtom } from '~/store/token'
+import type { UserMe } from '~/store/user'
 
 type Props = {
-  user: UserMe;
-};
+  user: UserMe
+}
 
 export default function NavUser({ user }: Props) {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const setAuthToken = useSetAtom(authTokenAtom);
-  const locale = useLocale();
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+  const setAuthToken = useSetAtom(authTokenAtom)
+  const locale = useLocale()
 
   const handleLogout = () => {
-    setAuthToken(null);
-    queryClient.invalidateQueries({ queryKey: ["userAtom"], exact: false });
-    toast.success("Berhasil keluar");
-    navigate(`/${locale}/auth/login`, { replace: true });
-  };
+    setAuthToken(null)
+    queryClient.invalidateQueries({ queryKey: ['userAtom'], exact: false })
+    toast.success('Berhasil keluar')
+    navigate(`/${locale}/auth/login`, { replace: true })
+  }
 
   return (
     <DropdownMenu>
@@ -44,20 +40,16 @@ export default function NavUser({ user }: Props) {
             {user.image_url && <AvatarImage src={user.image_url} />}
             <AvatarFallback>
               {user.name
-                ?.split(" ")
+                ?.split(' ')
                 .map((n) => n[0])
-                .join("")
+                .join('')
                 .slice(0, 2)
                 .toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1 text-start">
-            <p className="text-sm font-medium text-foreground truncate">
-              {user.name}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
-              {user.email}
-            </p>
+            <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
+            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
           </div>
         </button>
       </DropdownMenuTrigger>
@@ -70,7 +62,7 @@ export default function NavUser({ user }: Props) {
           >
             <span className="text-sm font-medium text-foreground">Saldo</span>
             <span className="text-sm font-semibold text-primary">
-              Rp {user.balance.toLocaleString("id-ID")}
+              Rp {user.balance.toLocaleString('id-ID')}
             </span>
           </Link>
         </DropdownMenuLabel>
@@ -108,5 +100,5 @@ export default function NavUser({ user }: Props) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 }

@@ -1,10 +1,7 @@
 import { InferPageProps } from '@adonisjs/inertia/types'
-import AdminLayout from '~/components/layout/admin-layout'
-import { router, useForm } from '@inertiajs/react'
-import { ColumnDef } from '@tanstack/react-table'
-import { Button } from '@repo/ui/components/ui/button'
+import { router } from '@inertiajs/react'
 import { DataTable } from '@repo/ui/components/data-table'
-import { formatDate } from '~/utils/index'
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -15,6 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
+import { ColumnDef } from '@tanstack/react-table'
+import AdminLayout from '~/components/layout/admin-layout'
+import { formatDate } from '~/utils/index'
 
 import InputFieldsController from '#controllers/input_fields_controller'
 import CreateInputFieldsModal from './create-modal'

@@ -1,8 +1,8 @@
-import { CheckCircleIcon } from "lucide-react";
-import { memo } from "react";
+import { CheckCircleIcon } from 'lucide-react'
+import { memo } from 'react'
 
 interface Props {
-  paymentName: string;
+  paymentName: string
 }
 
 export default memo(function PaymentSuccess({ paymentName }: Props) {
@@ -18,5 +18,5 @@ export default memo(function PaymentSuccess({ paymentName }: Props) {
         Pembayaran melalui {paymentName} telah berhasil diproses
       </p>
     </div>
-  );
-});
+  )
+})

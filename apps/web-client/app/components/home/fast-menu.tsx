@@ -1,10 +1,5 @@
-import { ProductGroupingType } from "@repo/db/types";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTrigger,
-} from "@repo/ui/components/ui/dialog";
+import { ProductGroupingType } from '@repo/db/types'
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from '@repo/ui/components/ui/dialog'
 import {
   Sheet,
   SheetContent,
@@ -12,38 +7,38 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@repo/ui/components/ui/sheet";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { Link } from "react-router";
-import { useWindowSize } from "usehooks-ts";
-import { apiClient } from "~/utils/axios";
-import Image from "../image";
+} from '@repo/ui/components/ui/sheet'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo, useState } from 'react'
+import { Link } from 'react-router'
+import { useWindowSize } from 'usehooks-ts'
+import { apiClient } from '~/utils/axios'
+import Image from '../image'
 
 export default function FastMenu() {
-  const { width } = useWindowSize();
-  const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<FastMenuData | null>(null);
+  const { width } = useWindowSize()
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState<FastMenuData | null>(null)
 
   const fastmenus = useQuery({
-    queryKey: ["fastmenus"],
+    queryKey: ['fastmenus'],
     queryFn: () =>
       apiClient
-        .get<FastMenuResponse>("/home/fast-menus")
+        .get<FastMenuResponse>('/home/fast-menus')
         .then((res) => res.data.data)
         .catch(() => {
-          throw new Error("Failed to fetch fast menus");
+          throw new Error('Failed to fetch fast menus')
         }),
-  });
+  })
 
-  const isMobile = useMemo(() => width < 768, [width]);
+  const isMobile = useMemo(() => width < 768, [width])
 
   const handleClick = (menu: FastMenuData) => {
     if (menu.type === ProductGroupingType.MODAL) {
-      setSelected(menu);
-      setOpen(true);
+      setSelected(menu)
+      setOpen(true)
     }
-  };
+  }
 
   if (fastmenus.isLoading) {
     return (
@@ -64,7 +59,7 @@ export default function FastMenu() {
           ))}
         </div>
       </section>
-    );
+    )
   }
 
   if (fastmenus.isError) {
@@ -75,7 +70,7 @@ export default function FastMenu() {
           Error loading fast menu
         </div>
       </section>
-    );
+    )
   }
 
   return (
@@ -83,13 +78,13 @@ export default function FastMenu() {
       <h2 className="text-lg font-bold">Fast Menu</h2>
       <div className="flex flex-wrap gap-3">
         {fastmenus.data?.map((menu) => {
-          const firstCategory = menu.product_categories?.[0];
+          const firstCategory = menu.product_categories?.[0]
           const href =
             menu.type === ProductGroupingType.REDIRECT && menu.redirect_url
               ? menu.redirect_url
               : menu.type === ProductGroupingType.CATEGORY && firstCategory
                 ? `/order/${firstCategory.slug}`
-                : undefined;
+                : undefined
 
           const card = (
             <div className="mt-1.5 rounded-xl border p-2 border-secondary flex flex-col md:flex-row items-center gap-2 w-16 md:w-32 cursor-pointer hover:border-primary transition-colors">
@@ -102,10 +97,7 @@ export default function FastMenu() {
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground line-clamp-1 flex items-center gap-1">
                   {menu.is_featured ? (
-                    <span
-                      aria-label="featured"
-                      className="text-amber-500 text-xs"
-                    >
+                    <span aria-label="featured" className="text-amber-500 text-xs">
                       ★
                     </span>
                   ) : null}
@@ -118,7 +110,7 @@ export default function FastMenu() {
                 ) : null}
               </div>
             </div>
-          );
+          )
 
           if (menu.type === ProductGroupingType.MODAL) {
             return (
@@ -130,19 +122,15 @@ export default function FastMenu() {
               >
                 {card}
               </button>
-            );
+            )
           }
 
           if (href) {
             return (
-              <Link
-                key={menu.id}
-                to={href}
-                className="no-underline text-foreground"
-              >
+              <Link key={menu.id} to={href} className="no-underline text-foreground">
                 {card}
               </Link>
-            );
+            )
           }
 
           return (
@@ -155,7 +143,7 @@ export default function FastMenu() {
             >
               {card}
             </div>
-          );
+          )
         })}
       </div>
 
@@ -164,10 +152,8 @@ export default function FastMenu() {
           <SheetTrigger asChild>{null}</SheetTrigger>
           <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto">
             <SheetHeader>
-              <SheetTitle>{selected?.name ?? "Menu"}</SheetTitle>
-              <SheetDescription>
-                Pilih kategori yang tersedia dari menu ini.
-              </SheetDescription>
+              <SheetTitle>{selected?.name ?? 'Menu'}</SheetTitle>
+              <SheetDescription>Pilih kategori yang tersedia dari menu ini.</SheetDescription>
             </SheetHeader>
             <div className="mt-4 grid grid-cols-2 gap-3">
               {selected?.product_categories?.length ? (
@@ -188,17 +174,13 @@ export default function FastMenu() {
                         {cat.name}
                       </p>
                       {cat.is_featured ? (
-                        <span className="text-[10px] text-primary font-semibold">
-                          Featured
-                        </span>
+                        <span className="text-[10px] text-primary font-semibold">Featured</span>
                       ) : null}
                     </div>
                   </Link>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground col-span-2">
-                  Tidak ada kategori.
-                </p>
+                <p className="text-sm text-muted-foreground col-span-2">Tidak ada kategori.</p>
               )}
             </div>
           </SheetContent>
@@ -209,9 +191,7 @@ export default function FastMenu() {
           <DialogContent className="max-w-xl">
             <DialogHeader>
               <div className="space-y-1">
-                <p className="text-base font-semibold">
-                  {selected?.name ?? "Menu"}
-                </p>
+                <p className="text-base font-semibold">{selected?.name ?? 'Menu'}</p>
                 <p className="text-sm text-muted-foreground">
                   Pilih kategori yang tersedia dari menu ini.
                 </p>
@@ -236,53 +216,49 @@ export default function FastMenu() {
                         {cat.name}
                       </p>
                       {cat.is_featured ? (
-                        <span className="text-[10px] text-primary font-semibold">
-                          Featured
-                        </span>
+                        <span className="text-[10px] text-primary font-semibold">Featured</span>
                       ) : null}
                     </div>
                   </Link>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground col-span-2">
-                  Tidak ada kategori.
-                </p>
+                <p className="text-sm text-muted-foreground col-span-2">Tidak ada kategori.</p>
               )}
             </div>
           </DialogContent>
         </Dialog>
       )}
     </div>
-  );
+  )
 }
 
 export interface FastMenuResponse {
-  success: boolean;
-  message: string;
-  data: FastMenuData[];
+  success: boolean
+  message: string
+  data: FastMenuData[]
 }
 
 export interface FastMenuData {
-  id: string;
-  name: string;
-  image_url: string;
-  redirect_url: any;
-  app_key: any;
-  platform: string;
-  type: ProductGroupingType;
-  order: number;
-  is_special_feature: boolean;
-  special_feature_key: string;
-  is_featured: boolean;
-  label: string;
-  product_categories: ProductCategory[];
+  id: string
+  name: string
+  image_url: string
+  redirect_url: any
+  app_key: any
+  platform: string
+  type: ProductGroupingType
+  order: number
+  is_special_feature: boolean
+  special_feature_key: string
+  is_featured: boolean
+  label: string
+  product_categories: ProductCategory[]
 }
 
 export interface ProductCategory {
-  id: string;
-  name: string;
-  slug: string;
-  image_url: string;
-  is_featured: boolean;
-  is_available: boolean;
+  id: string
+  name: string
+  slug: string
+  image_url: string
+  is_featured: boolean
+  is_available: boolean
 }

@@ -1,10 +1,10 @@
-import { InjectQueue } from '@nestjs/bullmq';
-import { Injectable, Logger } from '@nestjs/common';
-import { Queue } from 'bullmq';
+import { InjectQueue } from '@nestjs/bullmq'
+import { Injectable, Logger } from '@nestjs/common'
+import { Queue } from 'bullmq'
 
 @Injectable()
 export class QueueService {
-  private logger = new Logger(QueueService.name);
+  private logger = new Logger(QueueService.name)
 
   constructor(
     @InjectQueue('deposits-queue')
@@ -14,7 +14,7 @@ export class QueueService {
   ) {}
 
   async addExpiredDepositJob(depositId: string, delay: number) {
-    this.logger.log(`Adding expired deposit job for depositId: ${depositId}`);
+    this.logger.log(`Adding expired deposit job for depositId: ${depositId}`)
     await this.depositQueue.add(
       'expired-deposit',
       { depositId },
@@ -22,22 +22,22 @@ export class QueueService {
         delay,
         attempts: 3,
       },
-    );
+    )
   }
 
   async addOrderJob(orderId: string) {
-    this.logger.log(`Adding order job for orderId: ${orderId}`);
+    this.logger.log(`Adding order job for orderId: ${orderId}`)
     await this.orderQueue.add(
       'process-order',
       { orderId },
       {
         attempts: 3,
       },
-    );
+    )
   }
 
   async addExpiredOrderJob(orderId: string, delay: number) {
-    this.logger.log(`Adding expired order job for orderId: ${orderId}`);
+    this.logger.log(`Adding expired order job for orderId: ${orderId}`)
     await this.orderQueue.add(
       'expired-order',
       { orderId },
@@ -45,6 +45,6 @@ export class QueueService {
         delay,
         attempts: 3,
       },
-    );
+    )
   }
 }

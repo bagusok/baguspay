@@ -70,8 +70,8 @@ export default class PaymentsController {
       pagination: {
         page,
         limit,
-        total: total[0]?.count || 0,
-        totalPages: Math.ceil((total[0]?.count || 0) / limit),
+        total: total[0].count || 0,
+        totalPages: Math.ceil((total[0].count || 0) / limit),
       },
       filters: {
         searchBy,

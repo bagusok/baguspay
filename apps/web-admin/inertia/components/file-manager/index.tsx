@@ -11,11 +11,21 @@ import {
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useCallback, useEffect, useState } from 'react'
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import toast from 'react-hot-toast'
 import { apiClient } from '~/utils/axios'
+
+type FileListResponse = {
+  data: InferSelectModel<typeof tb.fileManager>[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
 
 function FileUploadDropzone({ onFilesSelected }: { onFilesSelected?: (files: File[]) => void }) {
   const [files, setFiles] = useState<File[]>([])
@@ -70,20 +80,32 @@ export default function FileManager({
     null
   )
   const [open, setOpen] = useState(false)
+  const loaderRef = useRef<HTMLDivElement | null>(null)
 
-  const listFile = useQuery<{ data: InferSelectModel<typeof tb.fileManager>[] }>({
+  const listFile = useInfiniteQuery<FileListResponse>({
     queryKey: ['listFile'],
-    queryFn: async () =>
+    queryFn: async ({ pageParam = 1 }) =>
       await apiClient
-        .get('/admin/file-managers')
+        .get('/admin/file-managers', {
+          params: { page: pageParam },
+        })
         .then((res) => res.data)
         .catch((error) => {
           toast.error(error.response?.data?.error || 'Failed to fetch files')
           console.error('Failed to fetch files:', error)
           throw new Error('Failed to fetch files')
         }),
+    getNextPageParam: (lastPage) => {
+      const currentPage = lastPage.pagination?.page ?? 1
+      const totalPages = lastPage.pagination?.totalPages ?? 1
+      return currentPage < totalPages ? currentPage + 1 : undefined
+    },
+    initialPageParam: 1,
     enabled: false,
   })
+
+  const filesData = listFile.data?.pages.flatMap((page) => page.data) ?? []
+  const { refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = listFile
 
   const uploadFile = useMutation({
     mutationKey: ['uploadFile'],
@@ -103,7 +125,7 @@ export default function FileManager({
         })
         .then((response) => {
           toast.success('File uploaded successfully')
-          listFile.refetch() // Refetch the file list after upload
+          refetch() // Refetch the file list after upload
           setFiles(null) // Clear files after successful upload
           return response.data
         })
@@ -122,7 +144,7 @@ export default function FileManager({
         .delete(`/admin/file-managers/${fileId}`)
         .then((response) => {
           toast.success('File deleted successfully')
-          listFile.refetch()
+          refetch()
           setSelectedFile(null)
           return response.data
         })
@@ -166,9 +188,33 @@ export default function FileManager({
   // Fetch file list every time dialog open
   useEffect(() => {
     if (open) {
-      listFile.refetch()
+      refetch()
     }
-  }, [open])
+  }, [open, refetch])
+
+  useEffect(() => {
+    if (!open) {
+      return
+    }
+
+    const target = loaderRef.current
+    if (!target) {
+      return
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      const [entry] = entries
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    })
+
+    observer.observe(target)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [open, filesData.length, fetchNextPage, hasNextPage, isFetchingNextPage])
 
   // Fetch default file only once on mount or when defaultFileId changes
   useEffect(() => {
@@ -199,22 +245,22 @@ export default function FileManager({
           </div>
         )}
       </DialogTrigger>
-      <DialogContent className="w-full md:min-w-2/3">
+      <DialogContent className="w-full max-w-[90vw] md:max-w-4xl h-[90vh] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-start">File Manager</DialogTitle>
           <DialogDescription></DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="list-file">
-          <TabsList>
+        <Tabs defaultValue="list-file" className="flex flex-1 flex-col gap-4 overflow-hidden">
+          <TabsList className="flex flex-wrap justify-start gap-2 shrink-0">
             <TabsTrigger value="list-file">Files</TabsTrigger>
             <TabsTrigger value="upload-file">Upload</TabsTrigger>
           </TabsList>
-          <TabsContent value="list-file">
-            <div className="overflow-y-auto">
-              <div className="columns-3 md:columns-4 lg:columns-5 mt-2 space-x-2 space-y-2">
-                {listFile.isSuccess &&
-                  listFile.data?.data?.map((file: InferSelectModel<typeof tb.fileManager>) => (
+          <TabsContent value="list-file" className="flex-1 overflow-hidden flex">
+            <div className="flex-1 overflow-y-auto pr-2">
+              <div className="mt-2 space-y-4 pb-24">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {filesData.map((file: InferSelectModel<typeof tb.fileManager>) => (
                     <label key={file.id} className="relative block cursor-pointer group">
                       <input
                         type="radio"
@@ -228,14 +274,21 @@ export default function FileManager({
                       <img
                         src={`${import.meta.env.VITE_S3_URL}${file.url}`}
                         alt={file.name || ''}
-                        className={`shadow rounded border-2 transition-all ${selectedFile?.id === file.id ? 'border-blue-500' : 'border-transparent'}`}
-                        style={{ width: '100%', display: 'block' }}
+                        className={`shadow rounded border-2 transition-all w-full object-contain ${selectedFile?.id === file.id ? 'border-blue-500' : 'border-transparent'}`}
                       />
                     </label>
                   ))}
+                </div>
+                {filesData.length === 0 && !isFetching && (
+                  <p className="text-sm text-gray-500 text-center">No files found.</p>
+                )}
+                {isFetchingNextPage && (
+                  <p className="text-xs text-gray-500 text-center">Loading more...</p>
+                )}
+                <div ref={loaderRef} className="h-4" />
               </div>
               {selectedFile && (
-                <div className="mt-4 flex justify-end gap-2">
+                <div className="sticky z-10 bottom-0 left-0 right-0 bg-white dark:bg-slate-950 pt-4 pb-4 flex flex-wrap justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
                   <Button
                     size="sm"
                     variant="destructive"
@@ -257,9 +310,9 @@ export default function FileManager({
               )}
             </div>
           </TabsContent>
-          <TabsContent value="upload-file">
+          <TabsContent value="upload-file" className="flex-1 overflow-y-auto">
             <FileUploadDropzone onFilesSelected={(file) => setFiles(file)} />
-            <DialogFooter className="mt-4">
+            <DialogFooter className="mt-4 flex flex-wrap justify-end gap-2">
               <Button
                 size="sm"
                 onClick={() => uploadFile.mutate(files && files.length > 0 ? files[0] : null)}

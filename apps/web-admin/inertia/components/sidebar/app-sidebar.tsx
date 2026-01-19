@@ -90,35 +90,35 @@ const data = {
         },
         {
           title: 'PLN Tagihan (Postpaid)',
-          url: '/admin/product-categories/pln-tagihan',
+          url: '/admin/product-categories/postpaid/tagihan-pln',
         },
         {
           title: 'PLN Non Taglist (Postpaid)',
-          url: '/admin/product-categories/pln-non-taglist',
+          url: '/admin/product-categories/postpaid/pln-non-taglist',
         },
         {
           title: 'PDAM',
-          url: '/admin/product-categories/pdam',
+          url: '/admin/product-categories/postpaid/pdam',
         },
         {
           title: 'Internet',
-          url: '/admin/product-categories/internet',
+          url: '/admin/product-categories/postpaid/internet',
         },
         {
           title: 'Kuota Rekomendasi',
-          url: '/admin/product-categories/kuota-rekomendasi',
+          url: '/admin/product-categories/postpaid/kuota-rekomendasi',
         },
         {
           title: 'BPJS Kesehatan',
-          url: '/admin/product-categories/bpjs-kesehatan',
+          url: '/admin/product-categories/postpaid/bpjs-kesehatan',
         },
         {
           title: 'BPJS Ketenagakerjaan',
-          url: '/admin/product-categories/bpjs-ketenagakerjaan',
+          url: '/admin/product-categories/postpaid/bpjs-ketenagakerjaan',
         },
         {
           title: 'Other Postpaid',
-          url: '/admin/product-categories/other-postpaid',
+          url: '/admin/product-categories/postpaid/other-postpaid',
         },
       ],
     },

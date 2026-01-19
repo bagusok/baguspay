@@ -1,59 +1,56 @@
-import { HttpException, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types';
-import crypto from 'crypto';
-import { ApiServiceException } from 'src/common/exceptions/api-service.exception';
-import {
-  CreatePaymentGatewayRequest,
-  CreatePaymentGatewayResponse,
-} from '../payment-gateway.type';
-import { PaymentGateway } from '../payment.interface';
-import { DuitkuAPiService } from './duitku.api.service';
+import { HttpException, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types'
+import crypto from 'crypto'
+import { ApiServiceException } from 'src/common/exceptions/api-service.exception'
+import { CreatePaymentGatewayRequest, CreatePaymentGatewayResponse } from '../payment-gateway.type'
+import { PaymentGateway } from '../payment.interface'
+import { DuitkuAPiService } from './duitku.api.service'
 
 @Injectable()
 export class DuitkuService implements PaymentGateway {
-  private API_KEY: string;
-  private MERCHANT_CODE: string;
-  private RETURN_URL: string;
-  private CALLBACK_URL: string;
+  private API_KEY: string
+  private MERCHANT_CODE: string
+  private RETURN_URL: string
+  private CALLBACK_URL: string
 
   constructor(
     private readonly duitkuApiService: DuitkuAPiService,
     private readonly configService: ConfigService,
   ) {
-    this.API_KEY = this.configService.get<string>('DUITKU_APIKEY');
-    this.MERCHANT_CODE = this.configService.get<string>('DUITKU_MERCHANT_CODE');
-    this.RETURN_URL = this.configService.get<string>('DUITKU_RETURN_URL');
-    this.CALLBACK_URL = this.configService.get<string>('DUITKU_CALLBACK_URL');
+    this.API_KEY = this.configService.get<string>('DUITKU_APIKEY')
+    this.MERCHANT_CODE = this.configService.get<string>('DUITKU_MERCHANT_CODE')
+    this.RETURN_URL = this.configService.get<string>('DUITKU_RETURN_URL')
+    this.CALLBACK_URL = this.configService.get<string>('DUITKU_CALLBACK_URL')
   }
 
   async createTransaction(
     data: CreatePaymentGatewayRequest,
   ): Promise<CreatePaymentGatewayResponse> {
     try {
-      const expiryPeriod = data.expired_in * 60;
-      const expiredAt = new Date(Date.now() + data.expired_in * 1000);
+      const expiryPeriod = data.expired_in * 60
+      const expiredAt = new Date(Date.now() + data.expired_in * 1000)
 
       //   hitung fee
-      const amount = data.amount;
+      const amount = data.amount
 
-      let totalAmount = 0;
+      let totalAmount = 0
 
       const fee = this.duitkuApiService.calculateFee(
         amount,
         data.fee_in_percent / 100,
         data.fee_static,
-      );
+      )
 
       if (data.fee_type == PaymentMethodFeeType.BUYER) {
-        totalAmount = data.amount;
+        totalAmount = data.amount
       } else {
-        totalAmount = data.amount + fee;
+        totalAmount = data.amount + fee
       }
 
       const signature = this.duitkuApiService.generateSignature(
         this.MERCHANT_CODE + data.id + totalAmount + this.API_KEY,
-      );
+      )
 
       const response = await this.duitkuApiService.createTransaction({
         merchantCode: this.MERCHANT_CODE,
@@ -66,22 +63,20 @@ export class DuitkuService implements PaymentGateway {
         expiryPeriod: expiryPeriod,
         merchantOrderId: data.id,
         signature: signature,
-        returnUrl:
-          data.return_url ??
-          (this.RETURN_URL ? this.RETURN_URL + '/' + data.id : ''),
-      });
+        returnUrl: data.return_url ?? (this.RETURN_URL ? this.RETURN_URL + '/' + data.id : ''),
+      })
 
       // Data Setelah Revisi Create Payment
-      let r_fee = 0;
-      let r_amount_received = 0;
-      const r_amount_total = response.amount;
+      let r_fee = 0
+      let r_amount_received = 0
+      const r_amount_total = response.amount
 
       if (data.fee_type == PaymentMethodFeeType.BUYER) {
-        r_fee = response.amount - data.amount;
-        r_amount_received = response.amount - r_fee;
+        r_fee = response.amount - data.amount
+        r_amount_received = response.amount - r_fee
       } else {
-        r_fee = fee;
-        r_amount_received = response.amount - r_fee;
+        r_fee = fee
+        r_amount_received = response.amount - r_fee
       }
 
       return {
@@ -104,46 +99,38 @@ export class DuitkuService implements PaymentGateway {
         qr_code: response.qrString,
         qr_url: null,
         status: PaymentStatus.PENDING,
-      };
+      }
     } catch (error) {
       if (error instanceof ApiServiceException) {
-        throw new HttpException(error.message, error.httpCode);
+        throw new HttpException(error.message, error.httpCode)
       }
-      throw error;
+      throw error
     }
   }
 
   cancelTransaction(data: any): Promise<any> {
-    throw new Error(`Method not implemented. ${data}`);
+    throw new Error(`Method not implemented. ${data}`)
   }
 
   handleCallback(data: any): Promise<any> {
-    throw new Error(`Method not implemented. ${data}`);
+    throw new Error(`Method not implemented. ${data}`)
   }
 
-  calculateFee(
-    amountReceived: number,
-    feePercent: number,
-    feeFixed: number,
-  ): number {
-    throw new Error(
-      `Method not implemented. ${amountReceived}, ${feePercent}, ${feeFixed}`,
-    );
+  calculateFee(amountReceived: number, feePercent: number, feeFixed: number): number {
+    throw new Error(`Method not implemented. ${amountReceived}, ${feePercent}, ${feeFixed}`)
   }
 
   public verifyCallbackSignature(data: {
-    signature: string;
-    merchantCode: string;
-    amount: number;
-    merchantOrderId: string;
+    signature: string
+    merchantCode: string
+    amount: number
+    merchantOrderId: string
   }): boolean {
     const hash = crypto
       .createHash('md5')
-      .update(
-        data.merchantCode + data.amount + data.merchantOrderId + this.API_KEY,
-      )
-      .digest('hex');
+      .update(data.merchantCode + data.amount + data.merchantOrderId + this.API_KEY)
+      .digest('hex')
 
-    return hash === data.signature;
+    return hash === data.signature
   }
 }

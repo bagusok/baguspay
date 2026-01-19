@@ -1,84 +1,64 @@
-import { relations } from "drizzle-orm";
-import {
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
-import { orders } from "./orders";
+import { relations } from 'drizzle-orm'
+import { index, integer, jsonb, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { orders } from './orders'
 import {
   InquiryStatus,
   inquiryStatusEnum,
   OfferAppliedOnInquiry,
   ProductProvider,
   productProviderEnum,
-} from "./pg-enums";
-import { paymentSnapshots, productSnapshots } from "./snapshots";
-import { users } from "./users";
+} from './pg-enums'
+import { paymentSnapshots, productSnapshots } from './snapshots'
+import { users } from './users'
 
 export const inquiries = pgTable(
-  "inquiries",
+  'inquiries',
   {
-    id: uuid("id").primaryKey().defaultRandom(),
+    id: uuid('id').primaryKey().defaultRandom(),
 
-    user_id: uuid("user_id")
+    user_id: uuid('user_id')
       .notNull()
       .references(() => users.id),
 
-    product_snapshot_id: uuid("product_snapshot_id").references(
-      () => productSnapshots.id,
-    ),
-    payment_snapshot_id: uuid("payment_snapshot_id").references(
-      () => paymentSnapshots.id,
-    ),
+    product_snapshot_id: uuid('product_snapshot_id').references(() => productSnapshots.id),
+    payment_snapshot_id: uuid('payment_snapshot_id').references(() => paymentSnapshots.id),
 
     // pricing details
-    price: integer("price").notNull().default(0),
-    cost_price: integer("cost_price").notNull().default(0),
-    discount_price: integer("discount_price").notNull().default(0),
-    fee: integer("fee").notNull().default(0),
-    admin_fee: integer("admin_fee").notNull().default(0),
-    total_price: integer("total_price").notNull(),
-    profit: integer("profit").notNull().default(0),
+    price: integer('price').notNull().default(0),
+    cost_price: integer('cost_price').notNull().default(0),
+    discount_price: integer('discount_price').notNull().default(0),
+    fee: integer('fee').notNull().default(0),
+    admin_fee: integer('admin_fee').notNull().default(0),
+    total_price: integer('total_price').notNull(),
+    profit: integer('profit').notNull().default(0),
 
-    inquiry_provider: productProviderEnum("inquiry_provider")
+    inquiry_provider: productProviderEnum('inquiry_provider')
       .default(ProductProvider.DIGIFLAZZ)
       .notNull(),
-    inquiry_provider_code: varchar("inquiry_provider_code", { length: 50 }),
-    inquiry_ref_id: varchar("inquiry_ref_id", { length: 100 }),
-    inquiry_response: jsonb("inquiry_response").$type<Record<string, any>>(),
+    inquiry_provider_code: varchar('inquiry_provider_code', { length: 50 }),
+    inquiry_ref_id: varchar('inquiry_ref_id', { length: 100 }),
+    inquiry_response: jsonb('inquiry_response').$type<Record<string, any>>(),
 
-    customer_input: jsonb("customer_input").notNull().default({}),
-    customer_input_merged: varchar("customer_input_merged")
-      .notNull()
-      .default(""),
-    customer_name: varchar("customer_name", { length: 150 }),
-    customer_phone: varchar("customer_phone", { length: 50 }),
-    customer_email: varchar("customer_email", { length: 150 }),
+    customer_input: jsonb('customer_input').notNull().default({}),
+    customer_input_merged: varchar('customer_input_merged').notNull().default(''),
+    customer_name: varchar('customer_name', { length: 150 }),
+    customer_phone: varchar('customer_phone', { length: 50 }),
+    customer_email: varchar('customer_email', { length: 150 }),
 
-    offer_applied: jsonb("offer_applied")
-      .$type<OfferAppliedOnInquiry[]>()
-      .default([]),
+    offer_applied: jsonb('offer_applied').$type<OfferAppliedOnInquiry[]>().default([]),
 
-    status: inquiryStatusEnum("status").default(
-      InquiryStatus.AWAIT_CONFIRMATION,
-    ),
-    expired_at: timestamp("expired_at", { withTimezone: true }), // batas validasi inquiry
+    status: inquiryStatusEnum('status').default(InquiryStatus.AWAIT_CONFIRMATION),
+    expired_at: timestamp('expired_at', { withTimezone: true }), // batas validasi inquiry
 
     // timestamps
-    created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
-    updated_at: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
+    created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    updated_at: timestamp('updated_at', { withTimezone: true }).$onUpdate(() => new Date()),
   },
   (table) => [
-    index("inquiries_user_idx").on(table.user_id),
-    index("inquiries_status_idx").on(table.status),
+    index('inquiries_user_idx').on(table.user_id),
+    index('inquiries_status_idx').on(table.status),
   ],
-);
+)
 
 export const inquiryRelations = relations(inquiries, ({ one, many }) => ({
   user: one(users, {
@@ -94,4 +74,4 @@ export const inquiryRelations = relations(inquiries, ({ one, many }) => ({
     references: [paymentSnapshots.id],
   }),
   orders: many(orders),
-}));
+}))

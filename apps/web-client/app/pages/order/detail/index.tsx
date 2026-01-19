@@ -1,6 +1,6 @@
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Button } from "@repo/ui/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { Badge } from '@repo/ui/components/ui/badge'
+import { Button } from '@repo/ui/components/ui/button'
+import { useQuery } from '@tanstack/react-query'
 import {
   AlertCircleIcon,
   CheckCircleIcon,
@@ -15,52 +15,52 @@ import {
   RefreshCwIcon,
   TagIcon,
   XCircleIcon,
-} from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { apiClient } from "~/utils/axios";
-import { formatPrice } from "~/utils/format";
-import type { Route } from "./+types";
-import CancelTransactionModal from "./cancel-transaction-modal";
-import PaymentCountdown from "./payment-countdown";
-import PaymentMethodDisplay from "./payment-method-display";
-import StatusBadge from "./status-badge";
+} from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { apiClient } from '~/utils/axios'
+import { formatPrice } from '~/utils/format'
+import type { Route } from './+types'
+import CancelTransactionModal from './cancel-transaction-modal'
+import PaymentCountdown from './payment-countdown'
+import PaymentMethodDisplay from './payment-method-display'
+import StatusBadge from './status-badge'
 
 export default function OrderDetailPage({ params }: Route.ComponentProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [isCanceling, setIsCanceling] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [isCanceling, setIsCanceling] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
 
   const orderDetail = useQuery({
-    queryKey: ["orderDetail", params.id],
+    queryKey: ['orderDetail', params.id],
     queryFn: async () =>
       apiClient
         .post<OrderDetailResponse>(`/order/${params.id}`)
         .then((res) => res.data)
         .catch((error) => {
-          throw error.response?.data;
+          throw error.response?.data
         }),
     retry: false,
-  });
+  })
 
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopiedField(fieldName);
-      toast.success(`${fieldName} disalin ke clipboard`);
-      setTimeout(() => setCopiedField(null), 2000);
-    });
-  };
+      setCopiedField(fieldName)
+      toast.success(`${fieldName} disalin ke clipboard`)
+      setTimeout(() => setCopiedField(null), 2000)
+    })
+  }
 
   const handleCancelTransaction = async () => {
-    if (!data) return;
-  };
+    if (!data) return
+  }
 
   const handleChatCS = () => {
-    const phoneNumber = "6281234567890"; // Ganti dengan nomor WhatsApp CS
-    const message = `Halo, saya ingin bertanya tentang transaksi dengan Order ID: ${data?.order_id}`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-  };
+    const phoneNumber = '6281234567890' // Ganti dengan nomor WhatsApp CS
+    const message = `Halo, saya ingin bertanya tentang transaksi dengan Order ID: ${data?.order_id}`
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
 
   if (orderDetail.isLoading) {
     return (
@@ -72,7 +72,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (orderDetail.isError) {
@@ -80,12 +80,9 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
       <div className="w-full md:max-w-7xl mx-auto">
         <div className="rounded-xl shadow-xs border border-red-200 p-8 dark:border-red-800/30 dark:bg-red-800/10 text-center">
           <XCircleIcon className="w-16 h-16 text-destructive mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">
-            Gagal Memuat Detail Pesanan
-          </h2>
+          <h2 className="text-xl font-semibold mb-2">Gagal Memuat Detail Pesanan</h2>
           <p className="text-muted-foreground mb-4">
-            {orderDetail.error?.message ||
-              "Terjadi kesalahan saat memuat detail pesanan"}
+            {orderDetail.error?.message || 'Terjadi kesalahan saat memuat detail pesanan'}
           </p>
           <Button onClick={() => orderDetail.refetch()} className="gap-2">
             <RefreshCwIcon className="w-4 h-4" />
@@ -93,31 +90,27 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
-  const data = orderDetail.data?.data;
-  if (!data) return null;
+  const data = orderDetail.data?.data
+  if (!data) return null
 
   return (
     <div className="w-full md:max-w-7xl mx-auto space-y-4">
       {/* Header Section */}
       <section id="header">
         <div className="text-center md:text-left">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">
-            Detail Pesanan
-          </h1>
-          <p className="text-muted-foreground">
-            Informasi lengkap tentang pesanan Anda
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Detail Pesanan</h1>
+          <p className="text-muted-foreground">Informasi lengkap tentang pesanan Anda</p>
         </div>
       </section>
 
       {/* Payment Countdown - Priority Display */}
       {data.payment.expired_at &&
-        (data.payment_status === "pending" ||
-          data.payment_status === "expired" ||
-          data.payment_status === "failed") && (
+        (data.payment_status === 'pending' ||
+          data.payment_status === 'expired' ||
+          data.payment_status === 'failed') && (
           <section id="payment-countdown">
             <PaymentCountdown
               expiredAt={data.payment.expired_at}
@@ -148,7 +141,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => copyToClipboard(data.order_id, "Order ID")}
+                      onClick={() => copyToClipboard(data.order_id, 'Order ID')}
                       className="p-1 h-auto"
                     >
                       <CopyIcon className="w-3 h-3" />
@@ -176,27 +169,20 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <TagIcon className="w-4 h-4" />
                 <span>
-                  {data.product.category_name} •{" "}
-                  {data.product.sub_category_name}
+                  {data.product.category_name} • {data.product.sub_category_name}
                 </span>
               </div>
 
               <div>
-                <h3 className="font-medium text-lg mb-2">
-                  {data.product.name}
-                </h3>
+                <h3 className="font-medium text-lg mb-2">{data.product.name}</h3>
                 <div className="flex flex-wrap gap-2">
                   <Badge className="rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
                     <GamepadIcon className="w-3 h-3" />
-                    {data.product.billing_type === "prepaid"
-                      ? "Prepaid"
-                      : "Postpaid"}
+                    {data.product.billing_type === 'prepaid' ? 'Prepaid' : 'Postpaid'}
                   </Badge>
                   <Badge className="rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-500">
                     <CheckCircleIcon className="w-3 h-3" />
-                    {data.product.fullfillment_type === "automatic_direct"
-                      ? "Otomatis"
-                      : "Manual"}
+                    {data.product.fullfillment_type === 'automatic_direct' ? 'Otomatis' : 'Manual'}
                   </Badge>
                 </div>
               </div>
@@ -210,9 +196,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() =>
-                      copyToClipboard(data.customer_input, "ID Akun")
-                    }
+                    onClick={() => copyToClipboard(data.customer_input, 'ID Akun')}
                     className="p-1 h-auto"
                   >
                     <CopyIcon className="w-3 h-3" />
@@ -222,9 +206,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
 
               {data.sn_number && (
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Serial Number
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">Serial Number</p>
                   <div className="flex items-center gap-2">
                     <code className="px-2 py-1 bg-green-100 dark:bg-green-800/30 rounded text-sm font-mono flex-1 text-green-800 dark:text-green-400">
                       {data.sn_number}
@@ -232,9 +214,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        copyToClipboard(data.sn_number, "Serial Number")
-                      }
+                      onClick={() => copyToClipboard(data.sn_number, 'Serial Number')}
                       className="p-1 h-auto"
                     >
                       <CopyIcon className="w-3 h-3" />
@@ -256,9 +236,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
 
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">
-                  Metode Pembayaran
-                </p>
+                <p className="text-xs text-muted-foreground mb-1">Metode Pembayaran</p>
                 <p className="font-medium">{data.payment.name}</p>
               </div>
 
@@ -271,9 +249,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Nomor Telepon
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">Nomor Telepon</p>
                   <div className="flex items-center gap-2">
                     <PhoneIcon className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm">{data.payment.phone_number}</span>
@@ -284,7 +260,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
               {/* Dynamic Payment Method Display */}
               <PaymentMethodDisplay
                 paymentMethod={{
-                  name: data.payment.name || "Metode Pembayaran",
+                  name: data.payment.name || 'Metode Pembayaran',
                   type: data.payment.type as any,
                   qr_code: data.payment.qr_code,
                   pay_url: data.payment.pay_url,
@@ -311,9 +287,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm">Harga Produk</span>
-                  <span className="text-sm font-medium">
-                    {formatPrice(data.price)}
-                  </span>
+                  <span className="text-sm font-medium">{formatPrice(data.price)}</span>
                 </div>
 
                 {data.offers && data.offers.length > 0 && (
@@ -334,9 +308,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
 
                 <div className="flex justify-between">
                   <span className="text-sm">Biaya Admin</span>
-                  <span className="text-sm font-medium">
-                    {formatPrice(data.fee)}
-                  </span>
+                  <span className="text-sm font-medium">{formatPrice(data.fee)}</span>
                 </div>
 
                 <div className="border-t pt-3">
@@ -363,9 +335,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                 <div className="space-y-3">
                   {data.voucher_code && (
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Kode Voucher
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Kode Voucher</p>
                       <div className="flex items-center gap-2">
                         <code className="px-2 py-1 bg-muted rounded text-sm font-mono flex-1">
                           {data.voucher_code}
@@ -373,9 +343,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() =>
-                            copyToClipboard(data.voucher_code, "Kode Voucher")
-                          }
+                          onClick={() => copyToClipboard(data.voucher_code, 'Kode Voucher')}
                           className="p-1 h-auto"
                         >
                           <CopyIcon className="w-3 h-3" />
@@ -385,12 +353,8 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                   )}
                   {data.notes && (
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Catatan
-                      </p>
-                      <p className="text-sm bg-muted p-3 rounded">
-                        {data.notes}
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Catatan</p>
+                      <p className="text-sm bg-muted p-3 rounded">{data.notes}</p>
                     </div>
                   )}
                 </div>
@@ -399,7 +363,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
 
             {/* Action Buttons */}
             <div className="space-y-4">
-              {data.payment_status === "pending" && (
+              {data.payment_status === 'pending' && (
                 <Button
                   onClick={() => setShowCancelModal(true)}
                   variant="destructive"
@@ -407,7 +371,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                   disabled={isCanceling}
                 >
                   <XCircleIcon className="w-4 h-4" />
-                  {isCanceling ? "Membatalkan..." : "Batalkan Transaksi"}
+                  {isCanceling ? 'Membatalkan...' : 'Batalkan Transaksi'}
                 </Button>
               )}
 
@@ -458,66 +422,66 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
         orderId={data.order_id}
       />
     </div>
-  );
+  )
 }
 
 export interface OrderDetailResponse {
-  success: boolean;
-  message: string;
-  data: OrderDetailData;
+  success: boolean
+  message: string
+  data: OrderDetailData
 }
 
 export interface OrderDetailData {
-  order_id: string;
-  order_status: string;
-  payment_status: string;
-  refund_status: string;
-  price: number;
-  total_price: number;
-  discount_price: number;
-  fee: number;
-  sn_number: string;
-  customer_input: string;
-  customer_email: string;
-  user_id: string;
-  voucher_code: any;
-  notes: any;
-  product: OrderDetailProduct;
-  payment: OrderDetailPayment;
-  offers: OrderDetailOffer[];
+  order_id: string
+  order_status: string
+  payment_status: string
+  refund_status: string
+  price: number
+  total_price: number
+  discount_price: number
+  fee: number
+  sn_number: string
+  customer_input: string
+  customer_email: string
+  user_id: string
+  voucher_code: any
+  notes: any
+  product: OrderDetailProduct
+  payment: OrderDetailPayment
+  offers: OrderDetailOffer[]
 }
 
 export interface OrderDetailProduct {
-  product_id: string;
-  name: string;
-  category_name: string;
-  sub_category_name: string;
-  price: number;
-  provider_ref_id: string;
-  fullfillment_type: string;
-  billing_type: string;
+  product_id: string
+  name: string
+  category_name: string
+  sub_category_name: string
+  price: number
+  provider_ref_id: string
+  fullfillment_type: string
+  billing_type: string
 }
 
 export interface OrderDetailPayment {
-  email: string;
-  phone_number: string;
-  payment_method_id: string;
-  qr_code: string;
-  type: string;
-  pay_url: any;
-  pay_code: any;
-  name: string;
-  fee_type: string;
-  fee_static: number;
-  fee_percentage: number;
-  expired_at: Date | string;
+  email: string
+  phone_number: string
+  payment_method_id: string
+  qr_code: string
+  type: string
+  pay_url: any
+  pay_code: any
+  name: string
+  fee_type: string
+  fee_static: number
+  fee_percentage: number
+  expired_at: Date | string
 }
 
 export interface OrderDetailOffer {
-  name: string;
-  type: string;
-  discount_percentage: number;
-  discount_static: number;
-  discount_maximum: number;
-  discount_total: number;
+  name: string
+  type: string
+  discount_percentage: number
+  discount_static: number
+  discount_maximum: number
+  discount_total: number
 }

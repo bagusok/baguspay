@@ -76,6 +76,7 @@
     "@radix-ui/react-popover": "^1.1.14",
     "@repo/db": "workspace:^",
     "@repo/ui": "workspace:*",
+    "@repo/configs": "workspace:*",
     "@sindresorhus/slugify": "^2.2.1",
     "@tailwindcss/vite": "^4.1.11",
     "@tanstack/query-core": "^5.83.0",

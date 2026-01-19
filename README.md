@@ -4,7 +4,6 @@ Dibangun dengan arsitektur monorepo menggunakan Turborepo, menggabungkan kekuata
 
 <img width="1920" height="1080" alt="Baguspay Web" src="https://github.com/user-attachments/assets/179b41b3-4287-4d55-b50f-49ac5f766fdc" />
 
-
 ## 🚀 Tech Stack
 
 | Layer          | Framework                                   | Deskripsi                                                       |

@@ -1,16 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, count, desc, eq, gte, lte, sql, SQL, sum } from '@repo/db';
-import {
-  BalanceMutationType,
-  DepositStatus,
-  OrderStatus,
-  tb,
-} from '@repo/db/types';
-import { MetaPaginated, TUser } from 'src/common/types/meta.type';
-import { SendResponse } from 'src/common/utils/response';
-import { DatabaseService } from 'src/database/database.service';
-import { StorageService } from 'src/storage/storage.service';
-import { GetBalanceMutationHistoryQuery } from './user.dto';
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { and, count, desc, eq, gte, lte, sql, SQL, sum } from '@repo/db'
+import { BalanceMutationType, DepositStatus, OrderStatus, tb } from '@repo/db/types'
+import { MetaPaginated, TUser } from 'src/common/types/meta.type'
+import { SendResponse } from 'src/common/utils/response'
+import { DatabaseService } from 'src/database/database.service'
+import { StorageService } from 'src/storage/storage.service'
+import { GetBalanceMutationHistoryQuery } from './user.dto'
 
 @Injectable()
 export class UserService {
@@ -35,17 +30,17 @@ export class UserService {
         is_email_verified: true,
         created_at: true,
       },
-    });
+    })
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${id} not found`)
     }
 
     if (user.image_url) {
-      user.image_url = this.storageService.getFileUrl(user.image_url);
+      user.image_url = this.storageService.getFileUrl(user.image_url)
     }
 
-    return SendResponse.success(user, 'User profile retrieved successfully');
+    return SendResponse.success(user, 'User profile retrieved successfully')
   }
 
   async getBalance(userId: string) {
@@ -54,65 +49,56 @@ export class UserService {
       columns: {
         balance: true,
       },
-    });
+    })
 
     if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+      throw new NotFoundException(`User with ID ${userId} not found`)
     }
 
-    return SendResponse.success(
-      { balance: user.balance },
-      'User balance retrieved successfully',
-    );
+    return SendResponse.success({ balance: user.balance }, 'User balance retrieved successfully')
   }
 
-  async getBalanceMutationHistory(
-    query: GetBalanceMutationHistoryQuery,
-    userId: string,
-  ) {
-    const where: SQL[] = [eq(tb.balanceMutations.user_id, userId)];
+  async getBalanceMutationHistory(query: GetBalanceMutationHistoryQuery, userId: string) {
+    const where: SQL[] = [eq(tb.balanceMutations.user_id, userId)]
 
     if (query.start_date) {
-      where.push(
-        gte(tb.balanceMutations.created_at, new Date(query.start_date)),
-      );
+      where.push(gte(tb.balanceMutations.created_at, new Date(query.start_date)))
     }
 
     if (query.end_date) {
-      where.push(lte(tb.balanceMutations.created_at, new Date(query.end_date)));
+      where.push(lte(tb.balanceMutations.created_at, new Date(query.end_date)))
     }
 
     if (query.ref_type) {
-      where.push(eq(tb.balanceMutations.ref_type, query.ref_type));
+      where.push(eq(tb.balanceMutations.ref_type, query.ref_type))
     }
 
     if (query.type) {
-      where.push(eq(tb.balanceMutations.type, query.type));
+      where.push(eq(tb.balanceMutations.type, query.type))
     }
 
-    const mutations =
-      await this.databaseService.db.query.balanceMutations.findMany({
-        where: and(...where),
-        limit: query.limit,
-        offset: (query.page - 1) * query.limit,
-        orderBy: desc(tb.balanceMutations.created_at),
-        columns: {
-          id: true,
-          amount: true,
-          name: true,
-          ref_type: true,
-          ref_id: true,
-          created_at: true,
-          type: true,
-        },
-      });
+    const mutations = await this.databaseService.db.query.balanceMutations.findMany({
+      where: and(...where),
+      limit: query.limit,
+      offset: (query.page - 1) * query.limit,
+      orderBy: desc(tb.balanceMutations.created_at),
+      columns: {
+        id: true,
+        amount: true,
+        name: true,
+        ref_type: true,
+        ref_id: true,
+        created_at: true,
+        type: true,
+      },
+    })
 
     const [totalData] = await this.databaseService.db
       .select({
         count: count(),
       })
       .from(tb.balanceMutations)
-      .where(and(...where));
+      .where(and(...where))
 
     return SendResponse.success<typeof mutations, MetaPaginated>(
       mutations,
@@ -125,7 +111,7 @@ export class UserService {
           total_pages: Math.ceil(totalData.count / query.limit),
         },
       },
-    );
+    )
   }
 
   me(user?: TUser) {
@@ -140,7 +126,7 @@ export class UserService {
         is_banned: false,
         is_email_verified: false,
         image_url: null,
-      });
+      })
     } else {
       return SendResponse.success(
         {
@@ -155,23 +141,15 @@ export class UserService {
           image_url: user.image_url,
         },
         'User profile retrieved successfully',
-      );
+      )
     }
   }
 
   async dashboard(user: TUser) {
     // Get current month start and end dates
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const monthEnd = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      0,
-      23,
-      59,
-      59,
-      999,
-    );
+    const now = new Date()
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999)
 
     const [
       balance,
@@ -194,10 +172,7 @@ export class UserService {
         })
         .from(tb.orders)
         .where(
-          and(
-            eq(tb.orders.user_id, user.id),
-            eq(tb.orders.order_status, OrderStatus.COMPLETED),
-          ),
+          and(eq(tb.orders.user_id, user.id), eq(tb.orders.order_status, OrderStatus.COMPLETED)),
         )
         .limit(1),
       // Monthly expenses (negative balance mutations)
@@ -237,10 +212,7 @@ export class UserService {
         })
         .from(tb.deposits)
         .where(
-          and(
-            eq(tb.deposits.user_id, user.id),
-            eq(tb.deposits.status, DepositStatus.COMPLETED),
-          ),
+          and(eq(tb.deposits.user_id, user.id), eq(tb.deposits.status, DepositStatus.COMPLETED)),
         )
         .limit(1),
 
@@ -276,10 +248,7 @@ export class UserService {
           total: count(tb.orders.id).as('total'), // beri alias agar bisa digunakan di orderBy
         })
         .from(tb.orders)
-        .innerJoin(
-          tb.productSnapshots,
-          eq(tb.orders.product_snapshot_id, tb.productSnapshots.id),
-        )
+        .innerJoin(tb.productSnapshots, eq(tb.orders.product_snapshot_id, tb.productSnapshots.id))
         .where(
           and(
             eq(tb.orders.user_id, user.id),
@@ -309,7 +278,7 @@ export class UserService {
           ),
         )
         .limit(1),
-    ]);
+    ])
 
     return SendResponse.success({
       balance: balance.balance,
@@ -324,6 +293,6 @@ export class UserService {
       totalDeposit: totalDeposit[0].totalDeposit || 0,
       recentOrders: recentOrder,
       popularOrders: popularOrder,
-    });
+    })
   }
 }

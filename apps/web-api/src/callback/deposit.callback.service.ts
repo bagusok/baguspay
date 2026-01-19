@@ -1,22 +1,13 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { and, eq, lte } from '@repo/db';
-import {
-  BalanceMutationRefType,
-  BalanceMutationType,
-  DepositStatus,
-  tb,
-} from '@repo/db/types';
-import { SendResponse } from 'src/common/utils/response';
-import { DatabaseService } from 'src/database/database.service';
-import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service';
-import { DuitkuService } from 'src/integrations/payment-gateway/duitku/duitku.service';
-import { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type';
-import { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service';
-import { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { and, eq, lte } from '@repo/db'
+import { BalanceMutationRefType, BalanceMutationType, DepositStatus, tb } from '@repo/db/types'
+import { SendResponse } from 'src/common/utils/response'
+import { DatabaseService } from 'src/database/database.service'
+import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
+import { DuitkuService } from 'src/integrations/payment-gateway/duitku/duitku.service'
+import { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type'
+import { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service'
+import { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type'
 
 @Injectable()
 export class DepositCallbackService {
@@ -33,10 +24,10 @@ export class DepositCallbackService {
       merchantCode: data.merchantCode,
       amount: data.amount,
       merchantOrderId: data.merchantOrderId,
-    });
+    })
 
     if (!verifySIgnature) {
-      throw new BadRequestException('Invalid signature');
+      throw new BadRequestException('Invalid signature')
     }
 
     const deposit = await this.databaseService.db.query.deposits.findFirst({
@@ -44,16 +35,16 @@ export class DepositCallbackService {
         eq(tb.deposits.deposit_id, data.merchantOrderId),
         eq(tb.deposits.status, DepositStatus.PENDING),
       ),
-    });
+    })
 
     if (!deposit) {
-      throw new NotFoundException('Deposit not found or already processed');
+      throw new NotFoundException('Deposit not found or already processed')
     }
 
-    let depositStatus: DepositStatus = DepositStatus.FAILED;
+    let depositStatus: DepositStatus = DepositStatus.FAILED
 
     if (data.resultCode == '00') {
-      depositStatus = DepositStatus.COMPLETED;
+      depositStatus = DepositStatus.COMPLETED
     }
 
     await this.databaseService.db.transaction(async (tx) => {
@@ -62,7 +53,7 @@ export class DepositCallbackService {
         .set({
           status: depositStatus,
         })
-        .where(eq(tb.deposits.deposit_id, data.merchantOrderId));
+        .where(eq(tb.deposits.deposit_id, data.merchantOrderId))
 
       if (depositStatus === DepositStatus.COMPLETED) {
         await this.balanceService.addBalance({
@@ -73,27 +64,24 @@ export class DepositCallbackService {
           ref_id: deposit.deposit_id,
           type: BalanceMutationType.CREDIT,
           notes: `Deposit successful: ${deposit.deposit_id}`,
-        });
+        })
       }
-    });
+    })
 
     return SendResponse.success({
       depositId: deposit.deposit_id,
       status: depositStatus,
-    });
+    })
   }
 
-  public async tripayCallback(
-    data: TripayCallbackData,
-    callbackSignature: string,
-  ) {
+  public async tripayCallback(data: TripayCallbackData, callbackSignature: string) {
     const verifySignature = this.tripayService.verifyCallbackSignature({
       data: data,
       signature: callbackSignature,
-    });
+    })
 
     if (!verifySignature) {
-      throw new BadRequestException('Invalid signature');
+      throw new BadRequestException('Invalid signature')
     }
 
     const deposit = await this.databaseService.db.query.deposits.findFirst({
@@ -102,21 +90,21 @@ export class DepositCallbackService {
         eq(tb.deposits.status, DepositStatus.PENDING),
         lte(tb.deposits.created_at, new Date()),
       ),
-    });
+    })
 
     if (!deposit) {
-      throw new BadRequestException('Deposit not found or already processed');
+      throw new BadRequestException('Deposit not found or already processed')
     }
 
-    let depositStatus: DepositStatus = DepositStatus.PENDING;
+    let depositStatus: DepositStatus = DepositStatus.PENDING
     if (data.status === 'PAID') {
-      depositStatus = DepositStatus.COMPLETED;
+      depositStatus = DepositStatus.COMPLETED
     } else if (data.status === 'FAILED') {
-      depositStatus = DepositStatus.FAILED;
+      depositStatus = DepositStatus.FAILED
     } else if (data.status === 'EXPIRED') {
-      depositStatus = DepositStatus.EXPIRED;
+      depositStatus = DepositStatus.EXPIRED
     } else if (data.status === 'REFUND') {
-      depositStatus = DepositStatus.CANCELED;
+      depositStatus = DepositStatus.CANCELED
     }
 
     await this.databaseService.db.transaction(async (tx) => {
@@ -125,7 +113,7 @@ export class DepositCallbackService {
         .set({
           status: depositStatus,
         })
-        .where(eq(tb.deposits.deposit_id, data.merchant_ref));
+        .where(eq(tb.deposits.deposit_id, data.merchant_ref))
 
       if (depositStatus === DepositStatus.COMPLETED) {
         await this.balanceService.addBalance({
@@ -136,13 +124,13 @@ export class DepositCallbackService {
           ref_id: deposit.deposit_id,
           type: BalanceMutationType.CREDIT,
           notes: `Deposit successful: ${deposit.deposit_id}`,
-        });
+        })
       }
-    });
+    })
 
     return SendResponse.success({
       depositId: deposit.deposit_id,
       status: depositStatus,
-    });
+    })
   }
 }

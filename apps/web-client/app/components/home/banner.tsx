@@ -1,56 +1,46 @@
-import type { BannerLocation } from "@repo/db/types";
+import type { BannerLocation } from '@repo/db/types'
 // import "swiper/css";
 // import "swiper/css/navigation";
 // import "swiper/css/pagination";
-import { Autoplay, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { useWindowSize } from "usehooks-ts";
-import Image from "../image";
-import "./banner.css";
+import { Autoplay, Pagination } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { useWindowSize } from 'usehooks-ts'
+import Image from '../image'
+import './banner.css'
 
 type Banner = {
-  id: string;
-  title: string;
-  description: string;
-  image_url: string;
-  href_url: string | null;
-  app_url: string | null;
-  banner_location: BannerLocation;
-  order: number;
-  is_available: boolean;
-  created_at: string;
-  is_featured?: boolean;
-  isFeatured?: boolean;
-};
+  id: string
+  title: string
+  description: string
+  image_url: string
+  href_url: string | null
+  app_url: string | null
+  banner_location: BannerLocation
+  order: number
+  is_available: boolean
+  created_at: string
+  is_featured?: boolean
+  isFeatured?: boolean
+}
 
 type Props = {
-  home_top: Banner[];
-  home_middle: Banner[];
-  home_bottom: Banner[];
-};
+  home_top: Banner[]
+  home_middle: Banner[]
+  home_bottom: Banner[]
+}
 
-export default function HomeBanner({
-  home_top,
-  home_middle,
-  home_bottom,
-}: Props) {
-  const { width } = useWindowSize();
+export default function HomeBanner({ home_top, home_middle, home_bottom }: Props) {
+  const { width } = useWindowSize()
 
   const hasAny =
-    (home_top?.length ?? 0) +
-      (home_middle?.length ?? 0) +
-      (home_bottom?.length ?? 0) >
-    0;
+    (home_top?.length ?? 0) + (home_middle?.length ?? 0) + (home_bottom?.length ?? 0) > 0
 
-  if (!hasAny) return null;
+  if (!hasAny) return null
 
-  const renderSwiper = (
-    banners: Banner[],
-    opts?: { slides?: number; loop?: boolean },
-  ) => {
-    if (!banners || banners.length === 0) return null;
-    const slidesPerView = opts?.slides ?? 1;
-    const loop = opts?.loop ?? banners.length > 1;
+  const renderSwiper = (banners: Banner[], opts?: { slides?: number; loop?: boolean }) => {
+    if (!banners || banners.length === 0) return null
+    const slidesPerView = opts?.slides ?? 1
+    const loop = opts?.loop ?? banners.length > 1
 
     return (
       <Swiper
@@ -75,29 +65,21 @@ export default function HomeBanner({
           </SwiperSlide>
         ))}
       </Swiper>
-    );
-  };
+    )
+  }
 
   // Mobile/tablet: collapse into single slider in order: top -> middle -> bottom
   if (width < 1024) {
-    const combined = [
-      ...(home_top || []),
-      ...(home_middle || []),
-      ...(home_bottom || []),
-    ];
-    if (combined.length === 0) return null;
+    const combined = [...(home_top || []), ...(home_middle || []), ...(home_bottom || [])]
+    if (combined.length === 0) return null
 
-    return (
-      <section className="w-full">
-        {renderSwiper(combined, { slides: 1 })}
-      </section>
-    );
+    return <section className="w-full">{renderSwiper(combined, { slides: 1 })}</section>
   }
 
   // Desktop: keep 3-box layout
-  const topHasMany = (home_top?.length ?? 0) > 1;
-  const middleHasMany = (home_middle?.length ?? 0) > 1;
-  const bottomHasMany = (home_bottom?.length ?? 0) > 1;
+  const topHasMany = (home_top?.length ?? 0) > 1
+  const middleHasMany = (home_middle?.length ?? 0) > 1
+  const bottomHasMany = (home_bottom?.length ?? 0) > 1
 
   return (
     <section className="w-full overflow-hidden">
@@ -160,5 +142,5 @@ export default function HomeBanner({
         </div>
       </div>
     </section>
-  );
+  )
 }

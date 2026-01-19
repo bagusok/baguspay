@@ -1,21 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { Link } from "react-router";
-import { apiClient } from "~/utils/axios";
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { Link } from 'react-router'
+import { apiClient } from '~/utils/axios'
 
 export default function HomeProductSections() {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 
   const productSections = useQuery({
-    queryKey: ["product-sections"],
+    queryKey: ['product-sections'],
     queryFn: () =>
       apiClient
-        .get<ProductSectionsResponse>("/home/product-sections")
+        .get<ProductSectionsResponse>('/home/product-sections')
         .then((res) => res.data.data)
         .catch(() => {
-          throw new Error("Failed to fetch product sections");
+          throw new Error('Failed to fetch product sections')
         }),
-  });
+  })
 
   if (productSections.isLoading) {
     return (
@@ -34,54 +34,44 @@ export default function HomeProductSections() {
           ))}
         </div>
       </section>
-    );
+    )
   }
 
   if (productSections.isError) {
     return (
       <section className="mt-10 space-y-2">
-        <h2 className="text-xl font-semibold text-foreground">
-          Product Sections
-        </h2>
+        <h2 className="text-xl font-semibold text-foreground">Product Sections</h2>
         <div className="rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           Error loading product sections
         </div>
       </section>
-    );
+    )
   }
 
-  const sections = productSections.data ?? [];
+  const sections = productSections.data ?? []
 
   const toggleSection = (key: string) => {
-    setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+    setExpanded((prev) => ({ ...prev, [key]: !prev[key] }))
+  }
 
-  const VISIBLE_LIMIT = 16;
+  const VISIBLE_LIMIT = 16
 
   return (
     <div className="mt-10 space-y-12">
       {sections.map((section) => {
-        const sectionKey = `${section.name}-${section.order}`;
-        const isExpanded = Boolean(expanded[sectionKey]);
-        const total = section.product_categories.length;
-        const visibleCount = isExpanded
-          ? total
-          : Math.min(VISIBLE_LIMIT, total);
-        const toRender = section.product_categories.slice(0, visibleCount);
+        const sectionKey = `${section.name}-${section.order}`
+        const isExpanded = Boolean(expanded[sectionKey])
+        const total = section.product_categories.length
+        const visibleCount = isExpanded ? total : Math.min(VISIBLE_LIMIT, total)
+        const toRender = section.product_categories.slice(0, visibleCount)
 
         return (
           <section key={sectionKey} className="mt-4 space-y-3">
-            <h2 className="text-xl font-semibold text-foreground capitalize">
-              {section.name}
-            </h2>
+            <h2 className="text-xl font-semibold text-foreground capitalize">{section.name}</h2>
 
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-8 mt-6">
               {toRender.map((item) => (
-                <Link
-                  key={item.id}
-                  to={`/order/${item.slug}`}
-                  className="h-full group"
-                >
+                <Link key={item.id} to={`/order/${item.slug}`} className="h-full group">
                   <div className="overflow-hidden rounded-xl h-full flex flex-col relative transform transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-2xl group-hover:-translate-y-2">
                     <div className="overflow-hidden relative">
                       <img
@@ -131,9 +121,7 @@ export default function HomeProductSections() {
                   className="inline-flex items-center gap-2 rounded-full border border-primary bg-primary/5 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
                 >
                   <span>Tampilkan lebih banyak</span>
-                  <span className="text-xs text-primary/80">
-                    ({total - visibleCount} lainnya)
-                  </span>
+                  <span className="text-xs text-primary/80">({total - visibleCount} lainnya)</span>
                 </button>
               </div>
             ) : total > VISIBLE_LIMIT ? (
@@ -148,38 +136,38 @@ export default function HomeProductSections() {
               </div>
             ) : null}
           </section>
-        );
+        )
       })}
     </div>
-  );
+  )
 }
 
 export interface ProductSectionsResponse {
-  success: boolean;
-  message: string;
-  data: ProductSection[];
+  success: boolean
+  message: string
+  data: ProductSection[]
 }
 
 export interface ProductSection {
-  name: string;
-  image_url: string;
-  order: number;
-  is_featured: boolean;
-  label: string;
-  product_categories: ProductCategory[];
+  name: string
+  image_url: string
+  order: number
+  is_featured: boolean
+  label: string
+  product_categories: ProductCategory[]
 }
 
 export interface ProductCategory {
-  id: string;
-  name: string;
-  sub_name?: string;
-  slug: string;
-  image_url: string;
-  icon_url?: string;
-  is_featured: boolean;
-  is_available: boolean;
-  label?: string;
-  publisher: string;
-  tags1: any[];
-  tags2: any[];
+  id: string
+  name: string
+  sub_name?: string
+  slug: string
+  image_url: string
+  icon_url?: string
+  is_featured: boolean
+  is_available: boolean
+  label?: string
+  publisher: string
+  tags1: any[]
+  tags2: any[]
 }

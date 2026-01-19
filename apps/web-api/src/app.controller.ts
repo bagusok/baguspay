@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Body, Controller, Get, Post } from '@nestjs/common'
+import { AppService } from './app.service'
 
 @Controller()
 export class AppController {
@@ -7,12 +7,12 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    return this.appService.getHello();
+    return this.appService.getHello()
   }
 
   @Post()
   postHello(@Body() body: { message?: string }): string {
-    console.log('Received body:', body);
-    return 'Hello from POST request!';
+    console.log('Received body:', body)
+    return 'Hello from POST request!'
   }
 }

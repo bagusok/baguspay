@@ -1,29 +1,29 @@
-import { Suspense, useId } from "react";
-import { Await, Link, redirect, useLoaderData } from "react-router";
-import HomeBanner from "~/components/home/banner";
-import FastMenu from "~/components/home/fast-menu";
-import HomeProductSections from "~/components/home/product-sections";
-import { apiClient } from "~/utils/axios";
-import type { Route } from "./+types";
+import { Suspense, useId } from 'react'
+import { Await, Link, redirect, useLoaderData } from 'react-router'
+import HomeBanner from '~/components/home/banner'
+import FastMenu from '~/components/home/fast-menu'
+import HomeProductSections from '~/components/home/product-sections'
+import { apiClient } from '~/utils/axios'
+import type { Route } from './+types'
 
 export async function loader({}: Route.LoaderArgs) {
   try {
-    const response = await apiClient.get("/home/products");
+    const response = await apiClient.get('/home/products')
 
-    const banners = apiClient.get("/home/banners");
+    const banners = apiClient.get('/home/banners')
 
     return {
       data: response.data?.data,
       banners: banners,
-    };
+    }
   } catch (error) {
-    return redirect("/error");
+    return redirect('/error')
   }
 }
 
 export default function Index({ loaderData }: Route.ComponentProps) {
-  const { data, banners } = useLoaderData();
-  const id = useId();
+  const { data, banners } = useLoaderData()
+  const id = useId()
 
   return (
     <>
@@ -43,9 +43,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
         <HomeProductSections />
         {data?.map((category: any) => (
           <section key={id} className="mt-14">
-            <h2 className="text-xl font-semibold text-foreground capitalize">
-              {category.type}
-            </h2>
+            <h2 className="text-xl font-semibold text-foreground capitalize">{category.type}</h2>
             <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-8 mt-6">
               {category.items.map((item: any) => (
                 <Link to={`/order/${item.slug}`} className="h-full group">
@@ -53,7 +51,7 @@ export default function Index({ loaderData }: Route.ComponentProps) {
                     <div className="overflow-hidden relative">
                       <img
                         src={
-                          item.image_url.startsWith("http")
+                          item.image_url.startsWith('http')
                             ? item.image_url
                             : `https://is3.cloudhost.id/bagusok${item.image_url}`
                         }
@@ -97,5 +95,5 @@ export default function Index({ loaderData }: Route.ComponentProps) {
         ))}
       </div>
     </>
-  );
+  )
 }

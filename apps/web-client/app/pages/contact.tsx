@@ -1,6 +1,6 @@
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
+import { Button } from '@repo/ui/components/ui/button'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
 import {
   Facebook,
   HelpCircle,
@@ -9,46 +9,44 @@ import {
   MessageCircle,
   MessageSquare,
   Send,
-} from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { Link } from "react-router";
+} from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { Link } from 'react-router'
 
 export default function Contact() {
-  const SUPPORT_EMAIL = "hunagus433@gmail.com"; // TODO: ganti dengan email resmi
-  const WHATSAPP_URL = "https://wa.me/6282122504669"; // TODO: ganti dengan nomor WA resmi
-  const TELEGRAM_URL = "https://t.me/baguspay"; // TODO: ganti dengan username Telegram resmi
-  const INSTAGRAM_URL = "https://instagram.com/baguspay"; // TODO: ganti dengan username Instagram resmi
-  const FACEBOOK_URL = "https://facebook.com/baguspay"; // TODO: ganti dengan halaman Facebook resmi
+  const SUPPORT_EMAIL = 'hunagus433@gmail.com' // TODO: ganti dengan email resmi
+  const WHATSAPP_URL = 'https://wa.me/6282122504669' // TODO: ganti dengan nomor WA resmi
+  const TELEGRAM_URL = 'https://t.me/baguspay' // TODO: ganti dengan username Telegram resmi
+  const INSTAGRAM_URL = 'https://instagram.com/baguspay' // TODO: ganti dengan username Instagram resmi
+  const FACEBOOK_URL = 'https://facebook.com/baguspay' // TODO: ganti dengan halaman Facebook resmi
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!name || !email || !subject || !message) {
-      toast.error("Lengkapi semua field terlebih dahulu.");
-      return;
+      toast.error('Lengkapi semua field terlebih dahulu.')
+      return
     }
-    setLoading(true);
+    setLoading(true)
     const body = `Halo Baguspay,%0D%0A%0D%0A${encodeURIComponent(
       message,
     )}%0D%0A%0D%0A--%0D%0ANama: ${encodeURIComponent(
       name,
-    )}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0ADikirim dari halaman Kontak`;
-    const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${body}`;
+    )}%0D%0AEmail: ${encodeURIComponent(email)}%0D%0ADikirim dari halaman Kontak`
+    const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${body}`
     // Buka aplikasi email default
-    window.location.href = mailto;
+    window.location.href = mailto
     // Reset form state ringan
     setTimeout(() => {
-      setLoading(false);
-    }, 300);
-  };
+      setLoading(false)
+    }, 300)
+  }
 
   return (
     <div className="md:max-w-7xl mx-auto">
@@ -63,9 +61,8 @@ export default function Contact() {
             Kontak Kami
           </h1>
           <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground max-w-3xl">
-            Ada pertanyaan, kendala transaksi, atau ingin kerja sama? Kirimkan
-            pesan melalui formulir di bawah atau pilih opsi bantuan yang
-            tersedia.
+            Ada pertanyaan, kendala transaksi, atau ingin kerja sama? Kirimkan pesan melalui
+            formulir di bawah atau pilih opsi bantuan yang tersedia.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             <Link
@@ -101,9 +98,7 @@ export default function Contact() {
 
       {/* Other channels */}
       <section className="mt-6 md:mt-10 rounded-2xl border border-border bg-background p-5 md:p-6">
-        <h2 className="text-base md:text-lg font-semibold text-foreground">
-          Opsi Kontak Lain
-        </h2>
+        <h2 className="text-base md:text-lg font-semibold text-foreground">Opsi Kontak Lain</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Pilih kanal yang paling nyaman untuk Anda.
         </p>
@@ -142,24 +137,18 @@ export default function Contact() {
           </a>
         </div>
         <div className="mt-4 text-xs text-muted-foreground">
-          Catatan: Link di atas menggunakan akun/nomor contoh. Mohon sesuaikan
-          dengan akun resmi.
+          Catatan: Link di atas menggunakan akun/nomor contoh. Mohon sesuaikan dengan akun resmi.
         </div>
       </section>
 
       {/* Contact form */}
       <section className="mt-12 rounded-2xl border border-border bg-card/50 p-6 md:p-8">
-        <h2 className="text-lg md:text-xl font-semibold text-foreground">
-          Form Kontak
-        </h2>
+        <h2 className="text-lg md:text-xl font-semibold text-foreground">Form Kontak</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Kami biasanya merespons dalam beberapa jam pada hari kerja.
         </p>
 
-        <form
-          className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"
-          onSubmit={handleSubmit}
-        >
+        <form className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="name">Nama Lengkap</Label>
             <Input
@@ -207,32 +196,21 @@ export default function Contact() {
           </div>
 
           <div className="md:col-span-2 flex items-center justify-end gap-3">
-            <Link
-              to="/"
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
               Batalkan
             </Link>
             <Button type="submit" disabled={loading}>
               <Send className="mr-2 size-4" />
-              {loading ? "Mengirim..." : "Kirim Pesan"}
+              {loading ? 'Mengirim...' : 'Kirim Pesan'}
             </Button>
           </div>
         </form>
       </section>
     </div>
-  );
+  )
 }
 
-function QuickCard({
-  icon,
-  title,
-  desc,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-}) {
+function QuickCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
       <div className="flex items-start gap-3">
@@ -245,5 +223,5 @@ function QuickCard({
         </div>
       </div>
     </div>
-  );
+  )
 }

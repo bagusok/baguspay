@@ -8,7 +8,7 @@ import {
 } from '#validators/file_manager'
 import { HttpContext } from '@adonisjs/core/http'
 import drive from '@adonisjs/drive/services/main'
-import { db, desc, eq } from '@repo/db'
+import { count, db, desc, eq } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import crypto from 'node:crypto'
@@ -132,8 +132,20 @@ export default class FileManagersController {
         limit,
       })
 
+      const [fCount] = await db
+        .select({
+          count: count(tb.fileManager.id),
+        })
+        .from(tb.fileManager)
+
       return ctx.response.json({
         data: files,
+        pagination: {
+          page,
+          limit,
+          total: Number(fCount.count),
+          totalPages: Math.ceil(Number(fCount.count) / limit),
+        },
       })
     } catch (error) {
       console.error('File list error:', error)

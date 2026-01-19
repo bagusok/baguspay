@@ -1,16 +1,8 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Headers,
-  Ip,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiHeader } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { LoginDto, RegisterDto } from './auth.dto';
-import { AuthService } from './auth.service';
+import { BadRequestException, Body, Controller, Headers, Ip, Post, UseGuards } from '@nestjs/common'
+import { ApiHeader } from '@nestjs/swagger'
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
+import { LoginDto, RegisterDto } from './auth.dto'
+import { AuthService } from './auth.service'
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +10,7 @@ export class AuthController {
 
   @Post('/register')
   async getUsers(@Body() body: RegisterDto) {
-    return this.authService.register(body);
+    return this.authService.register(body)
   }
 
   @ApiHeader({
@@ -52,19 +44,19 @@ export class AuthController {
     @Ip() ip: string,
   ) {
     if (!ip || !userAgent || !deviceId) {
-      throw new BadRequestException('Missing required headers');
+      throw new BadRequestException('Missing required headers')
     }
 
     return this.authService.login(body, {
       deviceId,
       ip,
       userAgent: userAgent,
-    });
+    })
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('/logout')
   async logout(@Headers('Authorization') accessToken: string) {
-    return this.authService.logout(accessToken.split(' ')[1]);
+    return this.authService.logout(accessToken.split(' ')[1])
   }
 }

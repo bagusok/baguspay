@@ -1,118 +1,103 @@
-import { enumToPgEnum } from "@/utils";
-import { pgEnum } from "drizzle-orm/pg-core";
+import { enumToPgEnum } from '@/utils'
+import { pgEnum } from 'drizzle-orm/pg-core'
 
 export enum UserRole {
-  ADMIN = "admin",
-  USER = "user",
-  GUEST = "guest",
+  ADMIN = 'admin',
+  USER = 'user',
+  GUEST = 'guest',
 }
 
 export enum UserRegisteredType {
-  GOOGLE = "google",
-  FACEBOOK = "facebook",
-  GITHUB = "github",
-  LOCAL = "local",
+  GOOGLE = 'google',
+  FACEBOOK = 'facebook',
+  GITHUB = 'github',
+  LOCAL = 'local',
 }
-export const userRoleEnum = pgEnum("user_role", enumToPgEnum(UserRole));
+export const userRoleEnum = pgEnum('user_role', enumToPgEnum(UserRole))
 export const userRegisteredTypeEnum = pgEnum(
-  "user_registered_type",
+  'user_registered_type',
   enumToPgEnum(UserRegisteredType),
-);
+)
 
 export enum BalanceMutationType {
-  CREDIT = "credit",
-  DEBIT = "debit",
+  CREDIT = 'credit',
+  DEBIT = 'debit',
 }
 
 export enum BalanceMutationRefType {
-  ORDER = "order",
-  DEPOSIT = "deposit",
-  WITHDRAWAL = "withdrawal",
-  OTHER = "other",
+  ORDER = 'order',
+  DEPOSIT = 'deposit',
+  WITHDRAWAL = 'withdrawal',
+  OTHER = 'other',
 }
 
 export const balanceMutationTypeEnum = pgEnum(
-  "balance_mutation_type",
+  'balance_mutation_type',
   enumToPgEnum(BalanceMutationType),
-);
+)
 
 export const balanceMutationRefTypeEnum = pgEnum(
-  "balance_mutation_ref_type",
+  'balance_mutation_ref_type',
   enumToPgEnum(BalanceMutationRefType),
-);
+)
 
 export enum DepositStatus {
-  PENDING = "pending",
-  COMPLETED = "completed",
-  FAILED = "failed",
-  CANCELED = "cancelled",
-  EXPIRED = "expired",
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+  CANCELED = 'cancelled',
+  EXPIRED = 'expired',
 }
 
-export const depositStatusEnum = pgEnum(
-  "deposit_status",
-  enumToPgEnum(DepositStatus),
-);
+export const depositStatusEnum = pgEnum('deposit_status', enumToPgEnum(DepositStatus))
 
 export enum InputFieldType {
-  TEXT = "text",
-  NUMBER = "number",
-  EMAIL = "email",
-  PASSWORD = "password",
-  SELECT = "select",
-  RADIO = "radio",
-  CHECKBOX = "checkbox",
-  TEXTAREA = "textarea",
+  TEXT = 'text',
+  NUMBER = 'number',
+  EMAIL = 'email',
+  PASSWORD = 'password',
+  SELECT = 'select',
+  RADIO = 'radio',
+  CHECKBOX = 'checkbox',
+  TEXTAREA = 'textarea',
 }
 
 export type InputFieldOption = {
-  label: string;
-  value: string;
-  value_checker_mapping: string;
-};
+  label: string
+  value: string
+  value_checker_mapping: string
+}
 
-export const inputFieldTypeEnum = pgEnum(
-  "input_field_type",
-  enumToPgEnum(InputFieldType),
-);
+export const inputFieldTypeEnum = pgEnum('input_field_type', enumToPgEnum(InputFieldType))
 
 export enum PaymentStatus {
-  PENDING = "pending",
-  SUCCESS = "success",
-  FAILED = "failed",
-  EXPIRED = "expired",
-  CANCELLED = "cancelled",
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  FAILED = 'failed',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
 }
 
 export enum OrderStatus {
-  NONE = "none",
-  PENDING = "pending",
-  COMPLETED = "completed",
-  CANCELLED = "cancelled",
-  FAILED = "failed",
+  NONE = 'none',
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  FAILED = 'failed',
 }
 
 export enum RefundStatus {
-  NONE = "none",
-  PROCESSING = "processing",
-  COMPLETED = "completed",
-  FAILED = "failed",
+  NONE = 'none',
+  PROCESSING = 'processing',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
 }
 
-export const paymentStatusEnum = pgEnum(
-  "payment_status",
-  enumToPgEnum(PaymentStatus),
-);
+export const paymentStatusEnum = pgEnum('payment_status', enumToPgEnum(PaymentStatus))
 
-export const orderStatusEnum = pgEnum(
-  "order_status",
-  enumToPgEnum(OrderStatus),
-);
+export const orderStatusEnum = pgEnum('order_status', enumToPgEnum(OrderStatus))
 
-export const refundStatusEnum = pgEnum(
-  "refund_status",
-  enumToPgEnum(RefundStatus),
-);
+export const refundStatusEnum = pgEnum('refund_status', enumToPgEnum(RefundStatus))
 
 // src/database/enums/inquiry-status.enum.ts
 
@@ -122,249 +107,231 @@ export enum InquiryStatus {
    * Biasanya setelah user memilih produk dan input data pelanggan,
    * tapi belum dikonfirmasi atau dibayar.
    */
-  AWAIT_CONFIRMATION = "AWAIT_CONFIRMATION",
+  AWAIT_CONFIRMATION = 'AWAIT_CONFIRMATION',
 
   /**
    * Inquiry sudah dikonfirmasi user dan siap dilanjutkan ke order
    * Biasanya untuk produk postpaid (setelah user lihat nominal tagihan).
    */
-  CONFIRMED = "CONFIRMED",
+  CONFIRMED = 'CONFIRMED',
 
   /**
    * Inquiry sudah diproses jadi order.
    * Biasanya setelah user checkout, sistem membuat order dari inquiry ini.
    */
-  USED = "USED",
+  USED = 'USED',
 
   /**
    * Inquiry kedaluwarsa (melebihi expired_at).
    * Biasanya otomatis dihapus oleh cron job kalau belum digunakan.
    */
-  EXPIRED = "EXPIRED",
+  EXPIRED = 'EXPIRED',
 
   /**
    * Inquiry gagal saat komunikasi dengan provider (misal provider down / invalid data).
    */
-  FAILED = "FAILED",
+  FAILED = 'FAILED',
 
   /**
    * Inquiry dibatalkan oleh user secara manual.
    */
-  CANCELED = "CANCELED",
+  CANCELED = 'CANCELED',
 }
-export const inquiryStatusEnum = pgEnum(
-  "inquiry_status",
-  enumToPgEnum(InquiryStatus),
-);
+export const inquiryStatusEnum = pgEnum('inquiry_status', enumToPgEnum(InquiryStatus))
 export enum PaymentMethodFeeType {
-  MERCHANT = "merchant",
-  BUYER = "buyer",
-  BOTH = "both",
+  MERCHANT = 'merchant',
+  BUYER = 'buyer',
+  BOTH = 'both',
 }
 
 export enum PaymentMethodProvider {
-  TRIPAY = "tripay",
-  FLIPBUSINESS = "flipbusiness",
-  DOKU = "doku",
-  XENDIT = "xendit",
-  MIDTRANS = "midtrans",
-  IPAYMU = "ipaymu",
-  DUITKU = "duitku",
-  BALANCE = "balance",
-  MANUAL = "manual",
+  TRIPAY = 'tripay',
+  FLIPBUSINESS = 'flipbusiness',
+  DOKU = 'doku',
+  XENDIT = 'xendit',
+  MIDTRANS = 'midtrans',
+  IPAYMU = 'ipaymu',
+  DUITKU = 'duitku',
+  BALANCE = 'balance',
+  MANUAL = 'manual',
 }
 
 export enum PaymentMethodType {
-  BANK_TRANSFER = "bank_transfer",
-  VIRTUAL_ACCOUNT = "virtual_account",
-  RETAIL = "retail",
-  QR_CODE = "qr_code",
-  E_WALLET = "e_wallet",
-  CREDIT_CARD = "credit_card",
-  VOUCHER = "voucher",
-  BALANCE = "balance",
-  LINK_PAYMENT = "link_payment",
-  MANUAL = "manual",
+  BANK_TRANSFER = 'bank_transfer',
+  VIRTUAL_ACCOUNT = 'virtual_account',
+  RETAIL = 'retail',
+  QR_CODE = 'qr_code',
+  E_WALLET = 'e_wallet',
+  CREDIT_CARD = 'credit_card',
+  VOUCHER = 'voucher',
+  BALANCE = 'balance',
+  LINK_PAYMENT = 'link_payment',
+  MANUAL = 'manual',
 }
 
 export enum PaymentMethodAllowAccess {
-  DEPOSIT = "deposit",
-  ORDER = "order",
+  DEPOSIT = 'deposit',
+  ORDER = 'order',
 }
 
 export const paymentMethodFeeTypeEnum = pgEnum(
-  "payment_method_fee_type",
+  'payment_method_fee_type',
   enumToPgEnum(PaymentMethodFeeType),
-);
+)
 
 export const paymentMethodProviderEnum = pgEnum(
-  "payment_method_provider",
+  'payment_method_provider',
   enumToPgEnum(PaymentMethodProvider),
-);
+)
 
-export const paymentMethodTypeEnum = pgEnum(
-  "payment_method_type",
-  enumToPgEnum(PaymentMethodType),
-);
+export const paymentMethodTypeEnum = pgEnum('payment_method_type', enumToPgEnum(PaymentMethodType))
 
 export const paymentMethodAllowAccessEnum = pgEnum(
-  "payment_method_allow_access",
+  'payment_method_allow_access',
   enumToPgEnum(PaymentMethodAllowAccess),
-);
+)
 
 export enum LoginIsFrom {
-  WEB = "web",
-  MOBILE = "mobile",
-  DESKTOP = "desktop",
+  WEB = 'web',
+  MOBILE = 'mobile',
+  DESKTOP = 'desktop',
 }
 
-export const loginIsFromEnum = pgEnum(
-  "login_is_from",
-  enumToPgEnum(LoginIsFrom),
-);
+export const loginIsFromEnum = pgEnum('login_is_from', enumToPgEnum(LoginIsFrom))
 
 export enum ProductCategoryType {
-  GAME = "game",
-  VOUCHER = "voucher",
-  AKTIVASI_PERDANA = "aktivasi_perdana",
-  AKTIVASI_VOUCHER = "aktivasi_voucher",
+  GAME = 'game',
+  VOUCHER = 'voucher',
+  AKTIVASI_PERDANA = 'aktivasi_perdana',
+  AKTIVASI_VOUCHER = 'aktivasi_voucher',
 
-  E_MONEY = "e_money",
-  E_WALLET = "e_wallet",
-  E_WALLET_BEBAS_NOMINAL = "e_wallet_bebas_nominal",
+  E_MONEY = 'e_money',
+  E_WALLET = 'e_wallet',
+  E_WALLET_BEBAS_NOMINAL = 'e_wallet_bebas_nominal',
 
-  PULSA = "pulsa",
-  KUOTA = "kuota",
-  MASA_AKTIF = "masa_aktif",
-  TELEPON_DAN_SMS = "telepon_dan_sms",
+  PULSA = 'pulsa',
+  KUOTA = 'kuota',
+  MASA_AKTIF = 'masa_aktif',
+  TELEPON_DAN_SMS = 'telepon_dan_sms',
 
-  PLN_PREPAID = "pln_prepaid",
+  PLN_PREPAID = 'pln_prepaid',
 
   // PASCABAYAR
-  PLN_POSTPAID = "pln_postpaid",
-  PLN_NON_TAGLIST = "pln_non_taglist",
-  PDAM = "pdam",
-  PULSA_POSTPAID = "pulsa_postpaid",
-  KUOTA_RECOMENDATION = "kuota_recomendation",
+  PLN_POSTPAID = 'pln_postpaid',
+  PLN_NON_TAGLIST = 'pln_non_taglist',
+  PDAM = 'pdam',
+  PULSA_POSTPAID = 'pulsa_postpaid',
+  KUOTA_RECOMENDATION = 'kuota_recomendation',
 
-  INTERNET_POSTPAID = "internet_postpaid",
-  BPJS_KESEHATAN_POSTPAID = "bpjs_keuangan_postpaid",
-  BPJS_KETENAGAKERJAAN_POSTPAID = "bpjs_ketenagakerjaan_postpaid",
-  MULTIFINANC_POSTPAID = "multifinanc_postpaid",
-  PBB_POSTPAID = "pbb_postpaid",
-  GAS_POSTPAID = "gas_postpaid",
-  INSURANCE_POSTPAID = "insurance_postpaid",
+  INTERNET_POSTPAID = 'internet_postpaid',
+  BPJS_KESEHATAN_POSTPAID = 'bpjs_keuangan_postpaid',
+  BPJS_KETENAGAKERJAAN_POSTPAID = 'bpjs_ketenagakerjaan_postpaid',
+  MULTIFINANC_POSTPAID = 'multifinanc_postpaid',
+  PBB_POSTPAID = 'pbb_postpaid',
+  GAS_POSTPAID = 'gas_postpaid',
+  INSURANCE_POSTPAID = 'insurance_postpaid',
 
-  ENTERTAINMENT = "entertainment",
-  FINANCE = "finance",
-  ECOMMERCE = "ecommerce",
-  TOPUP = "topup",
-  BILLING = "billing",
-  SENDMONEY = "send_money",
+  ENTERTAINMENT = 'entertainment',
+  FINANCE = 'finance',
+  ECOMMERCE = 'ecommerce',
+  TOPUP = 'topup',
+  BILLING = 'billing',
+  SENDMONEY = 'send_money',
 
-  OTHER = "other",
+  OTHER = 'other',
 }
 
 export const productCategoryTypeEnum = pgEnum(
-  "product_category_type",
+  'product_category_type',
   enumToPgEnum(ProductCategoryType),
-);
+)
 
 export enum ProductProvider {
-  DIGIFLAZZ = "digiflazz",
-  MOOGOLD = "moogold",
-  ATLANTICH2H = "atlantich2h",
-  VIPRESELLER = "vipreseller",
-  VOCAGAME = "vocagame",
+  DIGIFLAZZ = 'digiflazz',
+  MOOGOLD = 'moogold',
+  ATLANTICH2H = 'atlantich2h',
+  VIPRESELLER = 'vipreseller',
+  VOCAGAME = 'vocagame',
 }
 
 export enum ProductBillingType {
-  PREPAID = "prepaid",
-  POSTPAID = "postpaid",
+  PREPAID = 'prepaid',
+  POSTPAID = 'postpaid',
 }
 
 export enum ProductFullfillmentType {
-  MANUAL_DIRECT = "manual_direct",
-  MANUAL_DIRECT_WITH_VOUCHER = "manual_direct_with_voucher",
-  AUTOMATIC_DIRECT = "automatic_direct",
-  AUTOMATIC_DIRECT_WITH_VOUCHER = "automatic_direct_with_voucher",
+  MANUAL_DIRECT = 'manual_direct',
+  MANUAL_DIRECT_WITH_VOUCHER = 'manual_direct_with_voucher',
+  AUTOMATIC_DIRECT = 'automatic_direct',
+  AUTOMATIC_DIRECT_WITH_VOUCHER = 'automatic_direct_with_voucher',
 }
 
-export const productProviderEnum = pgEnum(
-  "product_provider",
-  enumToPgEnum(ProductProvider),
-);
+export const productProviderEnum = pgEnum('product_provider', enumToPgEnum(ProductProvider))
 
 export const productBillingTypeEnum = pgEnum(
-  "product_billing_type",
+  'product_billing_type',
   enumToPgEnum(ProductBillingType),
-);
+)
 
 export const productFullfillmentTypeEnum = pgEnum(
-  "product_fullfillment_type",
+  'product_fullfillment_type',
   enumToPgEnum(ProductFullfillmentType),
-);
+)
 
 export enum OfferType {
-  DISCOUNT = "discount",
-  FLASH_SALE = "flash_sale",
-  CASHBACK = "cashback",
-  VOUCHER = "voucher",
+  DISCOUNT = 'discount',
+  FLASH_SALE = 'flash_sale',
+  CASHBACK = 'cashback',
+  VOUCHER = 'voucher',
 }
 
-export const offerTypeEnum = pgEnum("offer_type", enumToPgEnum(OfferType));
+export const offerTypeEnum = pgEnum('offer_type', enumToPgEnum(OfferType))
 
 export enum AppPlatform {
-  WEB = "web",
-  APP = "app",
+  WEB = 'web',
+  APP = 'app',
 }
 
-export const appPlatformEnum = pgEnum(
-  "app_platform",
-  enumToPgEnum(AppPlatform),
-);
+export const appPlatformEnum = pgEnum('app_platform', enumToPgEnum(AppPlatform))
 
 export enum ProductGroupingType {
-  REDIRECT = "redirect",
-  MODAL = "modal",
-  CATEGORY = "category",
+  REDIRECT = 'redirect',
+  MODAL = 'modal',
+  CATEGORY = 'category',
 }
 
 export const productGroupingTypeEnum = pgEnum(
-  "product_grouping_type",
+  'product_grouping_type',
   enumToPgEnum(ProductGroupingType),
-);
+)
 
 export enum ProductGroupingMenuType {
-  HOME_MENU = "home_menu",
-  FAST_MENU = "fast_menu",
-  CATEGORY_MENU = "category_menu",
-  OTHER_MENU = "other_menu",
+  HOME_MENU = 'home_menu',
+  FAST_MENU = 'fast_menu',
+  CATEGORY_MENU = 'category_menu',
+  OTHER_MENU = 'other_menu',
 }
 
 export const productGroupingMenuTypeEnum = pgEnum(
-  "product_grouping_menu_type",
+  'product_grouping_menu_type',
   enumToPgEnum(ProductGroupingMenuType),
-);
+)
 
 export enum BannerLocation {
-  HOME_TOP = "home_top",
-  HOME_MIDDLE = "home_middle",
-  HOME_BOTTOM = "home_bottom",
-  CATEGORY_TOP = "category_top",
-  CATEGORY_MIDDLE = "category_middle",
-  CATEGORY_BOTTOM = "category_bottom",
-  PRODUCT_TOP = "product_top",
-  PRODUCT_MIDDLE = "product_middle",
-  PRODUCT_BOTTOM = "product_bottom",
+  HOME_TOP = 'home_top',
+  HOME_MIDDLE = 'home_middle',
+  HOME_BOTTOM = 'home_bottom',
+  CATEGORY_TOP = 'category_top',
+  CATEGORY_MIDDLE = 'category_middle',
+  CATEGORY_BOTTOM = 'category_bottom',
+  PRODUCT_TOP = 'product_top',
+  PRODUCT_MIDDLE = 'product_middle',
+  PRODUCT_BOTTOM = 'product_bottom',
 }
 
-export const bannerLocationEnum = pgEnum(
-  "banner_location",
-  enumToPgEnum(BannerLocation),
-);
+export const bannerLocationEnum = pgEnum('banner_location', enumToPgEnum(BannerLocation))
 
 export type OfferAppliedOnInquiry = {
-  id: string;
-  type: OfferType;
-};
+  id: string
+  type: OfferType
+}

@@ -4,10 +4,10 @@ import {
   ValidationOptions,
   registerDecorator,
   ValidationArguments,
-} from 'class-validator';
-import { ClassConstructor } from 'class-transformer';
+} from 'class-validator'
+import { ClassConstructor } from 'class-transformer'
 
-type Tfn<T> = (o: T) => any;
+type Tfn<T> = (o: T) => any
 
 export const Match = <T>(
   type: ClassConstructor<T>,
@@ -21,14 +21,14 @@ export const Match = <T>(
       options: validationOptions,
       constraints: [property],
       validator: MatchConstraint<T>,
-    });
-  };
-};
+    })
+  }
+}
 
 @ValidatorConstraint({ name: 'Match' })
 export class MatchConstraint<T> implements ValidatorConstraintInterface {
   validate(value: any, args: ValidationArguments) {
-    const [fn] = args.constraints as Tfn<T>[];
-    return fn(args.object as T) === value;
+    const [fn] = args.constraints as Tfn<T>[]
+    return fn(args.object as T) === value
   }
 }

@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { and, asc, eq, gte, lte, ne, or } from '@repo/db';
-import { OfferType, tb } from '@repo/db/types';
-import { SendResponse } from 'src/common/utils/response';
-import { DatabaseService } from 'src/database/database.service';
-import { StorageService } from 'src/storage/storage.service';
+
+import { Injectable, NotFoundException } from '@nestjs/common'
+import { and, asc, eq, gte, lte, ne, or } from '@repo/db'
+import { OfferType, tb } from '@repo/db/types'
+import { SendResponse } from 'src/common/utils/response'
+import { DatabaseService } from 'src/database/database.service'
+import { StorageService } from 'src/storage/storage.service'
 
 @Injectable()
 export class ProductCategoriesService {
@@ -15,52 +17,48 @@ export class ProductCategoriesService {
   ) {}
 
   async getAllCategories() {
-    let categories =
-      await this.databaseService.db.query.productCategories.findMany({
-        where: eq(tb.productCategories.is_available, true),
-        orderBy: asc(tb.productCategories.name),
-      });
+    let categories = await this.databaseService.db.query.productCategories.findMany({
+      where: eq(tb.productCategories.is_available, true),
+      orderBy: asc(tb.productCategories.name),
+    })
 
     categories = categories.map((category) => ({
       ...category,
       image_url: this.storageService.getFileUrl(category.image_url),
       banner_url: this.storageService.getFileUrl(category.banner_url),
       icon_url: this.storageService.getFileUrl(category.icon_url),
-    }));
+    }))
 
     return {
       success: true,
       data: categories,
-    };
+    }
   }
 
   async getCategoryById(id: string): Promise<{ success: boolean; data: any }> {
-    const category =
-      await this.databaseService.db.query.productCategories.findFirst({
-        where: eq(tb.productCategories.id, id),
-        with: {
-          input_on_product_category: {
-            with: {
-              input_field: true,
-            },
-          },
-          product_sub_categories: {
-            with: {
-              products: true,
-            },
+    const category = await this.databaseService.db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, id),
+      with: {
+        input_on_product_category: {
+          with: {
+            input_field: true,
           },
         },
-      });
+        product_sub_categories: {
+          with: {
+            products: true,
+          },
+        },
+      },
+    })
 
     if (!category) {
-      throw new NotFoundException(`Category with ID ${id} not found`);
+      throw new NotFoundException(`Category with ID ${id} not found`)
     }
 
-    const inputFields = category.input_on_product_category.map(
-      (input) => input.input_field,
-    );
+    const inputFields = category.input_on_product_category.map((input) => input.input_field)
 
-    delete category.input_on_product_category;
+    delete category.input_on_product_category
 
     return {
       success: true,
@@ -71,7 +69,7 @@ export class ProductCategoriesService {
         icon_url: this.storageService.getFileUrl(category.icon_url),
         input_fields: inputFields,
       },
-    };
+    }
   }
 
   // async getBySlug(slug: string): Promise<{ success: boolean; data: any }> {
@@ -391,87 +389,91 @@ export class ProductCategoriesService {
   // }
 
   async getBySlug(slug: string): Promise<{ success: boolean; data: any }> {
-    const category =
-      await this.databaseService.db.query.productCategories.findFirst({
-        where: eq(tb.productCategories.slug, slug),
-        columns: {
-          id: true,
-          name: true,
-          slug: true,
-          delivery_type: true,
-          description: true,
-          image_url: true,
-          is_featured: true,
-          is_available: true,
-          label: true,
-          banner_url: true,
-          publisher: true,
-          is_seo_enabled: true,
-          seo_title: true,
-          seo_description: true,
-          seo_image: true,
-          sub_name: true,
-        },
-        with: {
-          input_on_product_category: {
-            with: {
-              input_field: {
-                columns: {
-                  name: true,
-                  type: true,
-                  options: true,
-                  placeholder: true,
-                  is_required: true,
-                  title: true,
-                },
-              },
-            },
-          },
-          product_sub_categories: {
-            columns: {
-              name: true,
-              sub_name: true,
-              image_url: true,
-              is_featured: true,
-              is_available: true,
-              label: true,
-            },
-            with: {
-              products: {
-                columns: {
-                  id: true,
-                  name: true,
-                  image_url: true,
-                  price: true,
-                  is_available: true,
-                  is_featured: true,
-                  notes: true,
-                  stock: true,
-                  billing_type: true,
-                  cut_off_start: true,
-                  cut_off_end: true,
-                  description: true,
-                  label_text: true,
-                  sku_code: true,
-                  sub_name: true,
-                  label_image: true,
-                },
-                orderBy: asc(tb.products.price), // ✅ sudah ASC
+    const category = await this.databaseService.db.query.productCategories.findFirst({
+      where: and(
+        eq(tb.productCategories.slug, slug),
+        eq(tb.productCategories.is_special_feature, false),
+      ),
+      columns: {
+        id: true,
+        name: true,
+        slug: true,
+        delivery_type: true,
+        description: true,
+        image_url: true,
+        icon_url: true,
+        banner_url: true,
+        is_featured: true,
+        is_available: true,
+        label: true,
+        publisher: true,
+        is_seo_enabled: true,
+        seo_title: true,
+        seo_description: true,
+        seo_image: true,
+        sub_name: true,
+        product_billing_type: true,
+        tags1: true,
+        tags2: true,
+        type: true,
+      },
+      with: {
+        input_on_product_category: {
+          with: {
+            input_field: {
+              columns: {
+                name: true,
+                type: true,
+                options: true,
+                placeholder: true,
+                is_required: true,
+                title: true,
               },
             },
           },
         },
-      });
+        product_sub_categories: {
+          columns: {
+            name: true,
+            sub_name: true,
+            image_url: true,
+            is_featured: true,
+            is_available: true,
+            label: true,
+          },
+          with: {
+            products: {
+              columns: {
+                id: true,
+                name: true,
+                image_url: true,
+                price: true,
+                is_available: true,
+                is_featured: true,
+                notes: true,
+                stock: true,
+                cut_off_start: true,
+                cut_off_end: true,
+                description: true,
+                label_text: true,
+                sku_code: true,
+                sub_name: true,
+                label_image: true,
+              },
+              orderBy: asc(tb.products.price), // ✅ sudah ASC
+            },
+          },
+        },
+      },
+    })
 
     if (!category) {
-      throw new NotFoundException(`Category with slug ${slug} not found`);
+      throw new NotFoundException(`Category with slug ${slug} not found`)
     }
 
-    const inputFields = category.input_on_product_category.map(
-      (input) => input.input_field,
-    );
+    const inputFields = category.input_on_product_category.map((input) => input.input_field)
 
-    delete category.input_on_product_category;
+    delete category.input_on_product_category
 
     // Jalankan discount query paralel
     const [categoryDiscounts, globalOffers] = await Promise.all([
@@ -516,20 +518,14 @@ export class ProductCategoriesService {
           },
         })
         .from(tb.offer_products)
-        .innerJoin(
-          tb.products,
-          eq(tb.offer_products.product_id, tb.products.id),
-        )
+        .innerJoin(tb.products, eq(tb.offer_products.product_id, tb.products.id))
         .innerJoin(
           tb.productSubCategories,
           eq(tb.products.product_sub_category_id, tb.productSubCategories.id),
         )
         .innerJoin(
           tb.productCategories,
-          eq(
-            tb.productSubCategories.product_category_id,
-            tb.productCategories.id,
-          ),
+          eq(tb.productSubCategories.product_category_id, tb.productCategories.id),
         )
         .innerJoin(tb.offers, eq(tb.offer_products.offer_id, tb.offers.id))
         .where(
@@ -537,10 +533,7 @@ export class ProductCategoriesService {
             eq(tb.productCategories.id, category.id),
             eq(tb.offers.is_available, true),
             or(
-              and(
-                lte(tb.offers.start_date, new Date()),
-                gte(tb.offers.end_date, new Date()),
-              ),
+              and(lte(tb.offers.start_date, new Date()), gte(tb.offers.end_date, new Date())),
               eq(tb.offers.is_unlimited_date, true),
             ),
             or(eq(tb.offers.is_unlimited_quota, true), gte(tb.offers.quota, 1)),
@@ -578,10 +571,7 @@ export class ProductCategoriesService {
             eq(tb.offers.is_available, true),
             eq(tb.offers.is_all_products, true),
             or(
-              and(
-                lte(tb.offers.start_date, new Date()),
-                gte(tb.offers.end_date, new Date()),
-              ),
+              and(lte(tb.offers.start_date, new Date()), gte(tb.offers.end_date, new Date())),
               eq(tb.offers.is_unlimited_date, true),
             ),
             or(eq(tb.offers.is_unlimited_quota, true), gte(tb.offers.quota, 1)),
@@ -589,131 +579,117 @@ export class ProductCategoriesService {
             ne(tb.offers.type, OfferType.VOUCHER),
           ),
         ),
-    ]);
+    ])
 
-    const globalDiscounts = this.mapGlobalDiscounts(category, globalOffers);
+    const globalDiscounts = this.mapGlobalDiscounts(category, globalOffers)
 
-    const discounts = [...categoryDiscounts, ...globalDiscounts];
+    const discounts = [...categoryDiscounts, ...globalDiscounts]
 
-    const buildDiscounts = category.product_sub_categories.map(
-      (subCategory) => {
-        const products = subCategory.products.map((product) => {
-          // Filter discounts yang berlaku untuk produk ini
-          const productDiscounts = discounts.filter((d) => {
-            // Hanya offer tipe DISCOUNT
-            if (d.offer.type !== OfferType.DISCOUNT) return false;
-            // Jika offer is_all_products, berlaku untuk semua produk
-            if (d.offer.is_all_products) return true;
-            // Jika tidak, cocokkan id produk
-            return d.product.id === product.id;
-          });
+    const buildDiscounts = category.product_sub_categories.map((subCategory) => {
+      const products = subCategory.products.map((product) => {
+        // Filter discounts yang berlaku untuk produk ini
+        const productDiscounts = discounts.filter((d) => {
+          // Hanya offer tipe DISCOUNT
+          if (d.offer.type !== OfferType.DISCOUNT) return false
+          // Jika offer is_all_products, berlaku untuk semua produk
+          if (d.offer.is_all_products) return true
+          // Jika tidak, cocokkan id produk
+          return d.product.id === product.id
+        })
 
-          // Ambil diskon tertinggi
-          let maxDiscount = null;
-          let discountPrice = null;
-          if (productDiscounts.length > 0) {
-            maxDiscount = productDiscounts.reduce((prev, curr) => {
-              // Hitung nilai diskon: static + percentage
-              let prevDiscount =
-                (prev.offer.discount_percentage
-                  ? (product.price * prev.offer.discount_percentage) / 100
-                  : 0) + (prev.offer.discount_static || 0);
-              let currDiscount =
-                (curr.offer.discount_percentage
-                  ? (product.price * curr.offer.discount_percentage) / 100
-                  : 0) + (curr.offer.discount_static || 0);
-              // Batasi dengan discount_maximum jika ada
-              if (prev.offer.discount_maximum)
-                prevDiscount = Math.min(
-                  prevDiscount,
-                  prev.offer.discount_maximum,
-                );
-              if (curr.offer.discount_maximum)
-                currDiscount = Math.min(
-                  currDiscount,
-                  curr.offer.discount_maximum,
-                );
-              return currDiscount > prevDiscount ? curr : prev;
-            }, productDiscounts[0]);
+        // Ambil diskon tertinggi
+        let maxDiscount = null
+        let discountPrice = null
+        if (productDiscounts.length > 0) {
+          maxDiscount = productDiscounts.reduce((prev, curr) => {
+            // Hitung nilai diskon: static + percentage
+            let prevDiscount =
+              (prev.offer.discount_percentage
+                ? (product.price * prev.offer.discount_percentage) / 100
+                : 0) + (prev.offer.discount_static || 0)
+            let currDiscount =
+              (curr.offer.discount_percentage
+                ? (product.price * curr.offer.discount_percentage) / 100
+                : 0) + (curr.offer.discount_static || 0)
+            // Batasi dengan discount_maximum jika ada
+            if (prev.offer.discount_maximum)
+              prevDiscount = Math.min(prevDiscount, prev.offer.discount_maximum)
+            if (curr.offer.discount_maximum)
+              currDiscount = Math.min(currDiscount, curr.offer.discount_maximum)
+            return currDiscount > prevDiscount ? curr : prev
+          }, productDiscounts[0])
 
-            // Hitung harga diskon
-            let discountValue = 0;
-            if (maxDiscount) {
-              discountValue =
-                (maxDiscount.offer.discount_percentage
-                  ? (product.price * maxDiscount.offer.discount_percentage) /
-                    100
-                  : 0) + (maxDiscount.offer.discount_static || 0);
-              if (maxDiscount.offer.discount_maximum) {
-                discountValue = Math.min(
-                  discountValue,
-                  maxDiscount.offer.discount_maximum,
-                );
-              }
+          // Hitung harga diskon
+          let discountValue = 0
+          if (maxDiscount) {
+            discountValue =
+              (maxDiscount.offer.discount_percentage
+                ? (product.price * maxDiscount.offer.discount_percentage) / 100
+                : 0) + (maxDiscount.offer.discount_static || 0)
+            if (maxDiscount.offer.discount_maximum) {
+              discountValue = Math.min(discountValue, maxDiscount.offer.discount_maximum)
             }
-            discountPrice = Math.max(product.price - discountValue, 0);
           }
+          discountPrice = Math.max(product.price - discountValue, 0)
+        }
 
-          // Produk Flash Sale
-
-          return {
-            ...product,
-            discount: discountPrice
-              ? Math.round(product.price - (discountPrice || 0))
-              : 0,
-            total_price: Math.round(discountPrice || product.price),
-            offer: maxDiscount ? maxDiscount.offer : null,
-          };
-        });
+        // Produk Flash Sale
 
         return {
-          ...subCategory,
-          products: products,
-        };
-      },
-    );
+          ...product,
+          image_url: this.storageService.getFileUrl(product.image_url),
+          discount: discountPrice ? Math.round(product.price - (discountPrice || 0)) : 0,
+          total_price: Math.round(discountPrice || product.price),
+          offer: maxDiscount ? maxDiscount.offer : null,
+        }
+      })
 
-    delete category.product_sub_categories;
+      return {
+        ...subCategory,
+        products: products,
+      }
+    })
 
-    const offerFlashSale = categoryDiscounts.filter(
-      (d) => d.offer.type === OfferType.FLASH_SALE,
-    );
+    delete category.product_sub_categories
+
+    const offerFlashSale = categoryDiscounts.filter((d) => d.offer.type === OfferType.FLASH_SALE)
     const buildProductFlashSale = offerFlashSale.map((offer) => {
       let totalDiscount =
-        offer.product.price * (offer.offer.discount_percentage / 100) -
-        offer.offer.discount_static;
+        offer.product.price * (offer.offer.discount_percentage / 100) - offer.offer.discount_static
 
       if (offer.offer.discount_maximum < totalDiscount) {
-        totalDiscount = offer.offer.discount_maximum;
+        totalDiscount = offer.offer.discount_maximum
       }
 
       return {
         ...offer.product,
+        image_url: this.storageService.getFileUrl(offer.product.image_url),
         discount: Math.round(totalDiscount),
         total_price: Math.round(offer.product.price - (totalDiscount || 0)),
         offer: offer.offer,
-      };
-    });
+      }
+    })
 
     return SendResponse.success(
       {
         ...category,
         image_url: this.storageService.getFileUrl(category.image_url),
+        banner_url: this.storageService.getFileUrl(category.banner_url),
         input_fields: inputFields,
         product_sub_categories: buildDiscounts,
         flash_sales: buildProductFlashSale,
       },
       'Category retrieved successfully',
-    );
+    )
   }
 
   private mapGlobalDiscounts(category: any, globalOffers: any[]) {
     const result: Array<{
-      product: any;
-      category: any;
-      sub_category: any;
-      offer: any;
-    }> = [];
+      product: any
+      category: any
+      sub_category: any
+      offer: any
+    }> = []
     category.product_sub_categories.forEach((subCategory: any) => {
       subCategory.products.forEach((product: any) => {
         globalOffers.forEach((gOffer: any) => {
@@ -722,10 +698,10 @@ export class ProductCategoriesService {
             category: { id: category.id, name: category.name },
             sub_category: { id: subCategory.id, name: subCategory.name },
             offer: gOffer.offer,
-          });
-        });
-      });
-    });
-    return result;
+          })
+        })
+      })
+    })
+    return result
   }
 }

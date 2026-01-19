@@ -1,14 +1,18 @@
-import { Module } from '@nestjs/common';
-import { DatabaseModule } from 'src/database/database.module';
-import { DigiflazzModule } from 'src/integrations/h2h/digiflazz/digiflazz.module';
-import { BalanceModule } from 'src/integrations/payment-gateway/balance/balance.module';
-import { DuitkuModule } from 'src/integrations/payment-gateway/duitku/duitku.module';
-import { TripayModule } from 'src/integrations/payment-gateway/tripay/tripay.module';
-import { QueueModule } from 'src/queue/queue.module';
-import { CallbackController } from './callback.controller';
-import { CallbackService } from './callback.service';
-import { DepositCallbackService } from './deposit.callback.service';
-import { PaymentCallbackService } from './payment.callback.service';
+import { Module } from '@nestjs/common'
+import { DatabaseModule } from 'src/database/database.module'
+import { DepositModule } from 'src/deposit/deposit.module'
+import { DigiflazzModule } from 'src/integrations/h2h/digiflazz/digiflazz.module'
+import { BalanceModule } from 'src/integrations/payment-gateway/balance/balance.module'
+import { DuitkuModule } from 'src/integrations/payment-gateway/duitku/duitku.module'
+import { TripayModule } from 'src/integrations/payment-gateway/tripay/tripay.module'
+import { OffersModule } from 'src/offers/offers.module'
+import { OrderModule } from 'src/order/order.module'
+import { ProductsModule } from 'src/products/products.module'
+import { QueueModule } from 'src/queue/queue.module'
+import { CallbackService } from './callback.service'
+import { DepositCallbackService } from './deposit.callback.service'
+import { PaymentGatewayCallbackController } from './payment-gateway/payment-gateway-callback.controller'
+import { PaymentGatewayCallbackService } from './payment-gateway/payment-gateway-callback.service'
 
 @Module({
   imports: [
@@ -18,8 +22,12 @@ import { PaymentCallbackService } from './payment.callback.service';
     DigiflazzModule,
     QueueModule,
     DuitkuModule,
+    OrderModule,
+    ProductsModule,
+    OffersModule,
+    DepositModule,
   ],
-  controllers: [CallbackController],
-  providers: [CallbackService, DepositCallbackService, PaymentCallbackService],
+  controllers: [PaymentGatewayCallbackController],
+  providers: [CallbackService, DepositCallbackService, PaymentGatewayCallbackService],
 })
 export class CallbackModule {}

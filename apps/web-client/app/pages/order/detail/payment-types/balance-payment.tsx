@@ -1,8 +1,8 @@
-import { WalletIcon } from "lucide-react";
-import { memo } from "react";
+import { WalletIcon } from 'lucide-react'
+import { memo } from 'react'
 
 interface Props {
-  paymentName: string;
+  paymentName: string
 }
 
 export default memo(function BalancePayment({ paymentName }: Props) {
@@ -21,10 +21,9 @@ export default memo(function BalancePayment({ paymentName }: Props) {
       </div>
       <div className="p-3 bg-green-50/50 dark:bg-green-900/10 rounded-lg border-l-4 border-green-300">
         <p className="text-xs text-green-700 dark:text-green-300">
-          ✅ <strong>Otomatis:</strong> Saldo akan dipotong secara otomatis dari
-          akun Anda
+          ✅ <strong>Otomatis:</strong> Saldo akan dipotong secara otomatis dari akun Anda
         </p>
       </div>
     </div>
-  );
-});
+  )
+})

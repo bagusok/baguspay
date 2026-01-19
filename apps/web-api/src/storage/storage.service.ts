@@ -1,11 +1,11 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Disk } from 'flydrive';
-import { S3Driver } from 'flydrive/drivers/s3';
+import { Injectable, OnModuleInit } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { Disk } from 'flydrive'
+import { S3Driver } from 'flydrive/drivers/s3'
 
 @Injectable()
 export class StorageService implements OnModuleInit {
-  private disk: Disk;
+  private disk: Disk
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -20,32 +20,31 @@ export class StorageService implements OnModuleInit {
         bucket: this.configService.get('S3_BUCKET_NAME'),
         visibility: 'public',
       }),
-    );
+    )
   }
 
   async uploadFile(file: Express.Multer.File, folder: string): Promise<string> {
-    const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
-    const path = `${folder}/${fileName}`;
+    const fileName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`
+    const path = `${folder}/${fileName}`
 
-    await this.disk.put(path, file.buffer);
+    await this.disk.put(path, file.buffer)
 
-    return path;
+    return path
   }
 
   async deleteFile(filePath: string): Promise<void> {
-    await this.disk.delete(filePath);
+    await this.disk.delete(filePath)
   }
 
   getFileUrl(filePath?: string): string {
-    if (!filePath) return null;
-    if (filePath.startsWith('http')) return filePath;
+    if (!filePath) return null
+    if (filePath.startsWith('http')) return filePath
 
-    const cleanPath = filePath.replace(/^\//, '');
+    const cleanPath = filePath.replace(/^\//, '')
 
-    const publicUrl =
-      this.configService.get('S3_CDN_URL') || this.configService.get('S3_URL');
-    const bucketName = this.configService.get('S3_BUCKET_NAME');
+    const publicUrl = this.configService.get('S3_CDN_URL') || this.configService.get('S3_URL')
+    const bucketName = this.configService.get('S3_BUCKET_NAME')
 
-    return `${publicUrl}/${bucketName}/${cleanPath}`;
+    return `${publicUrl}/${bucketName}/${cleanPath}`
   }
 }

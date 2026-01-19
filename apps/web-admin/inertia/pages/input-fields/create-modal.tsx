@@ -23,7 +23,15 @@ import { Switch } from '@repo/ui/components/ui/switch'
 import { useEffect, useState } from 'react'
 
 export default function CreateInputFieldsModal() {
-  const { data, setData, errors, processing, post, reset } = useForm<CreateInputFieldValidator>()
+  const { data, setData, errors, processing, post, reset } = useForm<CreateInputFieldValidator>({
+    identifier: '',
+    title: '',
+    name: '',
+    type: InputFieldType.TEXT,
+    placeholder: '',
+    is_required: false,
+    options: [],
+  })
 
   const [options, setOptions] = useState<{ label: string; value: string }[]>(
     data.options && Array.isArray(data.options) && data.options.length > 0

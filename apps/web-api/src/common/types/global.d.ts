@@ -1,7 +1,7 @@
-import { TUser } from './meta.type';
+import { TUser } from './meta.type'
 
 declare module 'express' {
   interface Request {
-    user?: Omit<TUser, 'password'>;
+    user?: Omit<TUser, 'password'>
   }
 }

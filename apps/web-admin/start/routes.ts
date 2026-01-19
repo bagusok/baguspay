@@ -11,6 +11,8 @@ const HomeController = () => import('#controllers/home_controller')
 const AuthController = () => import('#controllers/auth_controller')
 const UserController = () => import('#controllers/users_controller')
 const ProductCategoryController = () => import('#controllers/product_categories_controller')
+const ProductCategoryPostpaidController = () =>
+  import('#controllers/product_categories_postpaid_controller')
 const FileManagerController = () => import('#controllers/file_managers_controller')
 const InputFieldController = () => import('#controllers/input_fields_controller')
 const ProductSubCategoryController = () => import('#controllers/product_sub_categories_controller')
@@ -102,10 +104,70 @@ router
       .get('/kuota/:id/edit', [ProductCategoryController, 'editKuota'])
       .as('productCategories.editKuota')
 
+    // token-pln
+    router
+      .get('/token-pln', [ProductCategoryController, 'indexTokenPln'])
+      .as('productCategories.indexTokenPln')
+    router
+      .get('/token-pln/create', [ProductCategoryController, 'createTokenPln'])
+      .as('productCategories.createTokenPln')
+    router
+      .get('/token-pln/:id/edit', [ProductCategoryController, 'editTokenPln'])
+      .as('productCategories.editTokenPln')
+
+    // e-wallet
+    router
+      .get('/e-wallet', [ProductCategoryController, 'indexEWallet'])
+      .as('productCategories.indexEWallet')
+    router
+      .get('/e-wallet/create', [ProductCategoryController, 'createEWallet'])
+      .as('productCategories.createEWallet')
+    router
+      .get('/e-wallet/:id/edit', [ProductCategoryController, 'editEWallet'])
+      .as('productCategories.editEWallet')
+
+    // voucher
+    router
+      .get('/voucher', [ProductCategoryController, 'indexVoucher'])
+      .as('productCategories.indexVoucher')
+    router
+      .get('/voucher/create', [ProductCategoryController, 'createVoucher'])
+      .as('productCategories.createVoucher')
+    router
+      .get('/voucher/:id/edit', [ProductCategoryController, 'editVoucher'])
+      .as('productCategories.editVoucher')
+
+    // other-prepaid
+    router
+      .get('/other-prepaid', [ProductCategoryController, 'indexOtherPrepaid'])
+      .as('productCategories.indexOtherPrepaid')
+    router
+      .get('/other-prepaid/create', [ProductCategoryController, 'createOtherPrepaid'])
+      .as('productCategories.createOtherPrepaid')
+    router
+      .get('/other-prepaid/:id/edit', [ProductCategoryController, 'editOtherPrepaid'])
+      .as('productCategories.editOtherPrepaid')
+
+    // postpaid
+    // Tagihan PLN
+    router
+      .get('/postpaid/tagihan-pln', [ProductCategoryPostpaidController, 'indexTagihanPLN'])
+      .as('productCategories.indexPostpaidTagihanPln')
+    router
+      .get('/postpaid/tagihan-pln/create', [ProductCategoryPostpaidController, 'createTagihanPLN'])
+      .as('productCategories.createPostpaidTagihanPln')
+    router
+      .get('/postpaid/tagihan-pln/:id/edit', [ProductCategoryPostpaidController, 'editTagihanPLN'])
+      .as('productCategories.editPostpaidTagihanPln')
+
+    // any
     router
       .get('/get-json', [ProductCategoryController, 'getProductByCategoryNameJson'])
       .as('productCategories.getProductByCategoryNameJson')
 
+    router
+      .get('/:billingType/:type/:id', [ProductCategoryController, 'detail'])
+      .as('productCategories.detailWithBillingType')
     router.get('/:type/:id', [ProductCategoryController, 'detail']).as('productCategories.detail')
 
     router

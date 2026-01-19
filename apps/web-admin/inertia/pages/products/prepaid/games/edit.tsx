@@ -1,6 +1,7 @@
 import ProductsCategoriesController from '#controllers/product_categories_controller'
 import { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
+import { ProductFullfillmentType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
@@ -223,8 +224,8 @@ export default function EditProductCategory(
         </div>
 
         {/* Biliing type & Fullfillment Type */}
-        {/* <div className="form-group flex gap-4 ">
-          <div>
+        <div className="form-group flex gap-4 ">
+          {/* <div>
             <Label htmlFor="billing_type" className="mb-2">
               Billing Type
             </Label>
@@ -246,7 +247,7 @@ export default function EditProductCategory(
             {errors.product_billing_type && (
               <p className="text-xs text-red-500 mt-1">{errors.product_billing_type}</p>
             )}
-          </div>
+          </div> */}
           <div>
             <Label htmlFor="billing_type" className="mb-2">
               Fullfillment Type
@@ -266,11 +267,11 @@ export default function EditProductCategory(
                 ))}
               </SelectContent>
             </Select>
-            {errors.product_billing_type && (
-              <p className="text-xs text-red-500 mt-1">{errors.product_billing_type}</p>
+            {errors.product_fullfillment_type && (
+              <p className="text-xs text-red-500 mt-1">{errors.product_fullfillment_type}</p>
             )}
           </div>
-        </div> */}
+        </div>
 
         {/* SEO Enabled */}
 

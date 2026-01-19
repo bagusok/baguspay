@@ -6,7 +6,10 @@ import { Label } from '@repo/ui/components/ui/label'
 import toast from 'react-hot-toast'
 
 export default function Login() {
-  const { data, setData, errors, processing, post } = useForm<LoginValidator>()
+  const { data, setData, errors, processing, post } = useForm<LoginValidator>({
+    email: '',
+    password: '',
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

@@ -1,6 +1,6 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { GetAllProductsDto } from './products.dto';
-import { ProductsService } from './products.service';
+import { Controller, Get, Param, Query } from '@nestjs/common'
+import { GetAllProductsDto } from './products.dto'
+import { ProductsService } from './products.service'
 
 @Controller('products')
 export class ProductsController {
@@ -8,11 +8,11 @@ export class ProductsController {
 
   @Get()
   async getAll(@Query() query: GetAllProductsDto) {
-    return this.productsService.getProducts(query);
+    return this.productsService.getProducts(query)
   }
 
   @Get(':slug')
   async getBySlug(@Param('slug') slug: string) {
-    return this.productsService.getBySlug(slug);
+    return this.productsService.getBySlug(slug)
   }
 }

@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { OrderStatus, PaymentStatus, RefundStatus } from '@repo/db/types';
-import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger'
+import { OrderStatus, PaymentStatus, RefundStatus } from '@repo/db/types'
+import { Type } from 'class-transformer'
 import {
   IsDateString,
   IsEmail,
@@ -16,68 +16,68 @@ import {
   ValidationArguments,
   ValidatorConstraint,
   ValidatorConstraintInterface,
-} from 'class-validator';
+} from 'class-validator'
 
 @ValidatorConstraint({ name: 'StartsWith62', async: false })
 export class StartsWith62Constraint implements ValidatorConstraintInterface {
   validate(phone: string) {
-    if (!phone) return true;
-    return phone.startsWith('62');
+    if (!phone) return true
+    return phone.startsWith('62')
   }
   defaultMessage(args: ValidationArguments) {
-    return `${args.property} must start with 62`;
+    return `${args.property} must start with 62`
   }
 }
 
 export class InputFieldDto {
   @ApiProperty({ example: 'id', description: 'Name of the input field' })
   @IsString()
-  name: string;
+  name: string
 
   @ApiProperty({ example: '79132815', description: 'Value of the input field' })
   @IsString()
-  value: string;
+  value: string
 }
 
 export class GetPriceByDto {
   @ApiProperty()
   @IsUUID()
-  product_id: string;
+  product_id: string
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsUUID()
-  voucher_id?: string;
+  voucher_id?: string
 }
 
 export class PreCheckoutPrepaidDto {
   @ApiProperty()
   @IsUUID()
-  product_id: string;
+  product_id: string
 
   @ApiProperty()
   @IsUUID()
-  payment_method_id: string;
+  payment_method_id: string
 
   @IsOptional()
   @ApiProperty()
   @IsUUID()
-  voucher_id: string;
+  voucher_id: string
 
   @ApiProperty()
   @IsOptional()
   @IsPhoneNumber('ID')
   @Validate(StartsWith62Constraint)
-  phone_number: string;
+  phone_number: string
 
   @ApiProperty()
   @IsEmail()
-  email: string;
+  email: string
 
   @ApiProperty()
   @IsOptional()
   @Validate(StartsWith62Constraint)
-  payment_phone_number?: string;
+  payment_phone_number?: string
 
   @ApiProperty({
     required: false,
@@ -88,36 +88,36 @@ export class PreCheckoutPrepaidDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => InputFieldDto)
-  input_fields?: InputFieldDto[];
+  input_fields?: InputFieldDto[]
 }
 
 export class CheckoutPrepaidDto {
   @ApiProperty()
   @IsUUID()
-  product_id: string;
+  product_id: string
 
   @ApiProperty()
   @IsUUID()
-  payment_method_id: string;
+  payment_method_id: string
 
   @IsOptional()
   @ApiProperty()
   @IsUUID()
-  voucher_id: string;
+  voucher_id: string
 
   @ApiProperty()
   @IsPhoneNumber('ID')
   @Validate(StartsWith62Constraint)
-  phone_number: string;
+  phone_number: string
 
   @ApiProperty()
   @IsEmail()
-  email: string;
+  email: string
 
   @ApiProperty()
   @IsOptional()
   @Validate(StartsWith62Constraint)
-  payment_phone_number?: string;
+  payment_phone_number?: string
 
   @ApiProperty({
     required: false,
@@ -128,11 +128,11 @@ export class CheckoutPrepaidDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => InputFieldDto)
-  input_fields?: InputFieldDto[];
+  input_fields?: InputFieldDto[]
 
   @ApiProperty()
   @IsString()
-  checkout_token: string;
+  checkout_token: string
 }
 
 export class GetOrderHistoryQueryDto {
@@ -143,64 +143,78 @@ export class GetOrderHistoryQueryDto {
   })
   @IsOptional()
   @IsString()
-  order_id?: string;
+  order_id?: string
 
   @ApiProperty({ required: false, enum: OrderStatus })
   @IsOptional()
   @IsEnum(OrderStatus)
-  order_status?: OrderStatus;
+  order_status?: OrderStatus
 
   @ApiProperty({ required: false, enum: PaymentStatus })
   @IsOptional()
   @IsEnum(PaymentStatus)
-  payment_status?: PaymentStatus;
+  payment_status?: PaymentStatus
 
   @ApiProperty({ required: false, enum: RefundStatus })
   @IsOptional()
   @IsEnum(RefundStatus)
-  refund_status?: RefundStatus;
+  refund_status?: RefundStatus
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsString()
-  sort?: string;
+  sort?: string
 
   @ApiProperty({ required: false, default: '1' })
   @IsOptional()
   @Type(() => Number)
   @Min(1)
-  page?: number;
+  page?: number
 
   @ApiProperty({ required: false, default: '10' })
   @IsOptional()
   @Type(() => Number)
   @Min(1)
   @Max(100)
-  limit?: number;
+  limit?: number
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
-  start_date?: string;
+  start_date?: string
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
-  end_date?: string;
+  end_date?: string
 }
 
 export class OrderIdDto {
   @ApiProperty()
   @IsString()
-  id: string;
+  id: string
 }
 
 export class CheckoutDto {
   @ApiProperty()
   @IsUUID()
-  inquiry_id: string;
+  inquiry_id: string
+
+  @ApiProperty()
+  @IsUUID()
+  payment_method_id: string
+
+  @ApiProperty({
+    required: false,
+    type: String,
+    description: 'Optional payment phone number, must start with 62',
+    example: '6281234567890',
+  })
+  @IsOptional()
+  @Validate(StartsWith62Constraint)
+  payment_phone_number?: string
 
   @ApiProperty()
   @IsString()
-  checkout_token: string;
+  checkout_token: string
 }

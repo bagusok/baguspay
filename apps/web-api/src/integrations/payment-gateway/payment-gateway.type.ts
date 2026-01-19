@@ -1,49 +1,45 @@
-import {
-  PaymentMethodFeeType,
-  PaymentMethodProvider,
-  PaymentStatus,
-} from '@repo/db/types';
-import { TripayOrderItem } from './tripay/tripay.type';
+import { PaymentMethodFeeType, PaymentMethodProvider, PaymentStatus } from '@repo/db/types'
+import { TripayOrderItem } from './tripay/tripay.type'
 
 export interface CreatePaymentGatewayRequest {
-  provider_name: PaymentMethodProvider;
-  provider_code: string;
-  fee_type: PaymentMethodFeeType;
-  id: string;
-  amount: number;
-  fee_in_percent: number;
-  fee_static: number;
-  customer_name: string;
-  customer_email: string;
-  customer_phone?: string;
-  order_items: TripayOrderItem[];
-  callback_url?: string;
-  return_url?: string;
-  expired_in: number; // in seconds
-  user_id: string | null;
+  provider_name: PaymentMethodProvider
+  provider_code: string
+  fee_type: PaymentMethodFeeType
+  id: string
+  amount: number
+  fee_in_percent: number
+  fee_static: number
+  customer_name: string
+  customer_email: string
+  customer_phone?: string
+  order_items: TripayOrderItem[]
+  callback_url?: string
+  return_url?: string
+  expired_in: number // in seconds
+  user_id: string | null
 }
 
 export interface CreatePaymentGatewayResponse {
-  id: string;
-  ref_id: string;
-  provider_name: PaymentMethodProvider;
-  provider_code: string;
-  amount: number;
-  amount_received: number;
-  amount_total: number;
-  total_fee: number;
-  fee_type: PaymentMethodFeeType;
-  customer_name: string;
-  customer_email: string;
-  customer_phone?: string;
-  order_items: TripayOrderItem[];
-  callback_url?: string;
-  return_url?: string;
-  expired_at: Date;
-  pay_code?: string;
-  pay_url?: string;
-  qr_code?: string;
-  qr_url?: string;
-  checkout_url?: string;
-  status: PaymentStatus;
+  id: string
+  ref_id: string
+  provider_name: PaymentMethodProvider
+  provider_code: string
+  amount: number
+  amount_received: number
+  amount_total: number
+  total_fee: number
+  fee_type: PaymentMethodFeeType
+  customer_name: string
+  customer_email: string
+  customer_phone?: string
+  order_items: TripayOrderItem[]
+  callback_url?: string
+  return_url?: string
+  expired_at: Date
+  pay_code?: string
+  pay_url?: string
+  qr_code?: string
+  qr_url?: string
+  checkout_url?: string
+  status: PaymentStatus
 }

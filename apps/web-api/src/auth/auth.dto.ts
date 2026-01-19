@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 import {
   Equals,
   IsEmail,
@@ -7,14 +7,14 @@ import {
   IsStrongPassword,
   MinLength,
   ValidateIf,
-} from 'class-validator';
+} from 'class-validator'
 
 export class LoginDto {
   @ApiProperty()
   @IsEmail({
     require_tld: true,
   })
-  email: string;
+  email: string
 
   @ApiProperty()
   @IsStrongPassword({
@@ -24,7 +24,7 @@ export class LoginDto {
     minNumbers: 1,
     minSymbols: 1,
   })
-  password: string;
+  password: string
 }
 
 export class RegisterDto {
@@ -32,7 +32,7 @@ export class RegisterDto {
   @IsEmail({
     require_tld: true,
   })
-  email: string;
+  email: string
 
   @ApiProperty()
   @IsStrongPassword({
@@ -42,7 +42,7 @@ export class RegisterDto {
     minNumbers: 1,
     minSymbols: 1,
   })
-  password: string;
+  password: string
 
   @ApiProperty()
   @IsStrongPassword({
@@ -56,24 +56,24 @@ export class RegisterDto {
   @Equals('password', {
     message: 'confirm_password do not match',
   })
-  confirm_password: string;
+  confirm_password: string
 
   @ApiProperty()
   @IsPhoneNumber('ID')
-  phone: string;
+  phone: string
 
   @ApiProperty()
   @IsString()
   @MinLength(3)
-  name: string;
+  name: string
 }
 
 export class GoogleLoginDto {
   @ApiProperty()
   @IsString()
-  access_token: string;
+  access_token: string
 
   @ApiProperty()
   @IsString()
-  id_token: string;
+  id_token: string
 }

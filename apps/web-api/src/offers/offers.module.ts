@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common';
-import { DatabaseModule } from 'src/database/database.module';
-import { OffersController } from './offers.controller';
-import { OffersService } from './offers.service';
+import { Module } from '@nestjs/common'
+import { DatabaseModule } from 'src/database/database.module'
+import { OffersController } from './offers.controller'
+import { OffersRepository } from './offers.repository'
+import { OffersService } from './offers.service'
 
 @Module({
-  exports: [OffersService],
+  exports: [OffersRepository, OffersService],
   imports: [DatabaseModule],
   controllers: [OffersController],
-  providers: [OffersService],
+  providers: [OffersService, OffersRepository],
 })
 export class OffersModule {}

@@ -1,38 +1,36 @@
-import { useNProgress } from "@tanem/react-nprogress";
-import { useEffect, useState } from "react";
-import { useFetchers, useNavigation, type Fetcher } from "react-router";
+import { useNProgress } from '@tanem/react-nprogress'
+import { useEffect, useState } from 'react'
+import { useFetchers, useNavigation, type Fetcher } from 'react-router'
 
 function useIsAnimating() {
-  const navigation = useNavigation();
-  const fetchers = useFetchers();
+  const navigation = useNavigation()
+  const fetchers = useFetchers()
 
   // Cek jika sedang navigasi
-  const isNavigationLoading = navigation.state === "loading";
+  const isNavigationLoading = navigation.state === 'loading'
 
   // Cek jika ada fetcher yang loading
-  const isFetcherLoading = fetchers.some(
-    (fetcher: Fetcher) => fetcher.state !== "idle",
-  );
+  const isFetcherLoading = fetchers.some((fetcher: Fetcher) => fetcher.state !== 'idle')
 
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false)
 
   useEffect(() => {
     if (isNavigationLoading || isFetcherLoading) {
-      setIsAnimating(true);
+      setIsAnimating(true)
     } else {
-      setIsAnimating(false);
+      setIsAnimating(false)
     }
-  }, [isNavigationLoading, isFetcherLoading]);
+  }, [isNavigationLoading, isFetcherLoading])
 
-  return isAnimating;
+  return isAnimating
 }
 
 export default function ProgressBar() {
-  const isAnimating = useIsAnimating();
+  const isAnimating = useIsAnimating()
 
   const { animationDuration, isFinished, progress } = useNProgress({
     isAnimating,
-  });
+  })
 
   return (
     <div
@@ -52,11 +50,11 @@ export default function ProgressBar() {
         <div
           className="absolute right-0 h-full w-[100px]"
           style={{
-            boxShadow: "0 0 10px #38bdf8, 0 0 5px #38bdf8", // sky-500
-            transform: "rotate(3deg) translate(0px, -4px)",
+            boxShadow: '0 0 10px #38bdf8, 0 0 5px #38bdf8', // sky-500
+            transform: 'rotate(3deg) translate(0px, -4px)',
           }}
         />
       </div>
     </div>
-  );
+  )
 }

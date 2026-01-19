@@ -1,59 +1,58 @@
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Skeleton } from "@repo/ui/components/ui/skeleton";
-import { useQuery } from "@tanstack/react-query";
-import { LayoutList } from "lucide-react";
-import { useMemo, useState } from "react";
-import Image from "~/components/image";
-import { apiClient } from "~/utils/axios";
-import { formatPrice } from "~/utils/format";
+import { Badge } from '@repo/ui/components/ui/badge'
+import { Button } from '@repo/ui/components/ui/button'
+import { Input } from '@repo/ui/components/ui/input'
+import { Skeleton } from '@repo/ui/components/ui/skeleton'
+import { useQuery } from '@tanstack/react-query'
+import { LayoutList } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import Image from '~/components/image'
+import { apiClient } from '~/utils/axios'
+import { formatPrice } from '~/utils/format'
 
 type ProductCategory = {
-  id: string;
-  name: string;
-  sub_name: string | null;
-  image_url: string | null;
-  is_available: boolean;
-};
+  id: string
+  name: string
+  sub_name: string | null
+  image_url: string | null
+  is_available: boolean
+}
 
 type Product = {
-  id: string;
-  name: string;
-  image_url: string | null;
-  price: number;
-  is_available: boolean;
-  billing_type: string;
-  description: string | null;
-  sku_code: string;
-  sub_name: string | null;
-};
+  id: string
+  name: string
+  image_url: string | null
+  price: number
+  is_available: boolean
+  billing_type: string
+  description: string | null
+  sku_code: string
+  sub_name: string | null
+}
 
 interface ApiListResponse<T> {
-  success: boolean;
-  message?: string;
-  data: T[];
+  success: boolean
+  message?: string
+  data: T[]
   // Updated meta shape based on API: limit, page, total, total_pages
-  meta?: { page: number; limit: number; total: number; total_pages: number };
+  meta?: { page: number; limit: number; total: number; total_pages: number }
 }
 
 export default function ListProductPricePage() {
   const [productQuery, setProductQuery] = useState({
-    category_id: "",
-    search: "",
+    category_id: '',
+    search: '',
     page: 1,
     limit: 50,
-  });
+  })
 
   const categoriesQuery = useQuery<ApiListResponse<ProductCategory>>({
-    queryKey: ["product-categories"],
-    queryFn: async () =>
-      apiClient.get("/product-categories").then((r: any) => r.data),
-  });
+    queryKey: ['product-categories'],
+    queryFn: async () => apiClient.get('/product-categories').then((r: any) => r.data),
+  })
 
   const productsQuery = useQuery<ApiListResponse<Product>>({
     queryKey: [
-      "products",
+      'products',
       productQuery.category_id,
       productQuery.page,
       productQuery.limit,
@@ -62,7 +61,7 @@ export default function ListProductPricePage() {
     enabled: !categoriesQuery.isLoading,
     queryFn: async () =>
       apiClient
-        .get("/products", {
+        .get('/products', {
           params: {
             category_id: productQuery.category_id || undefined,
             page: productQuery.page,
@@ -73,33 +72,30 @@ export default function ListProductPricePage() {
         .then((r: any) => r.data),
     staleTime: 30_000,
     placeholderData: (prev) => prev,
-  });
+  })
 
   const products: Product[] =
-    (productsQuery.data as ApiListResponse<Product> | undefined)?.data ?? [];
-  const hasServerPagination = !!productsQuery.data?.meta;
-  const meta = productsQuery.data?.meta;
+    (productsQuery.data as ApiListResponse<Product> | undefined)?.data ?? []
+  const hasServerPagination = !!productsQuery.data?.meta
+  const meta = productsQuery.data?.meta
   const canNext = hasServerPagination
     ? (meta?.page ?? 1) < (meta?.total_pages ?? 1)
-    : products.length >= productQuery.limit;
-  const canPrev = productQuery.page > 1;
+    : products.length >= productQuery.limit
+  const canPrev = productQuery.page > 1
 
   const selectedCategory = useMemo(
-    () =>
-      categoriesQuery.data?.data.find(
-        (c) => c.id === productQuery.category_id,
-      ) || null,
+    () => categoriesQuery.data?.data.find((c) => c.id === productQuery.category_id) || null,
     [categoriesQuery.data, productQuery.category_id],
-  );
+  )
 
   function setCategory(id: string) {
-    setProductQuery((q) => ({ ...q, category_id: id, page: 1 }));
+    setProductQuery((q) => ({ ...q, category_id: id, page: 1 }))
   }
   function nextPage() {
-    if (canNext) setProductQuery((q) => ({ ...q, page: q.page + 1 }));
+    if (canNext) setProductQuery((q) => ({ ...q, page: q.page + 1 }))
   }
   function prevPage() {
-    if (canPrev) setProductQuery((q) => ({ ...q, page: q.page - 1 }));
+    if (canPrev) setProductQuery((q) => ({ ...q, page: q.page - 1 }))
   }
 
   return (
@@ -115,8 +111,8 @@ export default function ListProductPricePage() {
             Produk & Harga Terbaru
           </h1>
           <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground max-w-3xl">
-            Telusuri harga produk digital. Pilih kategori, gunakan pencarian,
-            dan navigasi halaman untuk melihat semua.
+            Telusuri harga produk digital. Pilih kategori, gunakan pencarian, dan navigasi halaman
+            untuk melihat semua.
           </p>
         </div>
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
@@ -132,11 +128,9 @@ export default function ListProductPricePage() {
           {categoriesQuery.isSuccess && (
             <>
               <Button
-                variant={
-                  productQuery.category_id === "" ? "default" : "outline"
-                }
+                variant={productQuery.category_id === '' ? 'default' : 'outline'}
                 size="sm"
-                onClick={() => setCategory("")}
+                onClick={() => setCategory('')}
                 className="shrink-0"
               >
                 Semua
@@ -144,9 +138,7 @@ export default function ListProductPricePage() {
               {categoriesQuery.data.data.map((c) => (
                 <Button
                   key={c.id}
-                  variant={
-                    c.id === productQuery.category_id ? "default" : "outline"
-                  }
+                  variant={c.id === productQuery.category_id ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setCategory(c.id)}
                   className="shrink-0 flex items-center gap-2 pr-3"
@@ -159,9 +151,7 @@ export default function ListProductPricePage() {
                       className="h-6 w-6 object-cover rounded"
                     />
                   )}
-                  <span className="truncate max-w-30">
-                    {c.sub_name || c.name}
-                  </span>
+                  <span className="truncate max-w-30">{c.sub_name || c.name}</span>
                 </Button>
               ))}
             </>
@@ -182,8 +172,7 @@ export default function ListProductPricePage() {
           />
           {selectedCategory && (
             <div className="text-xs text-muted-foreground">
-              Kategori:{" "}
-              <span className="font-medium">{selectedCategory.name}</span>
+              Kategori: <span className="font-medium">{selectedCategory.name}</span>
             </div>
           )}
         </div>
@@ -220,20 +209,14 @@ export default function ListProductPricePage() {
               )}
               {productsQuery.isSuccess && products.length === 0 && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="p-4 text-center text-muted-foreground"
-                  >
+                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
                     Tidak ada produk.
                   </td>
                 </tr>
               )}
               {productsQuery.isSuccess &&
                 products.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="border-t hover:bg-muted/30 transition-colors"
-                  >
+                  <tr key={p.id} className="border-t hover:bg-muted/30 transition-colors">
                     <td className="p-2 align-top">
                       <div className="flex items-start gap-3">
                         {p.image_url && (
@@ -245,13 +228,9 @@ export default function ListProductPricePage() {
                           />
                         )}
                         <div>
-                          <div className="font-medium leading-snug">
-                            {p.name}
-                          </div>
+                          <div className="font-medium leading-snug">{p.name}</div>
                           {p.sub_name && (
-                            <div className="text-[11px] text-muted-foreground">
-                              {p.sub_name}
-                            </div>
+                            <div className="text-[11px] text-muted-foreground">{p.sub_name}</div>
                           )}
                           {p.description && (
                             <div className="mt-1 text-[11px] text-muted-foreground line-clamp-2 max-w-xs">
@@ -261,9 +240,7 @@ export default function ListProductPricePage() {
                         </div>
                       </div>
                     </td>
-                    <td className="p-2 font-semibold tabular-nums">
-                      {formatPrice(p.price)}
-                    </td>
+                    <td className="p-2 font-semibold tabular-nums">{formatPrice(p.price)}</td>
                     <td className="p-2 capitalize">{p.billing_type}</td>
                     <td className="p-2 text-xs font-mono">{p.sku_code}</td>
                     <td className="p-2">
@@ -305,11 +282,9 @@ export default function ListProductPricePage() {
           </div>
         </div>
         {productsQuery.isFetching && !productsQuery.isLoading && (
-          <div className="mt-3 text-xs text-muted-foreground">
-            Memuat data terbaru…
-          </div>
+          <div className="mt-3 text-xs text-muted-foreground">Memuat data terbaru…</div>
         )}
       </section>
     </div>
-  );
+  )
 }

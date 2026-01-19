@@ -1,7 +1,7 @@
-import type { OrderStatus, PaymentStatus, RefundStatus } from "@repo/db/types";
-import { DataTable } from "@repo/ui/components/data-table";
-import { Button } from "@repo/ui/components/ui/button";
-import { Calendar } from "@repo/ui/components/ui/calendar";
+import type { OrderStatus, PaymentStatus, RefundStatus } from '@repo/db/types'
+import { DataTable } from '@repo/ui/components/data-table'
+import { Button } from '@repo/ui/components/ui/button'
+import { Calendar } from '@repo/ui/components/ui/calendar'
 import {
   Dialog,
   DialogContent,
@@ -10,33 +10,29 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@repo/ui/components/ui/dialog";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@repo/ui/components/ui/popover";
+} from '@repo/ui/components/ui/dialog'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/ui/popover'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@repo/ui/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
-import { CalendarIcon, EyeIcon, Filter, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link } from "react-router";
-import { apiClient } from "~/utils/axios";
-import { formatDate, formatPrice } from "~/utils/format";
+} from '@repo/ui/components/ui/select'
+import { useQuery } from '@tanstack/react-query'
+import type { ColumnDef } from '@tanstack/react-table'
+import { CalendarIcon, EyeIcon, Filter, Search, X } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
+import { apiClient } from '~/utils/axios'
+import { formatDate, formatPrice } from '~/utils/format'
 
 const columns: ColumnDef<OrederHistoryData>[] = [
   {
-    accessorKey: "order_id",
-    header: "ID Order",
+    accessorKey: 'order_id',
+    header: 'ID Order',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <code className="px-2 py-1 bg-muted rounded text-xs font-mono">
@@ -52,30 +48,24 @@ const columns: ColumnDef<OrederHistoryData>[] = [
     ),
   },
   {
-    accessorKey: "total_price",
-    header: "Total Harga",
+    accessorKey: 'total_price',
+    header: 'Total Harga',
     cell: ({ row }) => (
-      <span className="font-semibold">
-        {formatPrice(row.original.total_price)}
-      </span>
+      <span className="font-semibold">{formatPrice(row.original.total_price)}</span>
     ),
   },
   {
-    accessorKey: "payment_status",
-    header: "Status Pembayaran",
+    accessorKey: 'payment_status',
+    header: 'Status Pembayaran',
     cell: ({ row }) => {
-      const status = row.original.payment_status;
+      const status = row.original.payment_status
       const statusConfig: Record<string, string> = {
-        pending:
-          "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400",
-        success:
-          "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400",
-        failed: "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400",
-        expired:
-          "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400",
-        cancelled:
-          "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400",
-      };
+        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
+        success: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
+        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+        expired: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
+        cancelled: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+      }
 
       return (
         <span
@@ -83,51 +73,44 @@ const columns: ColumnDef<OrederHistoryData>[] = [
         >
           {status.charAt(0).toUpperCase() + status.slice(1)}
         </span>
-      );
+      )
     },
   },
   {
-    accessorKey: "order_status",
-    header: "Status Order",
+    accessorKey: 'order_status',
+    header: 'Status Order',
     cell: ({ row }) => {
-      const status = row.original.order_status;
+      const status = row.original.order_status
       const statusConfig: Record<string, string> = {
-        none: "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400",
-        pending:
-          "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400",
-        completed:
-          "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400",
-        cancelled:
-          "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400",
-        failed: "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400",
-      };
+        none: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
+        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
+        completed: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
+        cancelled: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+      }
 
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig[status] || statusConfig.failed}`}
         >
-          {status === "none"
-            ? "None"
-            : status.charAt(0).toUpperCase() + status.slice(1)}
+          {status === 'none' ? 'None' : status.charAt(0).toUpperCase() + status.slice(1)}
         </span>
-      );
+      )
     },
   },
   {
-    accessorKey: "refund_status",
-    header: "Status Refund",
+    accessorKey: 'refund_status',
+    header: 'Status Refund',
     cell: ({ row }) => {
-      const status = row.original.refund_status;
-      if (!status) return <span className="text-muted-foreground">-</span>;
+      const status = row.original.refund_status
+      if (!status) return <span className="text-muted-foreground">-</span>
 
       const statusConfig: Record<string, string> = {
-        none: "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400",
-        processing:
-          "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400",
-        completed:
-          "bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400",
-        failed: "bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400",
-      };
+        none: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
+        processing: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
+        completed: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
+        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+      }
 
       return (
         <span
@@ -135,61 +118,57 @@ const columns: ColumnDef<OrederHistoryData>[] = [
         >
           {status.charAt(0).toUpperCase() + status.slice(1)}
         </span>
-      );
+      )
     },
   },
   {
-    accessorKey: "created_at",
-    header: "Tanggal Dibuat",
-    cell: ({ row }) => (
-      <span className="text-sm">{formatDate(row.original.created_at)}</span>
-    ),
+    accessorKey: 'created_at',
+    header: 'Tanggal Dibuat',
+    cell: ({ row }) => <span className="text-sm">{formatDate(row.original.created_at)}</span>,
   },
   {
-    accessorKey: "updated_at",
-    header: "Tanggal Update",
-    cell: ({ row }) => (
-      <span className="text-sm">{formatDate(row.original.updated_at)}</span>
-    ),
+    accessorKey: 'updated_at',
+    header: 'Tanggal Update',
+    cell: ({ row }) => <span className="text-sm">{formatDate(row.original.updated_at)}</span>,
   },
-];
+]
 
 export default function OrderHistoryPage() {
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [page, setPage] = useState(1)
+  const [limit, setLimit] = useState(10)
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
   const [tempFilter, setTempFilter] = useState<{
-    order_status: string;
-    payment_status: string;
-    refund_status: string;
-    start_date: Date | undefined;
-    end_date: Date | undefined;
-    sort: string;
+    order_status: string
+    payment_status: string
+    refund_status: string
+    start_date: Date | undefined
+    end_date: Date | undefined
+    sort: string
   }>({
-    order_status: "",
-    payment_status: "",
-    refund_status: "",
+    order_status: '',
+    payment_status: '',
+    refund_status: '',
     start_date: undefined,
     end_date: undefined,
-    sort: "",
-  });
+    sort: '',
+  })
   const [filter, setFilter] = useState<{
-    order_id: string;
-    order_status: string;
-    payment_status: string;
-    refund_status: string;
-    start_date: Date | undefined;
-    end_date: Date | undefined;
-    sort: string;
+    order_id: string
+    order_status: string
+    payment_status: string
+    refund_status: string
+    start_date: Date | undefined
+    end_date: Date | undefined
+    sort: string
   }>({
-    order_id: "",
-    order_status: "",
-    payment_status: "",
-    refund_status: "",
+    order_id: '',
+    order_status: '',
+    payment_status: '',
+    refund_status: '',
     start_date: undefined,
     end_date: undefined,
-    sort: "",
-  });
+    sort: '',
+  })
 
   // Count active filters
   const activeFiltersCount = [
@@ -199,32 +178,32 @@ export default function OrderHistoryPage() {
     filter.start_date,
     filter.end_date,
     filter.sort,
-  ].filter(Boolean).length;
+  ].filter(Boolean).length
 
   const applyFilters = () => {
     setFilter((prev) => ({
       ...prev,
       ...tempFilter,
-    }));
-    setIsFilterDialogOpen(false);
-  };
+    }))
+    setIsFilterDialogOpen(false)
+  }
 
   const clearFilters = () => {
     const emptyFilters = {
-      order_status: "",
-      payment_status: "",
-      refund_status: "",
+      order_status: '',
+      payment_status: '',
+      refund_status: '',
       start_date: undefined,
       end_date: undefined,
-      sort: "",
-    };
-    setTempFilter(emptyFilters);
+      sort: '',
+    }
+    setTempFilter(emptyFilters)
     setFilter((prev) => ({
       ...prev,
       ...emptyFilters,
-    }));
-    setIsFilterDialogOpen(false);
-  };
+    }))
+    setIsFilterDialogOpen(false)
+  }
 
   const openFilterDialog = () => {
     setTempFilter({
@@ -234,15 +213,15 @@ export default function OrderHistoryPage() {
       start_date: filter.start_date,
       end_date: filter.end_date,
       sort: filter.sort,
-    });
-    setIsFilterDialogOpen(true);
-  };
+    })
+    setIsFilterDialogOpen(true)
+  }
 
   const orderHistory = useQuery({
-    queryKey: ["orderHistory", page, limit, filter],
+    queryKey: ['orderHistory', page, limit, filter],
     queryFn: async () =>
       apiClient
-        .get<OrderHistoryResponse>("/order/history", {
+        .get<OrderHistoryResponse>('/order/history', {
           params: {
             page,
             limit,
@@ -251,20 +230,18 @@ export default function OrderHistoryPage() {
             payment_status: filter.payment_status || undefined,
             refund_status: filter.refund_status || undefined,
             start_date: filter.start_date
-              ? filter.start_date.toISOString().split("T")[0]
+              ? filter.start_date.toISOString().split('T')[0]
               : undefined,
-            end_date: filter.end_date
-              ? filter.end_date.toISOString().split("T")[0]
-              : undefined,
+            end_date: filter.end_date ? filter.end_date.toISOString().split('T')[0] : undefined,
             sort: filter.sort || undefined,
           },
         })
         .then((res) => res.data)
         .catch((err) => {
-          throw err.response?.data || err;
+          throw err.response?.data || err
         }),
     retry: 2,
-  });
+  })
 
   useEffect(() => {
     // Set ke satu jika ada filter yang berubah
@@ -277,20 +254,16 @@ export default function OrderHistoryPage() {
       filter.end_date ||
       filter.sort
     ) {
-      setPage(1);
+      setPage(1)
     }
-  }, [filter]);
+  }, [filter])
 
   return (
     <>
       <section id="header">
         <div className="md:text-left">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">
-            Riwayat Orderan
-          </h1>
-          <p className="text-muted-foreground">
-            Informasi lengkap tentang riwayat orderan Anda
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Riwayat Orderan</h1>
+          <p className="text-muted-foreground">Informasi lengkap tentang riwayat orderan Anda</p>
         </div>
       </section>
       <section>
@@ -302,18 +275,13 @@ export default function OrderHistoryPage() {
               type="text"
               placeholder="Cari ID Order..."
               value={filter.order_id}
-              onChange={(e) =>
-                setFilter({ ...filter, order_id: e.target.value })
-              }
+              onChange={(e) => setFilter({ ...filter, order_id: e.target.value })}
               className="pl-10"
             />
           </div>
 
           {/* Filter Dialog */}
-          <Dialog
-            open={isFilterDialogOpen}
-            onOpenChange={setIsFilterDialogOpen}
-          >
+          <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" onClick={openFilterDialog}>
                 <Filter className="w-4 h-4 mr-2" />
@@ -328,9 +296,7 @@ export default function OrderHistoryPage() {
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>Filter Orderan</DialogTitle>
-                <DialogDescription>
-                  Pilih filter untuk menyaring data orderan
-                </DialogDescription>
+                <DialogDescription>Pilih filter untuk menyaring data orderan</DialogDescription>
               </DialogHeader>
 
               <div className="space-y-4">
@@ -342,13 +308,13 @@ export default function OrderHistoryPage() {
                     onValueChange={(value) =>
                       setTempFilter({
                         ...tempFilter,
-                        order_status: value === "all" ? "" : value,
+                        order_status: value === 'all' ? '' : value,
                       })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih status order">
-                        {tempFilter.order_status || "Semua"}
+                        {tempFilter.order_status || 'Semua'}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -370,13 +336,13 @@ export default function OrderHistoryPage() {
                     onValueChange={(value) =>
                       setTempFilter({
                         ...tempFilter,
-                        payment_status: value === "all" ? "" : value,
+                        payment_status: value === 'all' ? '' : value,
                       })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih status pembayaran">
-                        {tempFilter.payment_status || "Semua"}
+                        {tempFilter.payment_status || 'Semua'}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -398,13 +364,13 @@ export default function OrderHistoryPage() {
                     onValueChange={(value) =>
                       setTempFilter({
                         ...tempFilter,
-                        refund_status: value === "all" ? "" : value,
+                        refund_status: value === 'all' ? '' : value,
                       })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih status refund">
-                        {tempFilter.refund_status || "Semua"}
+                        {tempFilter.refund_status || 'Semua'}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -430,7 +396,7 @@ export default function OrderHistoryPage() {
                           <CalendarIcon className="mr-2 h-4 w-4" />
                           {tempFilter.start_date
                             ? formatDate(tempFilter.start_date)
-                            : "Pilih tanggal"}
+                            : 'Pilih tanggal'}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -457,9 +423,7 @@ export default function OrderHistoryPage() {
                           className="w-full justify-start text-left font-normal"
                         >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {tempFilter.end_date
-                            ? formatDate(tempFilter.end_date)
-                            : "Pilih tanggal"}
+                          {tempFilter.end_date ? formatDate(tempFilter.end_date) : 'Pilih tanggal'}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
@@ -486,25 +450,21 @@ export default function OrderHistoryPage() {
                     onValueChange={(value) =>
                       setTempFilter({
                         ...tempFilter,
-                        sort: value === "default" ? "" : value,
+                        sort: value === 'default' ? '' : value,
                       })
                     }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih urutan">
-                        {tempFilter.sort || "Default"}
+                        {tempFilter.sort || 'Default'}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="default">Default</SelectItem>
                       <SelectItem value="created_at_desc">Terbaru</SelectItem>
                       <SelectItem value="created_at_asc">Terlama</SelectItem>
-                      <SelectItem value="total_price_desc">
-                        Harga Tertinggi
-                      </SelectItem>
-                      <SelectItem value="total_price_asc">
-                        Harga Terendah
-                      </SelectItem>
+                      <SelectItem value="total_price_desc">Harga Tertinggi</SelectItem>
+                      <SelectItem value="total_price_asc">Harga Terendah</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -521,10 +481,7 @@ export default function OrderHistoryPage() {
           </Dialog>
 
           {/* Limit Selection */}
-          <Select
-            value={limit.toString()}
-            onValueChange={(value) => setLimit(Number(value))}
-          >
+          <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
             <SelectTrigger className="w-[140px]">
               <SelectValue>{limit} per halaman</SelectValue>
             </SelectTrigger>
@@ -545,9 +502,7 @@ export default function OrderHistoryPage() {
 
         {orderHistory.isError && (
           <div className="flex items-center justify-center h-64">
-            <p className="text-red-500">
-              {orderHistory.error?.message || "Terjadi kesalahan"}
-            </p>
+            <p className="text-red-500">{orderHistory.error?.message || 'Terjadi kesalahan'}</p>
           </div>
         )}
 
@@ -560,7 +515,7 @@ export default function OrderHistoryPage() {
         <div className="flex justify-between gap-4 mt-4">
           <div>
             <p className="text-sm">
-              Page {orderHistory.data?.meta.pagination.page || 1} of{" "}
+              Page {orderHistory.data?.meta.pagination.page || 1} of{' '}
               {orderHistory.data?.meta.pagination.total_pages || 1}
             </p>
           </div>
@@ -574,22 +529,15 @@ export default function OrderHistoryPage() {
             >
               Previous
             </Button>
-            <span className="font-bold">
-              {orderHistory.data?.meta.pagination.page || 1}
-            </span>
+            <span className="font-bold">{orderHistory.data?.meta.pagination.page || 1}</span>
             <Button
               size="sm"
               variant="outline"
               className="border-border"
-              disabled={
-                page >= (orderHistory.data?.meta.pagination.total_pages ?? 1)
-              }
+              disabled={page >= (orderHistory.data?.meta.pagination.total_pages ?? 1)}
               onClick={() =>
                 setPage((prev) =>
-                  Math.min(
-                    prev + 1,
-                    orderHistory.data?.meta.pagination.total_pages ?? 1,
-                  ),
+                  Math.min(prev + 1, orderHistory.data?.meta.pagination.total_pages ?? 1),
                 )
               }
             >
@@ -599,34 +547,34 @@ export default function OrderHistoryPage() {
         </div>
       </section>
     </>
-  );
+  )
 }
 
 export interface OrderHistoryResponse {
-  success: boolean;
-  message: string;
-  data: OrederHistoryData[];
-  meta: Meta;
+  success: boolean
+  message: string
+  data: OrederHistoryData[]
+  meta: Meta
 }
 
 export interface OrederHistoryData {
-  id: string;
-  order_id: string;
-  total_price: number;
-  payment_status: PaymentStatus;
-  order_status: OrderStatus;
-  refund_status: RefundStatus;
-  created_at: string;
-  updated_at: string;
+  id: string
+  order_id: string
+  total_price: number
+  payment_status: PaymentStatus
+  order_status: OrderStatus
+  refund_status: RefundStatus
+  created_at: string
+  updated_at: string
 }
 
 export interface Meta {
-  pagination: Pagination;
+  pagination: Pagination
 }
 
 export interface Pagination {
-  total: number;
-  total_pages: number;
-  page: number;
-  limit: number;
+  total: number
+  total_pages: number
+  page: number
+  limit: number
 }

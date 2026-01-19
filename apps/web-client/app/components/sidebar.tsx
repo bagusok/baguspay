@@ -1,35 +1,31 @@
-import { UserRole } from "@repo/db/types";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@repo/ui/components/ui/avatar";
-import { Button } from "@repo/ui/components/ui/button";
-import { cn } from "@repo/ui/lib/utils";
-import { useAtom, useAtomValue } from "jotai";
-import { XIcon } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { isOpenSidebarAtom } from "~/store/sidebar";
-import { userAtom } from "~/store/user";
-import { navData, type LocalLabel } from "./header";
-import LinkWithLocale from "./link";
-import NavLinkWithLocale from "./navlink";
+import { UserRole } from '@repo/db/types'
+import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar'
+import { Button } from '@repo/ui/components/ui/button'
+import { cn } from '@repo/ui/lib/utils'
+import { useAtom, useAtomValue } from 'jotai'
+import { XIcon } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { isOpenSidebarAtom } from '~/store/sidebar'
+import { userAtom } from '~/store/user'
+import { navData, type LocalLabel } from './header'
+import LinkWithLocale from './link'
+import NavLinkWithLocale from './navlink'
 
 export default function Sidebar() {
-  const [isOpenSidebar, setIsOpenSidebar] = useAtom(isOpenSidebarAtom);
-  const user = useAtomValue(userAtom);
-  const { t } = useTranslation("common");
+  const [isOpenSidebar, setIsOpenSidebar] = useAtom(isOpenSidebarAtom)
+  const user = useAtomValue(userAtom)
+  const { t } = useTranslation('common')
 
   return (
     <aside
       className={`fixed top-0 left-0 w-full h-full min-h-screen z-50 transition-colors duration-300 md:hidden ${
-        isOpenSidebar ? "bg-black/50" : "bg-transparent pointer-events-none"
+        isOpenSidebar ? 'bg-black/50' : 'bg-transparent pointer-events-none'
       }`}
       onClick={() => isOpenSidebar && setIsOpenSidebar(false)}
     >
       <div
         className={`flex flex-col absolute top-0 left-0 h-full bg-background transition-transform duration-300 w-3/4 shadow-lg ${
-          isOpenSidebar ? "translate-x-0" : "-translate-x-full"
+          isOpenSidebar ? 'translate-x-0' : '-translate-x-full'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -50,32 +46,26 @@ export default function Sidebar() {
             <div className="rounded-xl p-2 bg-secondary/50">
               <div className="flex items-center gap-2">
                 <Avatar className="flex-shrink-0">
-                  {user.data?.image_url && (
-                    <AvatarImage src={user.data.image_url}></AvatarImage>
-                  )}
+                  {user.data?.image_url && <AvatarImage src={user.data.image_url}></AvatarImage>}
                   <AvatarFallback>
                     {user.data?.name
-                      ?.split(" ")
+                      ?.split(' ')
                       .map((n) => n[0])
-                      .join("")
+                      .join('')
                       .slice(0, 2)
                       .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {user.data?.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {user.data?.email}
-                  </p>
+                  <p className="text-sm font-medium text-foreground">{user.data?.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.data?.email}</p>
                 </div>
               </div>
               {/* Sisa Saldo */}
               <div className="mt-4 pt-4 flex items-center justify-between border-t border-border">
                 <p className="text-sm font-medium text-foreground">Saldo</p>
                 <p className="text-sm font-semibold text-primary">
-                  Rp {user.data?.balance.toLocaleString("id-ID")}
+                  Rp {user.data?.balance.toLocaleString('id-ID')}
                 </p>
               </div>
             </div>
@@ -87,16 +77,16 @@ export default function Sidebar() {
             <NavLinkWithLocale
               key={item.label}
               to={item.href}
-              end={item.href === "/" || item.href === `/id`}
+              end={item.href === '/' || item.href === `/id`}
               onClick={() => setIsOpenSidebar(false)}
             >
               {({ isActive }) => (
                 <div
                   className={cn(
-                    "flex items-center gap-2.5 p-2 text-sm mb-2 rounded-md font-medium text-foreground",
+                    'flex items-center gap-2.5 p-2 text-sm mb-2 rounded-md font-medium text-foreground',
                     {
-                      "bg-primary text-primary-foreground": isActive,
-                      "hover:bg-secondary": !isActive,
+                      'bg-primary text-primary-foreground': isActive,
+                      'hover:bg-secondary': !isActive,
                     },
                   )}
                 >
@@ -122,10 +112,10 @@ export default function Sidebar() {
                 {({ isActive }) => (
                   <div
                     className={cn(
-                      "flex items-center gap-2.5 p-2 text-sm mb-2 rounded-md font-medium text-foreground",
+                      'flex items-center gap-2.5 p-2 text-sm mb-2 rounded-md font-medium text-foreground',
                       {
-                        "bg-primary text-primary-foreground": isActive,
-                        "hover:bg-secondary": !isActive,
+                        'bg-primary text-primary-foreground': isActive,
+                        'hover:bg-secondary': !isActive,
                       },
                     )}
                   >
@@ -156,7 +146,7 @@ export default function Sidebar() {
               className="w-full"
               onClick={() => {
                 // Handle logout logic here
-                setIsOpenSidebar(false);
+                setIsOpenSidebar(false)
               }}
             >
               Keluar
@@ -165,5 +155,5 @@ export default function Sidebar() {
         )}
       </div>
     </aside>
-  );
+  )
 }

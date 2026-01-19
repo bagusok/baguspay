@@ -1,3 +1,3 @@
-import * as dbSchema from "./schema";
+import * as dbSchema from './schema'
 
-export const tb = dbSchema;
+export const tb = dbSchema

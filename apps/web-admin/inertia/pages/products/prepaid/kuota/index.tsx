@@ -48,7 +48,7 @@ export default function ProductCategory(props: Props) {
   return (
     <AdminLayout>
       <div className="flex justify-between mt-5 mb-2">
-        <h1 className="text-2xl font-bold">Product Categories</h1>
+        <h1 className="text-2xl font-bold">List Kuota</h1>
         <Button asChild>
           <Link href="/admin/product-categories/kuota/create">Add New</Link>
         </Button>

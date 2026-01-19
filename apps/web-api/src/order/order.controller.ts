@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -6,106 +7,87 @@ import {
   Headers,
   Ip,
   Param,
+  ParseUUIDPipe,
   Post,
   Query,
   UseGuards,
-} from '@nestjs/common';
-import { ApiSecurity } from '@nestjs/swagger';
-import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt.guard';
-import { TransactionGuard } from 'src/auth/guards/transaction.guard';
-import { User } from 'src/common/decorators/user.decorator';
+} from '@nestjs/common'
+import { ApiSecurity } from '@nestjs/swagger'
 
-import { TUser } from 'src/common/types/meta.type';
-import {
-  CheckoutPrepaidDto,
-  GetOrderHistoryQueryDto,
-  GetPriceByDto,
-  OrderIdDto,
-  PreCheckoutPrepaidDto,
-} from './dtos/order.dto';
-import { OrderService } from './order.service';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
+import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
+import { TransactionGuard } from 'src/auth/guards/transaction.guard'
+import { TUser } from 'src/common/types/meta.type'
+import { InquiryUniversalDto } from './dto/inquiry.universal.dto'
+import { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from './dto/order.dto'
+import { OrderService } from './services/order.service'
 
 @ApiSecurity('access-token')
-@Controller('order')
+@Controller('v2/order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @UseGuards(TransactionGuard)
-  @Post('products/price')
-  getPriceBy(
-    @Body() body: GetPriceByDto,
-    @Query('flash_sale') isFlashSale: boolean = false,
-    @CurrentUser() user: TUser,
-  ) {
-    return this.orderService.getPriceBy(
-      body.product_id,
-      isFlashSale,
-      body.voucher_id,
-      user,
-    );
+  @Get('get-product-price/:productId')
+  getPriceBy(@Param('productId', ParseUUIDPipe) productId: string, @CurrentUser() user: TUser) {
+    return this.orderService.getPricePerPaymentMethod(productId, user)
   }
 
   @UseGuards(TransactionGuard)
-  @Post('prepaid/pre-checkout')
-  async preCheckoutPrepaid(
-    @Body() data: PreCheckoutPrepaidDto,
+  @Post('inquiry')
+  async inquiry(
+    @Body() data: InquiryUniversalDto,
     @Headers('X-Time') timestamp: number,
-    @Query('flash_sale') isFlashSale: boolean = false,
     @CurrentUser() user: TUser,
   ) {
-    console.log(user);
-    return await this.orderService.preCheckoutPrepaid(
-      data,
-      timestamp,
-      isFlashSale,
-      user,
-    );
+    return await this.orderService.inquiry(data, timestamp, user)
   }
 
   @UseGuards(TransactionGuard)
-  @Post('prepaid/checkout')
+  @Get('payment-method/:inquiryId')
+  async getPaymentMethodByInquiry(
+    @Param('inquiryId') inquiryId: string,
+    @CurrentUser() user: TUser,
+  ) {
+    if (!inquiryId) {
+      throw new BadRequestException('Inquiry ID is required')
+    }
+    return await this.orderService.getPaymentMethod(inquiryId, user)
+  }
+
+  @UseGuards(TransactionGuard)
+  @Post('checkout')
   async checkoutPrepaid(
-    @Body() data: CheckoutPrepaidDto,
+    @Body() data: CheckoutDto,
     @Headers('X-Time') timestamp: number,
-    @Query('flash_sale') isFlashSale: boolean = false,
     @Ip() ip: string,
     @Headers('User-Agent') userAgent: string,
     @CurrentUser() user: TUser,
   ) {
-    return await this.orderService.checkoutPrepaid(
-      data,
-      timestamp,
-      isFlashSale,
-      user,
-      ip,
-      userAgent,
-    );
+    return await this.orderService.checkout(data, timestamp, user, ip, userAgent)
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('history')
-  async getHistory(
-    @Query() query: GetOrderHistoryQueryDto,
-    @User() user: TUser,
-  ) {
-    return await this.orderService.getHistory(query, user);
-  }
-
-  @Post('check/:id')
-  async getOrderIdByGuest(@Param() param: OrderIdDto) {
-    return await this.orderService.getByIdByGuest(param);
+  async getAllHistory(@Query() query: GetOrderHistoryQueryDto, @CurrentUser() user: TUser) {
+    return await this.orderService.getAllHistory(query, user)
   }
 
   @UseGuards(TransactionGuard)
-  @Post(':id')
-  async getOrderById(@Param() param: OrderIdDto, @User() user: TUser) {
-    return await this.orderService.getById(param, user);
+  @Get('check/:id')
+  async checkOrder(@Param() param: OrderIdDto, @CurrentUser() user: TUser) {
+    return await this.orderService.getOrderDetail(param, user)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  async getOrderDetail(@Param() param: OrderIdDto, @CurrentUser() user: TUser) {
+    return await this.orderService.getOrderDetail(param, user)
   }
 
   @UseGuards(TransactionGuard)
   @Delete(':id')
-  async cancelOrderById(@Param() param: OrderIdDto, @User() user: TUser) {
-    return await this.orderService.cancelOrder(param, user);
+  async cancelOrderById(@Param() param: OrderIdDto, @CurrentUser() user: TUser) {
+    return await this.orderService.cancelOrder(param, user)
   }
 }

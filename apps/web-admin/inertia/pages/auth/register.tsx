@@ -6,7 +6,13 @@ import { Label } from '@repo/ui/components/ui/label'
 import toast from 'react-hot-toast'
 
 export default function Register() {
-  const { data, setData, errors, processing, post } = useForm<RegisterValidator>()
+  const { data, setData, errors, processing, post } = useForm<RegisterValidator>({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    password_confirmation: '',
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

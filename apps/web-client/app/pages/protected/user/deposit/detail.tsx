@@ -1,7 +1,7 @@
-import { DepositStatus } from "@repo/db/types";
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Button } from "@repo/ui/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { DepositStatus } from '@repo/db/types'
+import { Badge } from '@repo/ui/components/ui/badge'
+import { Button } from '@repo/ui/components/ui/button'
+import { useQuery } from '@tanstack/react-query'
 import {
   AlertCircleIcon,
   CheckCircleIcon,
@@ -15,45 +15,45 @@ import {
   RefreshCwIcon,
   WalletIcon,
   XCircleIcon,
-} from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { apiClient } from "~/utils/axios";
-import { formatPrice } from "~/utils/format";
-import type { Route } from "./+types/detail";
+} from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { apiClient } from '~/utils/axios'
+import { formatPrice } from '~/utils/format'
+import type { Route } from './+types/detail'
 
 export default function DepositDetail({ params }: Route.ComponentProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null)
 
   const depositDetail = useQuery({
-    queryKey: ["depositDetail", params.id],
+    queryKey: ['depositDetail', params.id],
     queryFn: async () =>
       apiClient
         .get<DepositDetailResponse>(`/deposit/${params.id}`)
         .then((res) => res.data)
         .catch((error) => {
-          throw error.response?.data;
+          throw error.response?.data
         }),
     retry: false,
-  });
+  })
 
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopiedField(fieldName);
-      toast.success(`${fieldName} disalin ke clipboard`);
-      setTimeout(() => setCopiedField(null), 2000);
-    });
-  };
+      setCopiedField(fieldName)
+      toast.success(`${fieldName} disalin ke clipboard`)
+      setTimeout(() => setCopiedField(null), 2000)
+    })
+  }
 
   const handleChatCS = () => {
-    const phoneNumber = "6281234567890"; // Ganti dengan nomor WhatsApp CS
-    const message = `Halo, saya ingin bertanya tentang deposit dengan ID: ${data?.deposit_id}`;
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
-  };
+    const phoneNumber = '6281234567890' // Ganti dengan nomor WhatsApp CS
+    const message = `Halo, saya ingin bertanya tentang deposit dengan ID: ${data?.deposit_id}`
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
+  }
 
   const getStatusBadge = (status: string) => {
-    const normalizedStatus = status.toLowerCase();
+    const normalizedStatus = status.toLowerCase()
 
     switch (normalizedStatus) {
       case DepositStatus.PENDING:
@@ -62,40 +62,40 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
             <ClockIcon className="w-3 h-3 mr-1" />
             Menunggu Pembayaran
           </Badge>
-        );
+        )
       case DepositStatus.COMPLETED:
         return (
           <Badge className="bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400">
             <CheckCircleIcon className="w-3 h-3 mr-1" />
             Berhasil
           </Badge>
-        );
+        )
       case DepositStatus.FAILED:
         return (
           <Badge className="bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400">
             <XCircleIcon className="w-3 h-3 mr-1" />
             Gagal
           </Badge>
-        );
+        )
       case DepositStatus.EXPIRED:
         return (
           <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400">
             <ClockIcon className="w-3 h-3 mr-1" />
             Kadaluarsa
           </Badge>
-        );
+        )
       case DepositStatus.CANCELED:
         return (
           <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400">
             <XCircleIcon className="w-3 h-3 mr-1" />
             Dibatalkan
           </Badge>
-        );
+        )
 
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline">{status}</Badge>
     }
-  };
+  }
 
   if (depositDetail.isLoading) {
     return (
@@ -107,7 +107,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   if (depositDetail.isError) {
@@ -115,12 +115,9 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
       <div className="w-full md:max-w-7xl mx-auto px-6 py-8">
         <div className="rounded-xl shadow-xs border border-red-200 p-8 dark:border-red-800/30 dark:bg-red-800/10 text-center">
           <XCircleIcon className="w-16 h-16 text-destructive mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">
-            Gagal Memuat Detail Deposit
-          </h2>
+          <h2 className="text-xl font-semibold mb-2">Gagal Memuat Detail Deposit</h2>
           <p className="text-muted-foreground mb-4">
-            {depositDetail.error?.message ||
-              "Terjadi kesalahan saat memuat detail deposit"}
+            {depositDetail.error?.message || 'Terjadi kesalahan saat memuat detail deposit'}
           </p>
           <Button onClick={() => depositDetail.refetch()} className="gap-2">
             <RefreshCwIcon className="w-4 h-4" />
@@ -128,27 +125,23 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
           </Button>
         </div>
       </div>
-    );
+    )
   }
 
-  const data = depositDetail.data?.data;
-  if (!data) return null;
+  const data = depositDetail.data?.data
+  if (!data) return null
 
   return (
     <div className="space-y-4">
       {/* Header Section */}
       <section id="header">
         <div className="md:text-left">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2">
-            Detail Deposit
-          </h1>
-          <p className="text-muted-foreground">
-            Informasi lengkap tentang deposit Anda
-          </p>
+          <h1 className="text-2xl md:text-3xl font-bold mb-2">Detail Deposit</h1>
+          <p className="text-muted-foreground">Informasi lengkap tentang deposit Anda</p>
         </div>
       </section>
 
-      {data.expired_at && data.status === "pending" && (
+      {data.expired_at && data.status === 'pending' && (
         <section id="payment-countdown">
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-800/30 dark:bg-orange-800/10">
             <div className="flex items-center gap-2 mb-2">
@@ -158,8 +151,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
               </h3>
             </div>
             <p className="text-sm text-orange-700 dark:text-orange-300">
-              Batas waktu pembayaran:{" "}
-              {new Date(data.expired_at).toLocaleString("id-ID")}
+              Batas waktu pembayaran: {new Date(data.expired_at).toLocaleString('id-ID')}
             </p>
           </div>
         </section>
@@ -187,9 +179,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        copyToClipboard(data.deposit_id, "Deposit ID")
-                      }
+                      onClick={() => copyToClipboard(data.deposit_id, 'Deposit ID')}
                       className="p-1 h-auto"
                     >
                       <CopyIcon className="w-3 h-3" />
@@ -197,9 +187,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {getStatusBadge(data.status)}
-              </div>
+              <div className="flex flex-wrap gap-2">{getStatusBadge(data.status)}</div>
             </div>
           </div>
 
@@ -217,7 +205,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <img
                   src={
-                    data.payment_method.image_url?.startsWith("http")
+                    data.payment_method.image_url?.startsWith('http')
                       ? data.payment_method.image_url
                       : `https://is3.cloudhost.id/bagusok${data.payment_method.image_url}`
                   }
@@ -227,7 +215,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                 <div className="flex-1">
                   <p className="font-semibold">{data.payment_method.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {data.payment_method.type.replace("_", " ").toUpperCase()}
+                    {data.payment_method.type.replace('_', ' ').toUpperCase()}
                   </p>
                 </div>
               </div>
@@ -243,9 +231,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                 </div>
                 {data.phone_number && (
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Nomor Telepon
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-1">Nomor Telepon</p>
                     <div className="flex items-center gap-2">
                       <PhoneIcon className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm">{data.phone_number}</span>
@@ -263,9 +249,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
 
                   {data.pay_code && (
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Kode Pembayaran
-                      </p>
+                      <p className="text-xs text-muted-foreground mb-1">Kode Pembayaran</p>
                       <div className="flex items-center gap-2">
                         <code className="px-3 py-2 bg-white dark:bg-gray-800 rounded text-lg font-mono flex-1 border">
                           {data.pay_code}
@@ -273,9 +257,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() =>
-                            copyToClipboard(data.pay_code, "Kode Pembayaran")
-                          }
+                          onClick={() => copyToClipboard(data.pay_code, 'Kode Pembayaran')}
                           className="p-2 h-auto"
                         >
                           <CopyIcon className="w-4 h-4" />
@@ -287,7 +269,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                   {data.pay_url && (
                     <div>
                       <Button
-                        onClick={() => window.open(data.pay_url, "_blank")}
+                        onClick={() => window.open(data.pay_url, '_blank')}
                         className="w-full"
                       >
                         Lanjutkan Pembayaran
@@ -301,11 +283,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                         Scan QR Code untuk membayar
                       </p>
                       <div className="inline-block p-2 bg-white rounded-lg">
-                        <img
-                          src={data.qr_code}
-                          alt="QR Code"
-                          className="w-48 h-48 mx-auto"
-                        />
+                        <img src={data.qr_code} alt="QR Code" className="w-48 h-48 mx-auto" />
                       </div>
                     </div>
                   )}
@@ -344,16 +322,12 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-sm">Jumlah Deposit</span>
-                  <span className="text-sm font-medium">
-                    {formatPrice(data.amount_received)}
-                  </span>
+                  <span className="text-sm font-medium">{formatPrice(data.amount_received)}</span>
                 </div>
 
                 <div className="flex justify-between">
                   <span className="text-sm">Biaya Admin</span>
-                  <span className="text-sm font-medium">
-                    {formatPrice(data.amount_fee)}
-                  </span>
+                  <span className="text-sm font-medium">{formatPrice(data.amount_fee)}</span>
                 </div>
 
                 <div className="border-t pt-3">
@@ -378,32 +352,20 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
 
               <div className="space-y-3">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Dibuat pada
-                  </p>
-                  <p className="text-sm">
-                    {new Date(data.created_at).toLocaleString("id-ID")}
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">Dibuat pada</p>
+                  <p className="text-sm">{new Date(data.created_at).toLocaleString('id-ID')}</p>
                 </div>
 
                 {data.expired_at && (
                   <div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Batas Pembayaran
-                    </p>
-                    <p className="text-sm">
-                      {new Date(data.expired_at).toLocaleString("id-ID")}
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-1">Batas Pembayaran</p>
+                    <p className="text-sm">{new Date(data.expired_at).toLocaleString('id-ID')}</p>
                   </div>
                 )}
 
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">
-                    Terakhir Diperbarui
-                  </p>
-                  <p className="text-sm">
-                    {new Date(data.updated_at).toLocaleString("id-ID")}
-                  </p>
+                  <p className="text-xs text-muted-foreground mb-1">Terakhir Diperbarui</p>
+                  <p className="text-sm">{new Date(data.updated_at).toLocaleString('id-ID')}</p>
                 </div>
               </div>
             </div>
@@ -448,38 +410,38 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export interface DepositDetailResponse {
-  success: boolean;
-  message: string;
-  data: DeposiDetailData;
+  success: boolean
+  message: string
+  data: DeposiDetailData
 }
 
 export interface DeposiDetailData {
-  deposit_id: string;
-  payment_method_id: string;
-  amount_pay: number;
-  amount_received: number;
-  amount_fee: number;
-  phone_number: any;
-  email: string;
-  status: DepositStatus;
-  pay_code: string;
-  pay_url: any;
-  qr_code: any;
-  expired_at: string;
-  created_at: string;
-  updated_at: string;
-  payment_method: DepositDetailPaymentMethod;
+  deposit_id: string
+  payment_method_id: string
+  amount_pay: number
+  amount_received: number
+  amount_fee: number
+  phone_number: any
+  email: string
+  status: DepositStatus
+  pay_code: string
+  pay_url: any
+  qr_code: any
+  expired_at: string
+  created_at: string
+  updated_at: string
+  payment_method: DepositDetailPaymentMethod
 }
 
 export interface DepositDetailPaymentMethod {
-  name: string;
-  image_url: string;
-  type: string;
-  is_need_phone_number: boolean;
-  is_need_email: boolean;
-  instruction: string;
+  name: string
+  image_url: string
+  type: string
+  is_need_phone_number: boolean
+  is_need_email: boolean
+  instruction: string
 }

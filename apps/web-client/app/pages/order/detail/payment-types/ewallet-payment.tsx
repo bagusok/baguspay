@@ -1,8 +1,8 @@
-import { SmartphoneIcon } from "lucide-react";
-import { memo } from "react";
+import { SmartphoneIcon } from 'lucide-react'
+import { memo } from 'react'
 
 interface Props {
-  paymentName: string;
+  paymentName: string
 }
 
 export default memo(function EWalletPayment({ paymentName }: Props) {
@@ -21,10 +21,9 @@ export default memo(function EWalletPayment({ paymentName }: Props) {
       </div>
       <div className="p-3 bg-blue-50/50 dark:bg-blue-900/10 rounded-lg border-l-4 border-blue-300">
         <p className="text-xs text-blue-700 dark:text-blue-300">
-          📱 <strong>Langkah:</strong> Buka aplikasi → Pilih Bayar → Scan QR
-          atau masukkan kode
+          📱 <strong>Langkah:</strong> Buka aplikasi → Pilih Bayar → Scan QR atau masukkan kode
         </p>
       </div>
     </div>
-  );
-});
+  )
+})

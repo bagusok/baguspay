@@ -1,15 +1,15 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Provider, useAtom, useSetAtom } from "jotai";
-import { queryClientAtom } from "jotai-tanstack-query";
-import { useHydrateAtoms } from "jotai/utils";
-import { useEffect } from "react";
-import { Outlet, redirect } from "react-router";
-import UserLayout from "~/components/layout/user-layout";
-import { queryClient, store } from "~/store/store";
-import { authTokenAtom } from "~/store/token";
-import { userAtom } from "~/store/user";
-import type { Route } from "./+types";
+import { QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { Provider, useAtom, useSetAtom } from 'jotai'
+import { queryClientAtom } from 'jotai-tanstack-query'
+import { useHydrateAtoms } from 'jotai/utils'
+import { useEffect } from 'react'
+import { Outlet, redirect } from 'react-router'
+import UserLayout from '~/components/layout/user-layout'
+import { queryClient, store } from '~/store/store'
+import { authTokenAtom } from '~/store/token'
+import { userAtom } from '~/store/user'
+import type { Route } from './+types'
 
 // export const loader = async ({
 //   params,
@@ -33,30 +33,26 @@ import type { Route } from "./+types";
 // };
 
 export default function Locale({ params, matches }: Route.ComponentProps) {
-  useHydrateAtoms([[queryClientAtom, queryClient]]);
-  const setAuthToken = useSetAtom(authTokenAtom);
-  const [user] = useAtom(userAtom);
+  useHydrateAtoms([[queryClientAtom, queryClient]])
+  const setAuthToken = useSetAtom(authTokenAtom)
+  const [user] = useAtom(userAtom)
 
   useEffect(() => {
     if (user.isError) {
-      console.error("Error loading user data:", user.error);
-      setAuthToken(null);
-      redirect("/auth/login");
+      console.error('Error loading user data:', user.error)
+      setAuthToken(null)
+      redirect('/auth/login')
     }
-  }, [user]);
+  }, [user])
 
   if (user.isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-linear-to-br from-blue-100 to-indigo-200">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-500 mb-6"></div>
-        <h2 className="text-xl font-semibold text-indigo-700 mb-2">
-          Loading...
-        </h2>
-        <p className="text-indigo-500">
-          Please wait while we prepare your content.
-        </p>
+        <h2 className="text-xl font-semibold text-indigo-700 mb-2">Loading...</h2>
+        <p className="text-indigo-500">Please wait while we prepare your content.</p>
       </div>
-    );
+    )
   }
 
   if (user.isError) {
@@ -65,7 +61,7 @@ export default function Locale({ params, matches }: Route.ComponentProps) {
         <h2 className="text-xl font-semibold text-red-700 mb-2">Error</h2>
         <p className="text-red-500">Failed to load user data. Please Refresh</p>
       </div>
-    );
+    )
   }
 
   return (
@@ -78,5 +74,5 @@ export default function Locale({ params, matches }: Route.ComponentProps) {
         {/* <NProgressBar /> */}
       </Provider>
     </QueryClientProvider>
-  );
+  )
 }

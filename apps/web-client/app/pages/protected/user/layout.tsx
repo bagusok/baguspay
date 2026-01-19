@@ -1,5 +1,5 @@
-import { Outlet } from "react-router";
-import UserSidebarDesktop from "~/components/user/user-sidebar-desktop";
+import { Outlet } from 'react-router'
+import UserSidebarDesktop from '~/components/user/user-sidebar-desktop'
 
 export default function UserLayout() {
   return (
@@ -11,5 +11,5 @@ export default function UserLayout() {
         </div>
       </div>
     </div>
-  );
+  )
 }

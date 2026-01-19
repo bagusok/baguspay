@@ -1,4 +1,4 @@
-import { Button } from "@repo/ui/components/ui/button";
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -6,15 +6,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@repo/ui/components/ui/dialog";
-import { AlertTriangleIcon } from "lucide-react";
+} from '@repo/ui/components/ui/dialog'
+import { AlertTriangleIcon } from 'lucide-react'
 
 interface Props {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  isLoading?: boolean;
-  orderId: string;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: () => void
+  isLoading?: boolean
+  orderId: string
 }
 
 export default function CancelTransactionModal({
@@ -35,10 +35,8 @@ export default function CancelTransactionModal({
             <DialogTitle>Batalkan Transaksi</DialogTitle>
           </div>
           <DialogDescription className="text-left mt-4">
-            Apakah Anda yakin ingin membatalkan transaksi dengan Order ID{" "}
-            <code className="px-1 py-0.5 bg-muted rounded text-sm font-mono">
-              {orderId}
-            </code>
+            Apakah Anda yakin ingin membatalkan transaksi dengan Order ID{' '}
+            <code className="px-1 py-0.5 bg-muted rounded text-sm font-mono">{orderId}</code>
             ?
             <br />
             <br />
@@ -46,27 +44,19 @@ export default function CancelTransactionModal({
               Peringatan: Tindakan ini tidak dapat dibatalkan.
             </strong>
             <br />
-            Setelah transaksi dibatalkan, Anda perlu membuat pesanan baru jika
-            masih ingin melakukan pembelian.
+            Setelah transaksi dibatalkan, Anda perlu membuat pesanan baru jika masih ingin melakukan
+            pembelian.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
             Batal
           </Button>
-          <Button
-            variant="destructive"
-            onClick={onConfirm}
-            disabled={isLoading}
-          >
-            {isLoading ? "Membatalkan..." : "Ya, Batalkan Transaksi"}
+          <Button variant="destructive" onClick={onConfirm} disabled={isLoading}>
+            {isLoading ? 'Membatalkan...' : 'Ya, Batalkan Transaksi'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

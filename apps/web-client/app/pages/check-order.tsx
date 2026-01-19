@@ -1,37 +1,32 @@
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
-import { useMutation } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
-import {
-  ClockIcon,
-  Loader2Icon,
-  SearchIcon,
-  TicketCheckIcon,
-} from "lucide-react";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import LinkWithLocale from "~/components/link";
-import { apiClient } from "~/utils/axios";
-import { formatDate, formatPrice } from "~/utils/format";
+import { Button } from '@repo/ui/components/ui/button'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
+import { useMutation } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
+import { ClockIcon, Loader2Icon, SearchIcon, TicketCheckIcon } from 'lucide-react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import LinkWithLocale from '~/components/link'
+import { apiClient } from '~/utils/axios'
+import { formatDate, formatPrice } from '~/utils/format'
 
 export default function CheckOrderPage() {
-  const [orderId, setOrderId] = useState("");
+  const [orderId, setOrderId] = useState('')
 
   const checkOrder = useMutation({
-    mutationKey: ["check-order"],
+    mutationKey: ['check-order'],
     mutationFn: async (orderId: string) =>
       apiClient.post(`/order/check/${orderId}`).then((res) => res.data),
-  });
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!orderId.trim()) {
-      toast.error("Order ID tidak boleh kosong");
-      return;
+      toast.error('Order ID tidak boleh kosong')
+      return
     }
-    checkOrder.mutate(orderId);
-  };
+    checkOrder.mutate(orderId)
+  }
 
   return (
     <div className="md:max-w-7xl mx-auto">
@@ -66,11 +61,7 @@ export default function CheckOrderPage() {
                   name="orderId"
                   autoComplete="off"
                 />
-                <Button
-                  type="submit"
-                  disabled={checkOrder.isPending}
-                  className="shrink-0"
-                >
+                <Button type="submit" disabled={checkOrder.isPending} className="shrink-0">
                   {checkOrder.isPending ? (
                     <>
                       <Loader2Icon className="size-4 animate-spin" />
@@ -85,8 +76,8 @@ export default function CheckOrderPage() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground">
-                Hanya masukkan Order ID tanpa spasi. Contoh bisa ditemukan pada
-                email/riwayat pesanan Anda.
+                Hanya masukkan Order ID tanpa spasi. Contoh bisa ditemukan pada email/riwayat
+                pesanan Anda.
               </p>
             </div>
           </div>
@@ -104,18 +95,15 @@ export default function CheckOrderPage() {
         {checkOrder.isPending && (
           <div className="rounded-xl border border-border p-6 flex items-center gap-3">
             <Loader2Icon className="size-5 animate-spin" />
-            <span className="text-sm text-muted-foreground">
-              Mengambil data pesanan...
-            </span>
+            <span className="text-sm text-muted-foreground">Mengambil data pesanan...</span>
           </div>
         )}
 
         {checkOrder.isError && (
           <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-destructive text-sm">
-            {isAxiosError(checkOrder.error) &&
-            checkOrder.error.response?.status === 404
-              ? "Order ID tidak ditemukan. Periksa kembali dan coba lagi."
-              : "Terjadi kesalahan saat memeriksa pesanan. Silakan coba lagi."}
+            {isAxiosError(checkOrder.error) && checkOrder.error.response?.status === 404
+              ? 'Order ID tidak ditemukan. Periksa kembali dan coba lagi.'
+              : 'Terjadi kesalahan saat memeriksa pesanan. Silakan coba lagi.'}
           </div>
         )}
 
@@ -124,9 +112,7 @@ export default function CheckOrderPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <TicketCheckIcon className="size-5 text-primary" />
-                <h2 className="font-semibold">
-                  Order #{checkOrder.data.data.order_id}
-                </h2>
+                <h2 className="font-semibold">Order #{checkOrder.data.data.order_id}</h2>
               </div>
               <Button asChild>
                 <LinkWithLocale
@@ -142,39 +128,29 @@ export default function CheckOrderPage() {
             <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Order ID</p>
-                <p className="font-medium break-all">
-                  {checkOrder.data.data.order_id}
-                </p>
+                <p className="font-medium break-all">{checkOrder.data.data.order_id}</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Status Pembayaran</p>
-                <p className="font-medium capitalize">
-                  {checkOrder.data.data.payment_status}
-                </p>
+                <p className="font-medium capitalize">{checkOrder.data.data.payment_status}</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Status Order</p>
-                <p className="font-medium capitalize">
-                  {checkOrder.data.data.order_status}
-                </p>
+                <p className="font-medium capitalize">{checkOrder.data.data.order_status}</p>
               </div>
               <div className="rounded-lg border border-border p-3">
                 <p className="text-muted-foreground">Total</p>
-                <p className="font-medium">
-                  {formatPrice(checkOrder.data.data.total_price)}
-                </p>
+                <p className="font-medium">{formatPrice(checkOrder.data.data.total_price)}</p>
               </div>
             </div>
 
             <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
               <ClockIcon className="size-4" />
-              <time>
-                Dibuat pada {formatDate(checkOrder.data.data.created_at)}
-              </time>
+              <time>Dibuat pada {formatDate(checkOrder.data.data.created_at)}</time>
             </div>
           </article>
         )}
       </section>
     </div>
-  );
+  )
 }

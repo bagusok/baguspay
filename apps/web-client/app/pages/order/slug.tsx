@@ -1,22 +1,17 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Label } from "@repo/ui/components/ui/label";
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Badge } from '@repo/ui/components/ui/badge'
+import { Button } from '@repo/ui/components/ui/button'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@repo/ui/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@repo/ui/components/ui/tabs";
-import { useAtom, useSetAtom } from "jotai";
+} from '@repo/ui/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs'
+import { useAtom, useSetAtom } from 'jotai'
 import {
   CheckIcon,
   ContactIcon,
@@ -26,16 +21,16 @@ import {
   ShieldCheckIcon,
   TrendingDownIcon,
   ZapIcon,
-} from "lucide-react";
-import { useEffect, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { data } from "react-router";
-import z from "zod";
-import Image from "~/components/image";
-import { useFormMutation } from "~/hooks/use-form-mutation";
-import { apiClient } from "~/utils/axios";
-import { formatPrice } from "~/utils/format";
-import type { Route } from "./+types/slug";
+} from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { data } from 'react-router'
+import z from 'zod'
+import Image from '~/components/image'
+import { useFormMutation } from '~/hooks/use-form-mutation'
+import { apiClient } from '~/utils/axios'
+import { formatPrice } from '~/utils/format'
+import type { Route } from './+types/slug'
 import CheckoutModal, {
   checkoutTokenAtom,
   inquiryIdAtom,
@@ -43,142 +38,139 @@ import CheckoutModal, {
   preCheckoutRequestDataAtom,
   preCheckoutTimeAtom,
   type PreCheckoutResponse,
-} from "./checkout-modal";
-import PaymentSection from "./payment-section";
+} from './checkout-modal'
+import PaymentSection from './payment-section'
 
 export async function loader({ params }: Route.LoaderArgs) {
   try {
-    const slug = params.slug;
+    const slug = params.slug
 
     if (!slug) {
-      throw new Response("Slug not found", { status: 404 });
+      throw new Response('Slug not found', { status: 404 })
     }
 
-    const response = await apiClient.get(`/products/${slug}`);
+    const response = await apiClient.get(`/products/${slug}`)
 
     console.log(
-      "Order slug page loaded successfully:",
+      'Order slug page loaded successfully:',
       response.data.data.product_sub_categories[0],
-    );
+    )
 
     return data({
       success: true,
-      message: "Order details loaded successfully",
+      message: 'Order details loaded successfully',
       data: response?.data.data,
-    });
+    })
   } catch (error) {
-    console.error("Error loading order slug page:", error);
+    console.error('Error loading order slug page:', error)
     return data({
       success: false,
-      message: "Failed to load order details. Please try again later.",
+      message: 'Failed to load order details. Please try again later.',
       data: null,
-    });
+    })
   }
 }
 
 const preCheckoutSchema = z.object({
-  product_id: z.string().min(1, "Product ID is required"),
-  payment_method_id: z.string().min(1, "Payment method is required"),
+  product_id: z.string().min(1, 'Product ID is required'),
+  payment_method_id: z.string().min(1, 'Payment method is required'),
   voucher_id: z.string().optional(),
   phone_number: z.string().optional(),
-  email: z.email("Invalid email format"),
+  email: z.email('Invalid email format'),
   payment_phone_number: z.string().optional(),
   input_fields: z
     .array(
       z.object({
-        name: z.string().min(1, "Name is required"),
-        value: z.string().min(1, "Value is required"),
+        name: z.string().min(1, 'Name is required'),
+        value: z.string().min(1, 'Value is required'),
       }),
     )
-    .min(1, "At least one input field is required"),
-});
+    .min(1, 'At least one input field is required'),
+})
 
-export type PreCheckoutForm = z.infer<typeof preCheckoutSchema>;
+export type PreCheckoutForm = z.infer<typeof preCheckoutSchema>
 
 export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
-  const { data } = loaderData;
+  const { data } = loaderData
 
-  const [preCheckoutTime, setPreCheckoutTime] = useAtom(preCheckoutTimeAtom);
-  const setIsOpenModalConfirmation = useSetAtom(isOpenModalCheckout);
-  const setCheckoutToken = useSetAtom(checkoutTokenAtom);
-  const setInquiryId = useSetAtom(inquiryIdAtom);
-  const setPreCheckoutRequestData = useSetAtom(preCheckoutRequestDataAtom);
+  const [preCheckoutTime, setPreCheckoutTime] = useAtom(preCheckoutTimeAtom)
+  const setIsOpenModalConfirmation = useSetAtom(isOpenModalCheckout)
+  const setCheckoutToken = useSetAtom(checkoutTokenAtom)
+  const setInquiryId = useSetAtom(inquiryIdAtom)
+  const setPreCheckoutRequestData = useSetAtom(preCheckoutRequestDataAtom)
 
   const form = useForm<PreCheckoutForm>({
     defaultValues: {
-      product_id: data.product_sub_categories[0]?.products[0]?.id || "",
-      payment_method_id: "",
-      phone_number: "",
-      email: "",
-      payment_phone_number: "",
+      product_id: data.product_sub_categories[0]?.products[0]?.id || '',
+      payment_method_id: '',
+      phone_number: '',
+      email: '',
+      payment_phone_number: '',
       input_fields:
         data.input_fields?.map((field: any) => ({
           name: field.name,
-          value: "",
+          value: '',
         })) || [],
     },
     resolver: zodResolver(preCheckoutSchema),
-    mode: "onChange",
-  });
+    mode: 'onChange',
+  })
 
   const [selectedItem, setSelectedItem] = useState<OrderProducts | null>(
     data.product_sub_categories[0]?.products[0] || null,
-  );
+  )
 
   const { update } = useFieldArray({
     control: form.control,
-    name: "input_fields",
-  });
+    name: 'input_fields',
+  })
 
   // Update form when selectedItem changes
   useEffect(() => {
     if (selectedItem) {
-      form.setValue("product_id", selectedItem.id);
+      form.setValue('product_id', selectedItem.id)
     }
-  }, [selectedItem, form]);
+  }, [selectedItem, form])
 
   const preCheckout = useFormMutation({
     form,
-    mutationKey: [
-      "preCheckout",
-      data.product_sub_categories[0]?.products[0]?.id,
-    ],
+    mutationKey: ['preCheckout', data.product_sub_categories[0]?.products[0]?.id],
     mutationFn: async (formData: PreCheckoutForm) =>
       apiClient
-        .post<PreCheckoutResponse>("/v2/order/inquiry", formData, {
+        .post<PreCheckoutResponse>('/v2/order/inquiry', formData, {
           headers: {
-            "X-Time": preCheckoutTime,
+            'X-Time': preCheckoutTime,
           },
         })
         .then((res) => res.data)
         .catch((err) => {
-          throw err;
+          throw err
         }),
     onSuccess: (data) => {
-      setIsOpenModalConfirmation(true);
-      setCheckoutToken(data.data.checkout_token);
-      setInquiryId(data.data.inquiry_id);
+      setIsOpenModalConfirmation(true)
+      setCheckoutToken(data.data.checkout_token)
+      setInquiryId(data.data.inquiry_id)
     },
-  });
+  })
 
   const onSubmit = (formData: PreCheckoutForm) => {
-    const { voucher_id, ...rest } = formData;
+    const { voucher_id, ...rest } = formData
 
-    setPreCheckoutTime(Date.now());
+    setPreCheckoutTime(Date.now())
     if (!voucher_id) {
-      setPreCheckoutRequestData(rest);
-      preCheckout.mutate(rest);
+      setPreCheckoutRequestData(rest)
+      preCheckout.mutate(rest)
     } else {
       setPreCheckoutRequestData({
         ...rest,
         voucher_id,
-      });
+      })
       preCheckout.mutate({
         ...rest,
         voucher_id,
-      });
+      })
     }
-  };
+  }
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -206,7 +198,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
               <div className="flex-1">
                 <h2 className="text-lg font-semibold">{data.name}</h2>
                 <p className="text-sm text-muted-foreground mt-1 text-ellipsis line-clamp-2">
-                  {data.description || "No description available."}
+                  {data.description || 'No description available.'}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <Badge className="rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
@@ -237,19 +229,16 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
               </div>
               <div className="flex gap-2 mt-4">
                 {data.input_fields.map((input: any, index: number) => {
-                  if (input.type == "select") {
+                  if (input.type == 'select') {
                     return (
                       <div className="w-full" key={input.title}>
-                        <Label
-                          htmlFor={`input_fields.${index}.value`}
-                          className="text-xs"
-                        >
+                        <Label htmlFor={`input_fields.${index}.value`} className="text-xs">
                           {input.title}
                         </Label>
                         <Select
                           value={form.watch(`input_fields.${index}.value`)}
                           onValueChange={(value) => {
-                            update(index, { name: input.name, value });
+                            update(index, { name: input.name, value })
                           }}
                         >
                           <SelectTrigger className="w-full mt-2 rounded-full dark:border-none">
@@ -257,10 +246,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                           </SelectTrigger>
                           <SelectContent>
                             {input.options.map((option: any) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
+                              <SelectItem key={option.value} value={option.value}>
                                 {option.label}
                               </SelectItem>
                             ))}
@@ -268,21 +254,15 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                         </Select>
                         {form.formState.errors.input_fields?.[index]?.value && (
                           <p className="text-red-500 text-xs mt-1">
-                            {
-                              form.formState.errors.input_fields[index]?.value
-                                ?.message
-                            }
+                            {form.formState.errors.input_fields[index]?.value?.message}
                           </p>
                         )}
                       </div>
-                    );
+                    )
                   } else {
                     return (
                       <div className="w-full" key={input.title}>
-                        <Label
-                          htmlFor={`input_fields.${index}.value`}
-                          className="text-xs"
-                        >
+                        <Label htmlFor={`input_fields.${index}.value`} className="text-xs">
                           {input.title}
                         </Label>
                         <Input
@@ -294,32 +274,21 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                         />
                         {form.formState.errors.input_fields?.[index]?.value && (
                           <p className="text-red-500 text-xs mt-1">
-                            {
-                              form.formState.errors.input_fields[index]?.value
-                                ?.message
-                            }
+                            {form.formState.errors.input_fields[index]?.value?.message}
                           </p>
                         )}
                       </div>
-                    );
+                    )
                   }
                 })}
               </div>
-              <p className="text-xs underline italic font-medium mt-2">
-                Bagaimana Menemukan ID?
-              </p>
+              <p className="text-xs underline italic font-medium mt-2">Bagaimana Menemukan ID?</p>
             </div>
             <div className="rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
-              <Tabs
-                defaultValue={data.product_sub_categories[0]?.name ?? ""}
-                className="w-full"
-              >
+              <Tabs defaultValue={data.product_sub_categories[0]?.name ?? ''} className="w-full">
                 <TabsList>
                   {data.product_sub_categories.map((subCategory: any) => (
-                    <TabsTrigger
-                      key={subCategory.name}
-                      value={subCategory.name}
-                    >
+                    <TabsTrigger key={subCategory.name} value={subCategory.name}>
                       {subCategory.name}
                     </TabsTrigger>
                   ))}
@@ -337,20 +306,18 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                           )}
 
                           <div
-                            onClick={() =>
-                              item.is_available && setSelectedItem(item)
-                            }
+                            onClick={() => item.is_available && setSelectedItem(item)}
                             className={`
                       h-full group relative rounded-xl border transition-all duration-300 cursor-pointer flex flex-col
                       ${
                         selectedItem?.id === item.id
-                          ? "border-primary shadow-lg shadow-primary/20 ring-2 ring-primary/20 scale-[1.02]"
-                          : "border-border dark:border-foreground/20 hover:border-primary/50"
+                          ? 'border-primary shadow-lg shadow-primary/20 ring-2 ring-primary/20 scale-[1.02]'
+                          : 'border-border dark:border-foreground/20 hover:border-primary/50'
                       }
                       ${
                         !item.is_available
-                          ? "opacity-60 cursor-not-allowed grayscale"
-                          : "hover:scale-[1.02] hover:shadow-md"
+                          ? 'opacity-60 cursor-not-allowed grayscale'
+                          : 'hover:scale-[1.02] hover:shadow-md'
                       }
                     `}
                           >
@@ -384,9 +351,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                                   <p className="text-sm font-semibold text-foreground truncate">
                                     {item.name}
                                   </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {item.sub_name}
-                                  </p>
+                                  <p className="text-xs text-muted-foreground">{item.sub_name}</p>
                                 </div>
                               </div>
 
@@ -406,14 +371,8 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                               <div className="space-y-1">
                                 {item.discount > 0 && (
                                   <div className="flex items-center gap-2">
-                                    <Badge
-                                      variant="destructive"
-                                      className="text-xs px-1 py-0"
-                                    >
-                                      {Math.round(
-                                        (item.discount / item.price) * 100,
-                                      )}
-                                      %
+                                    <Badge variant="destructive" className="text-xs px-1 py-0">
+                                      {Math.round((item.discount / item.price) * 100)}%
                                     </Badge>
                                     <p className="text-xs line-through text-muted-foreground">
                                       {formatPrice(item.price)}
@@ -451,7 +410,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                     Masukkan Email
                   </Label>
                   <Input
-                    {...form.register("email")}
+                    {...form.register('email')}
                     type="text"
                     id="email"
                     className="w-full mt-2 rounded-full dark:border-none"
@@ -469,7 +428,7 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                     Nomor Telepon
                   </Label>
                   <Input
-                    {...form.register("phone_number")}
+                    {...form.register('phone_number')}
                     type="text"
                     id="phone_number"
                     className="w-full mt-2 rounded-full dark:border-none"
@@ -483,13 +442,13 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
                 </div>
 
                 {/* Conditional payment phone number field */}
-                {form.watch("payment_method_id") && (
+                {form.watch('payment_method_id') && (
                   <div className="w-full mb-2">
                     <Label htmlFor="payment_phone_number" className="text-xs">
                       Nomor Telepon Pembayaran (WhatsApp)
                     </Label>
                     <Input
-                      {...form.register("payment_phone_number")}
+                      {...form.register('payment_phone_number')}
                       type="text"
                       id="payment_phone_number"
                       className="w-full mt-2 rounded-full dark:border-none"
@@ -530,26 +489,26 @@ export default function OrderSlugPage({ loaderData }: Route.ComponentProps) {
       </div>
       {preCheckout.isSuccess && <CheckoutModal data={preCheckout.data.data} />}
     </form>
-  );
+  )
 }
 
 export type OrderProducts = {
-  id: string;
-  name: string;
-  image_url: string;
-  price: number;
-  is_available: boolean;
-  is_featured: boolean;
-  notes: string | null;
-  stock: number;
-  billing_type: string;
-  cut_off_start: string;
-  cut_off_end: string;
-  description: string;
-  label_text: string | null;
-  sku_code: string;
-  sub_name: string;
-  label_image: string | null;
-  discount: number;
-  total_price: number;
-};
+  id: string
+  name: string
+  image_url: string
+  price: number
+  is_available: boolean
+  is_featured: boolean
+  notes: string | null
+  stock: number
+  billing_type: string
+  cut_off_start: string
+  cut_off_end: string
+  description: string
+  label_text: string | null
+  sku_code: string
+  sub_name: string
+  label_image: string | null
+  discount: number
+  total_price: number
+}

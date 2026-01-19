@@ -1,27 +1,26 @@
-import { Link } from "react-router";
+import { Link } from 'react-router'
 
 type Post = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  image: string;
-  date: string;
-  tag: string;
-};
+  slug: string
+  title: string
+  excerpt: string
+  image: string
+  date: string
+  tag: string
+}
 
 const posts: Post[] = Array.from({ length: 9 }).map((_, i) => ({
   slug: `dummy-post-${i + 1}`,
   title: `Tips Topup Hemat #${i + 1}`,
-  excerpt:
-    "Pelajari cara mendapatkan harga terbaik saat topup game & PPOB di Baguspay.",
+  excerpt: 'Pelajari cara mendapatkan harga terbaik saat topup game & PPOB di Baguspay.',
   image: `https://picsum.photos/seed/baguspay-${i}/600/400`,
-  date: new Date(Date.now() - i * 86400000).toLocaleDateString("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+  date: new Date(Date.now() - i * 86400000).toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
   }),
-  tag: i % 2 === 0 ? "Topup" : "PPOB",
-}));
+  tag: i % 2 === 0 ? 'Topup' : 'PPOB',
+}))
 
 export default function Blog() {
   return (
@@ -64,17 +63,13 @@ export default function Blog() {
                 <h3 className="mt-2 font-semibold text-foreground line-clamp-2 group-hover:text-primary">
                   {post.title}
                 </h3>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-3">
-                  {post.excerpt}
-                </p>
-                <span className="mt-3 text-sm font-medium text-primary">
-                  Baca selengkapnya →
-                </span>
+                <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{post.excerpt}</p>
+                <span className="mt-3 text-sm font-medium text-primary">Baca selengkapnya →</span>
               </div>
             </article>
           </Link>
         ))}
       </section>
     </div>
-  );
+  )
 }

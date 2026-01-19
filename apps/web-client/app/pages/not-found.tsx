@@ -1,6 +1,6 @@
-import { Button } from "@repo/ui/components/ui/button";
-import { Home, Search, TriangleAlert } from "lucide-react";
-import { Link } from "react-router";
+import { Button } from '@repo/ui/components/ui/button'
+import { Home, Search, TriangleAlert } from 'lucide-react'
+import { Link } from 'react-router'
 
 export default function NotFound() {
   return (
@@ -15,8 +15,8 @@ export default function NotFound() {
             404
           </h1>
           <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground max-w-2xl">
-            Maaf, kami tidak dapat menemukan halaman yang Anda cari. Link
-            mungkin salah atau halaman telah dipindahkan.
+            Maaf, kami tidak dapat menemukan halaman yang Anda cari. Link mungkin salah atau halaman
+            telah dipindahkan.
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -37,7 +37,7 @@ export default function NotFound() {
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
       </section>
     </div>
-  );
+  )
 }
 
 function QuickLink({ to, label }: { to: string; label: string }) {
@@ -48,5 +48,5 @@ function QuickLink({ to, label }: { to: string; label: string }) {
     >
       {label}
     </Link>
-  );
+  )
 }

@@ -8,9 +8,9 @@ export default function FooterSection() {
               Baguspay
             </h2>
             <p className="text-sm mt-2 text-muted-foreground text-center md:text-start max-w-full lg:max-w-2/3">
-              Baguspay adalah platform top-up & pembayaran digital yang
-              memudahkan pembelian pulsa, paket data, game voucher, dan layanan
-              digital lainnya secara cepat, aman, dan transparan
+              Baguspay adalah platform top-up & pembayaran digital yang memudahkan pembelian pulsa,
+              paket data, game voucher, dan layanan digital lainnya secara cepat, aman, dan
+              transparan
             </p>
             <address className="not-italic mt-4 text-xs leading-relaxed text-muted-foreground text-center md:text-start max-w-full lg:max-w-2/3">
               Jl. Raya Bandung Durenan, Desa Gandong, Kec. Bandung,
@@ -27,11 +27,7 @@ export default function FooterSection() {
                 alt="gp"
                 className="h-13 object-contain"
               />
-              <img
-                src="/images/download-app-store.png"
-                alt="gp"
-                className="h-9 object-contain"
-              />
+              <img src="/images/download-app-store.png" alt="gp" className="h-9 object-contain" />
               <img
                 src="/images/download-app-gallery.png"
                 alt="gp"
@@ -50,35 +46,24 @@ export default function FooterSection() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/contact"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/contact" className="text-sm text-muted-foreground">
                       Kontak
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/privacy-policy"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/privacy-policy" className="text-sm text-muted-foreground">
                       Kebijakan Privasi
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/terms-of-service"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/terms-of-service" className="text-sm text-muted-foreground">
                       Syarat dan Ketentuan
                     </a>
                   </li>
                 </ul>
               </div>
               <div className="flex-1">
-                <h2 className="font-semibold md:mt-4 text-foreground">
-                  Lainnya
-                </h2>
+                <h2 className="font-semibold md:mt-4 text-foreground">Lainnya</h2>
                 <ul>
                   <li>
                     <a href="/faq" className="text-sm text-muted-foreground">
@@ -86,10 +71,7 @@ export default function FooterSection() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/support"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/support" className="text-sm text-muted-foreground">
                       Dukungan
                     </a>
                   </li>
@@ -99,10 +81,7 @@ export default function FooterSection() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/careers"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/careers" className="text-sm text-muted-foreground">
                       Karir
                     </a>
                   </li>
@@ -121,19 +100,14 @@ export default function FooterSection() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/contact"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/contact" className="text-sm text-muted-foreground">
                       Gabung Reseller
                     </a>
                   </li>
                 </ul>
               </div>
               <div className="flex-1">
-                <h2 className="font-semibold md:mt-4 text-foreground">
-                  Social Media
-                </h2>
+                <h2 className="font-semibold md:mt-4 text-foreground">Social Media</h2>
                 <ul>
                   <li>
                     <a href="/faq" className="text-sm text-muted-foreground">
@@ -141,10 +115,7 @@ export default function FooterSection() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/support"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/support" className="text-sm text-muted-foreground">
                       Facebook
                     </a>
                   </li>
@@ -154,10 +125,7 @@ export default function FooterSection() {
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/careers"
-                      className="text-sm text-muted-foreground"
-                    >
+                    <a href="/careers" className="text-sm text-muted-foreground">
                       Twitter
                     </a>
                   </li>
@@ -172,5 +140,5 @@ export default function FooterSection() {
         </div>
       </div>
     </footer>
-  );
+  )
 }

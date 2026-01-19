@@ -1,10 +1,10 @@
-import { Button } from "@repo/ui/components/ui/button";
-import { ExternalLinkIcon } from "lucide-react";
-import { memo } from "react";
+import { Button } from '@repo/ui/components/ui/button'
+import { ExternalLinkIcon } from 'lucide-react'
+import { memo } from 'react'
 
 interface Props {
-  payUrl: string;
-  paymentName: string;
+  payUrl: string
+  paymentName: string
 }
 
 export default memo(function LinkPayment({ payUrl, paymentName }: Props) {
@@ -23,10 +23,9 @@ export default memo(function LinkPayment({ payUrl, paymentName }: Props) {
       </div>
       <div className="p-3 bg-green-50/50 dark:bg-green-900/10 rounded-lg border-l-4 border-green-300">
         <p className="text-xs text-green-700 dark:text-green-300">
-          🔒 <strong>Aman:</strong> Link akan membawa Anda ke halaman pembayaran
-          resmi
+          🔒 <strong>Aman:</strong> Link akan membawa Anda ke halaman pembayaran resmi
         </p>
       </div>
     </div>
-  );
-});
+  )
+})

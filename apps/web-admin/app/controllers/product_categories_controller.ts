@@ -5,7 +5,7 @@ import {
   updateProductCategoryValidator,
 } from '#validators/product'
 import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, desc, eq, ilike, inArray, InferSelectModel } from '@repo/db'
+import { and, asc, count, db, desc, eq, ilike, inArray, InferSelectModel } from '@repo/db'
 import { ProductBillingType, ProductCategoryType, tb } from '@repo/db/types'
 import slugify from '@sindresorhus/slugify'
 import vine from '@vinejs/vine'
@@ -36,7 +36,7 @@ export default class ProductsCategoriesController {
       .select()
       .from(tb.productCategories)
       .where(whereFilter.length ? and(...whereFilter) : undefined)
-      .orderBy(desc(tb.productCategories.created_at))
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
       .limit(limit)
       .offset(offset)
 
@@ -54,7 +54,7 @@ export default class ProductsCategoriesController {
       pagination: {
         page: page,
         limit,
-        total,
+        total: total[0].count,
         totalPages: Math.ceil(total[0].count / limit),
       },
       filters: {
@@ -452,6 +452,7 @@ export default class ProductsCategoriesController {
     })
   }
 
+  // Pulsa Section
   public async indexGames(ctx: HttpContext) {
     const {
       limit = 10,
@@ -480,7 +481,7 @@ export default class ProductsCategoriesController {
       .select()
       .from(tb.productCategories)
       .where(whereFilter.length ? and(...whereFilter) : undefined)
-      .orderBy(desc(tb.productCategories.created_at))
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
       .limit(limit)
       .offset(offset)
 
@@ -498,7 +499,7 @@ export default class ProductsCategoriesController {
       pagination: {
         page: page,
         limit,
-        total,
+        total: total[0].count,
         totalPages: Math.ceil(total[0].count / limit),
       },
       filters: {
@@ -556,6 +557,7 @@ export default class ProductsCategoriesController {
     })
   }
 
+  // Pulsa Section
   public async indexPulsa(ctx: HttpContext) {
     const {
       limit = 10,
@@ -584,7 +586,7 @@ export default class ProductsCategoriesController {
       .select()
       .from(tb.productCategories)
       .where(whereFilter.length ? and(...whereFilter) : undefined)
-      .orderBy(desc(tb.productCategories.created_at))
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
       .limit(limit)
       .offset(offset)
 
@@ -602,7 +604,7 @@ export default class ProductsCategoriesController {
       pagination: {
         page: page,
         limit,
-        total,
+        total: total[0].count,
         totalPages: Math.ceil(total[0].count / limit),
       },
       filters: {
@@ -660,6 +662,7 @@ export default class ProductsCategoriesController {
     })
   }
 
+  // Kuota Section
   public async indexKuota(ctx: HttpContext) {
     const {
       limit = 10,
@@ -688,7 +691,7 @@ export default class ProductsCategoriesController {
       .select()
       .from(tb.productCategories)
       .where(whereFilter.length ? and(...whereFilter) : undefined)
-      .orderBy(desc(tb.productCategories.created_at))
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
       .limit(limit)
       .offset(offset)
 
@@ -706,7 +709,7 @@ export default class ProductsCategoriesController {
       pagination: {
         page: page,
         limit,
-        total,
+        total: total[0].count,
         totalPages: Math.ceil(total[0].count / limit),
       },
       filters: {
@@ -752,6 +755,425 @@ export default class ProductsCategoriesController {
       )
 
     return inertia.render('products/prepaid/kuota/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
+      },
+    })
+  }
+
+  // Token PLN Section
+  public async indexTokenPln(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.PLN_PREPAID),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/token-pln/index', {
+      title: 'Product Categories - Token PLN',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total: total[0].count,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createTokenPln({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/token-pln/create', {
+      title: 'Create Token PLN',
+      description: 'Add a new token PLN to the system.',
+    })
+  }
+
+  public async editTokenPln({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/kuota/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
+      },
+    })
+  }
+
+  // e-wallet Section
+  public async indexEWallet(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.E_WALLET),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/e-wallet/index', {
+      title: 'Product Categories - E-Wallet',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total: total[0].count,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createEWallet({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/e-wallet/create', {
+      title: 'Create E-Wallet',
+      description: 'Add a new E-Wallet to the system.',
+    })
+  }
+
+  public async editEWallet({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/e-wallet/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
+      },
+    })
+  }
+
+  // voucher Section
+  public async indexVoucher(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.VOUCHER),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/voucher/index', {
+      title: 'Product Categories - Voucher',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total: total[0].count,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createVoucher({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/voucher/create', {
+      title: 'Create Voucher',
+      description: 'Add a new Voucher to the system.',
+    })
+  }
+
+  public async editVoucher({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/voucher/edit', {
+      title: `Edit Product Category - ${productCategory.name}`,
+      description: productCategory.description,
+      productCategory,
+      image: {
+        file_image_id: images.find((img) => img.url === productCategory.image_url)?.id ?? '',
+        file_banner_id: images.find((img) => img.url === productCategory.banner_url)?.id ?? '',
+        file_icon_id: images.find((img) => img.url === productCategory.icon_url)?.id ?? '',
+        seo_image_id: images.find((img) => img.url === productCategory.seo_image)?.id ?? '',
+      },
+    })
+  }
+
+  public async indexOtherPrepaid(ctx: HttpContext) {
+    const {
+      limit = 10,
+      page = 1,
+      searchBy = 'id',
+      searchQuery = '',
+    } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const offset = (page - 1) * limit
+    const whereFilter = [
+      eq(tb.productCategories.product_billing_type, ProductBillingType.PREPAID),
+      eq(tb.productCategories.type, ProductCategoryType.OTHER),
+    ]
+
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        whereFilter.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        whereFilter.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    const productCategories = await db
+      .select()
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+      .orderBy(desc(tb.productCategories.created_at), asc(tb.productCategories.name))
+      .limit(limit)
+      .offset(offset)
+
+    const total = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(whereFilter.length ? and(...whereFilter) : undefined)
+
+    return ctx.inertia.render('products/prepaid/other-prepaid/index', {
+      title: 'Product Categories - Other Prepaid',
+      description: 'Manage your product categories here.',
+      productCategories,
+      pagination: {
+        page: page,
+        limit,
+        total: total[0].count,
+        totalPages: Math.ceil(total[0].count / limit),
+      },
+      filters: {
+        searchBy,
+        searchQuery,
+      },
+    })
+  }
+
+  public async createOtherPrepaid({ inertia }: HttpContext) {
+    return inertia.render('products/prepaid/other-prepaid/create', {
+      title: 'Create Other Prepaid',
+      description: 'Add a new Other Prepaid to the system.',
+    })
+  }
+
+  public async editOtherPrepaid({ inertia, request, response }: HttpContext) {
+    const data = await request.validateUsing(vine.compile(productCategoryIdValidator), {
+      data: request.params(),
+    })
+
+    const productCategory = await db.query.productCategories.findFirst({
+      where: eq(tb.productCategories.id, data.id),
+    })
+
+    if (!productCategory) {
+      return response.notFound('Product category not found')
+    }
+
+    const seoImage = productCategory?.seo_image ? [productCategory.seo_image] : []
+    const iconUrl = productCategory?.icon_url ? [productCategory.icon_url] : []
+
+    const images = await db
+      .select()
+      .from(tb.fileManager)
+      .where(
+        inArray(tb.fileManager.url, [
+          productCategory.banner_url,
+          productCategory.image_url,
+          ...seoImage,
+          ...iconUrl,
+        ])
+      )
+
+    return inertia.render('products/prepaid/other-prepaid/edit', {
       title: `Edit Product Category - ${productCategory.name}`,
       description: productCategory.description,
       productCategory,

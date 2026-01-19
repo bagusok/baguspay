@@ -1,10 +1,8 @@
 // @ts-check
-import eslint from '@eslint/js';
-// import drizzle from '@repo/eslint-config/drizzle';
-import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
-import unusedImports from 'eslint-plugin-unused-imports';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
+import eslint from '@eslint/js'
+import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
+import globals from 'globals'
+import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
   {
@@ -13,13 +11,6 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommendedTypeChecked,
   eslintPluginPrettierRecommended,
-  // Shared Drizzle plugin setup
-  // ...drizzle,
-  {
-    plugins: {
-      'unused-imports': unusedImports,
-    },
-  },
   {
     languageOptions: {
       globals: {
@@ -35,26 +26,13 @@ export default tseslint.config(
   },
   {
     rules: {
-      'linebreak-style': ['error', 'unix'],
-      'prettier/prettier': [
-        'error',
-        {
-          endOfLine: 'lf',
-        },
-      ],
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      'unused-imports/no-unused-vars': [
-        'warn',
-        {
-          vars: 'all',
-          varsIgnorePattern: '^_',
-          args: 'after-used',
-          argsIgnorePattern: '^_',
-        },
-      ],
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },
-);
+)

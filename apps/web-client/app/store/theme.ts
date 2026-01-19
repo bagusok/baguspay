@@ -1,15 +1,10 @@
-import { atomWithStorage } from "jotai/utils";
+import { atomWithStorage } from 'jotai/utils'
 
 export enum Theme {
-  LIGHT = "light",
-  DARK = "dark",
+  LIGHT = 'light',
+  DARK = 'dark',
 }
 
-export const themeAtom = atomWithStorage<Theme>(
-  Theme.LIGHT,
-  Theme.LIGHT,
-  undefined,
-  {
-    getOnInit: true,
-  },
-);
+export const themeAtom = atomWithStorage<Theme>(Theme.LIGHT, Theme.LIGHT, undefined, {
+  getOnInit: true,
+})

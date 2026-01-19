@@ -1,8 +1,8 @@
-import { LoaderIcon } from "lucide-react";
-import { memo } from "react";
+import { LoaderIcon } from 'lucide-react'
+import { memo } from 'react'
 
 interface Props {
-  paymentName: string;
+  paymentName: string
 }
 
 export default memo(function PaymentLoading({ paymentName }: Props) {
@@ -18,5 +18,5 @@ export default memo(function PaymentLoading({ paymentName }: Props) {
         Menunggu detail pembayaran {paymentName}...
       </p>
     </div>
-  );
-});
+  )
+})
