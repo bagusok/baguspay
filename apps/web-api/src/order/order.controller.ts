@@ -23,7 +23,7 @@ import { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from './dto/order.dt
 import { OrderService } from './services/order.service'
 
 @ApiSecurity('access-token')
-@Controller('v2/order')
+@Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 

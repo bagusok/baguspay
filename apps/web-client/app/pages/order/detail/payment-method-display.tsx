@@ -23,9 +23,9 @@ type Props = {
   paymentMethod: {
     name: string
     type: PaymentMethodType
-    qr_code?: string
-    pay_url?: string
-    pay_code?: string
+    qr_code: string | null
+    pay_url: string | null
+    pay_code: string | null
   }
   paymentStatus: string
   orderStatus: string
@@ -74,7 +74,7 @@ export default function PaymentMethodDisplay({ paymentMethod, paymentStatus, ord
     // Show payment details for pending payments
     switch (paymentMethod.type) {
       case PaymentMethodType.QR_CODE:
-        if (paymentMethod.qr_code && paymentMethod.qr_code !== 'SANDBOX MODE') {
+        if (paymentMethod.qr_code) {
           return <QrCodePayment qrCode={paymentMethod.qr_code} paymentName={paymentMethod.name} />
         }
         break

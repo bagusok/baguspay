@@ -29,7 +29,7 @@ export class PaymentGatewayCallbackService {
 
     const paymentStatus = payload.status === 'PAID' ? PaymentStatus.SUCCESS : PaymentStatus.FAILED
 
-    if (payload.merchant_ref.toLowerCase().startsWith('T')) {
+    if (payload.merchant_ref.toLowerCase().startsWith('t')) {
       const result = await this.orderService.handlePaymentCallback(
         payload.merchant_ref,
         paymentStatus,
@@ -63,7 +63,7 @@ export class PaymentGatewayCallbackService {
 
     const paymentStatus = payload.resultCode == '00' ? PaymentStatus.SUCCESS : PaymentStatus.FAILED
 
-    if (!payload.merchantOrderId.toLowerCase().startsWith('T')) {
+    if (!payload.merchantOrderId.toLowerCase().startsWith('t')) {
       const result = await this.orderService.handlePaymentCallback(
         payload.merchantOrderId,
         paymentStatus,

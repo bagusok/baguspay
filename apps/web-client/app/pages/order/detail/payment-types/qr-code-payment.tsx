@@ -6,15 +6,7 @@ interface Props {
 }
 
 export default memo(function QRCodePayment({ qrCode, paymentName }: Props) {
-  if (!qrCode || qrCode === 'SANDBOX MODE') {
-    return (
-      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/30 rounded-lg">
-        <p className="text-sm text-yellow-800 dark:text-yellow-300 text-center">
-          QR Code belum tersedia
-        </p>
-      </div>
-    )
-  }
+  const qrCodeImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCode)}`
 
   return (
     <div className="space-y-3">
@@ -23,7 +15,11 @@ export default memo(function QRCodePayment({ qrCode, paymentName }: Props) {
           Scan QR Code untuk melakukan pembayaran
         </p>
         <div className="p-4 bg-white rounded-lg border w-fit mx-auto shadow-sm">
-          <img src={qrCode} alt={`QR Code Pembayaran ${paymentName}`} className="w-48 h-48" />
+          <img
+            src={qrCodeImageUrl}
+            alt={`QR Code Pembayaran ${paymentName}`}
+            className="w-48 h-48"
+          />
         </div>
         <p className="text-xs text-muted-foreground mt-2">
           Buka aplikasi mobile banking atau e-wallet untuk scan

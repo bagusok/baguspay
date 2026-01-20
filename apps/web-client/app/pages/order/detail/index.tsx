@@ -1,9 +1,7 @@
-import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
 import { useQuery } from '@tanstack/react-query'
 import {
   AlertCircleIcon,
-  CheckCircleIcon,
   CopyIcon,
   CreditCardIcon,
   GamepadIcon,
@@ -35,7 +33,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
     queryKey: ['orderDetail', params.id],
     queryFn: async () =>
       apiClient
-        .post<OrderDetailResponse>(`/order/${params.id}`)
+        .get<OrderDetailResponse>(`/order/${params.id}`)
         .then((res) => res.data)
         .catch((error) => {
           throw error.response?.data
@@ -175,16 +173,6 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
 
               <div>
                 <h3 className="font-medium text-lg mb-2">{data.product.name}</h3>
-                <div className="flex flex-wrap gap-2">
-                  <Badge className="rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
-                    <GamepadIcon className="w-3 h-3" />
-                    {data.product.billing_type === 'prepaid' ? 'Prepaid' : 'Postpaid'}
-                  </Badge>
-                  <Badge className="rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-500">
-                    <CheckCircleIcon className="w-3 h-3" />
-                    {data.product.fullfillment_type === 'automatic_direct' ? 'Otomatis' : 'Manual'}
-                  </Badge>
-                </div>
               </div>
 
               <div>
@@ -245,14 +233,14 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                   <p className="text-xs text-muted-foreground mb-1">Email</p>
                   <div className="flex items-center gap-2">
                     <MailIcon className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{data.payment.email}</span>
+                    <span className="text-sm">{data.customer_email}</span>
                   </div>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Nomor Telepon</p>
                   <div className="flex items-center gap-2">
                     <PhoneIcon className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{data.payment.phone_number}</span>
+                    <span className="text-sm">{data.customer_phone}</span>
                   </div>
                 </div>
               </div>
@@ -323,7 +311,7 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
             </div>
 
             {/* Additional Information */}
-            {(data.notes || data.voucher_code) && (
+            {data.voucher_code && (
               <div className="rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
                 <div className="inline-flex gap-2 items-center mb-4">
                   <div className="rounded-full p-2 bg-primary">
@@ -333,30 +321,22 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                 </div>
 
                 <div className="space-y-3">
-                  {data.voucher_code && (
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Kode Voucher</p>
-                      <div className="flex items-center gap-2">
-                        <code className="px-2 py-1 bg-muted rounded text-sm font-mono flex-1">
-                          {data.voucher_code}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(data.voucher_code, 'Kode Voucher')}
-                          className="p-1 h-auto"
-                        >
-                          <CopyIcon className="w-3 h-3" />
-                        </Button>
-                      </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Kode Voucher</p>
+                    <div className="flex items-center gap-2">
+                      <code className="px-2 py-1 bg-muted rounded text-sm font-mono flex-1">
+                        {data.voucher_code}
+                      </code>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => copyToClipboard(data.voucher_code ?? '', 'Kode Voucher')}
+                        className="p-1 h-auto"
+                      >
+                        <CopyIcon className="w-3 h-3" />
+                      </Button>
                     </div>
-                  )}
-                  {data.notes && (
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Catatan</p>
-                      <p className="text-sm bg-muted p-3 rounded">{data.notes}</p>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
             )}
@@ -443,38 +423,30 @@ export interface OrderDetailData {
   sn_number: string
   customer_input: string
   customer_email: string
-  user_id: string
-  voucher_code: any
-  notes: any
+  customer_phone: string
+  voucher_code: string | null
+  created_at: string
+  updated_at: string
   product: OrderDetailProduct
   payment: OrderDetailPayment
   offers: OrderDetailOffer[]
+  user: OrderDetailUser
 }
 
 export interface OrderDetailProduct {
-  product_id: string
   name: string
   category_name: string
   sub_category_name: string
   price: number
-  provider_ref_id: string
-  fullfillment_type: string
-  billing_type: string
 }
 
 export interface OrderDetailPayment {
-  email: string
-  phone_number: string
-  payment_method_id: string
-  qr_code: string
-  type: string
-  pay_url: any
-  pay_code: any
   name: string
-  fee_type: string
-  fee_static: number
-  fee_percentage: number
-  expired_at: Date | string
+  type: string
+  qr_code: string | null
+  pay_url: string | null
+  pay_code: string | null
+  expired_at: string
 }
 
 export interface OrderDetailOffer {
@@ -484,4 +456,9 @@ export interface OrderDetailOffer {
   discount_static: number
   discount_maximum: number
   discount_total: number
+}
+
+export interface OrderDetailUser {
+  email: string
+  name: string
 }

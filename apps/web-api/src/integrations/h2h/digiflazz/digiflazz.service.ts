@@ -5,9 +5,12 @@ import axios, { AxiosInstance } from 'axios'
 import crypto from 'crypto'
 import {
   DigiflazzApiTopupResponse,
-  DigiflazzCallbackData,
+  DigiflazzBayarTagihanData,
+  DigiflazzBayarTagihanResponse,
   DigiflazzCekTagihanData,
   DigiflazzCekTagihanResponse,
+  DigiflazzPostpaidCallbackData,
+  DigiflazzPrepaidCallbackData,
   DigiflazzTopupData,
   DigiflazzTopupResponse,
 } from './digiflazz.type'
@@ -64,6 +67,7 @@ export class DigiflazzService {
             wa: response.data.data.wa,
             tele: response.data.data.tele,
             sn: response.data.data.sn || null,
+            raw: response.data,
           }
         case '01':
           throw new GatewayTimeoutException(`DF: ${response.data.data.message}`)
@@ -81,6 +85,7 @@ export class DigiflazzService {
             wa: response.data.data.wa,
             tele: response.data.data.tele,
             sn: response.data.data.sn || null,
+            raw: response.data,
           }
         case '03':
           return {
@@ -96,6 +101,7 @@ export class DigiflazzService {
             wa: response.data.data.wa,
             tele: response.data.data.tele,
             sn: response.data.data.sn || null,
+            raw: response.data,
           }
         case '99':
           return {
@@ -111,6 +117,7 @@ export class DigiflazzService {
             wa: response.data.data.wa,
             tele: response.data.data.tele,
             sn: response.data.data.sn || null,
+            raw: response.data,
           }
         default:
           return {
@@ -126,6 +133,7 @@ export class DigiflazzService {
             wa: response.data.data.wa,
             tele: response.data.data.tele,
             sn: response.data.data.sn || null,
+            raw: response.data,
           }
       }
     } catch (error) {
@@ -228,6 +236,154 @@ export class DigiflazzService {
     }
   }
 
+  async bayarTagihan(data: DigiflazzBayarTagihanData): Promise<DigiflazzBayarTagihanResponse> {
+    try {
+      const sign = this.generateSignature(data.inquiry_id)
+
+      const response = await this.apiClient.post('/transaction', {
+        commands: 'pay-pasca',
+        username: this.username,
+        buyer_sku_code: data.provider_code,
+        customer_no: data.customer_input,
+        ref_id: data.inquiry_id,
+        sign: sign,
+        testing: this.testing,
+      })
+
+      switch (response.data.data.rc) {
+        case '00':
+          return {
+            provider_code: data.provider_code,
+            customer_input: data.customer_input,
+            order_id: data.order_id,
+            max_price: 0,
+            callback_url: null,
+            allow_dot: false,
+            status: OrderStatus.COMPLETED,
+            buyer_last_saldo: response.data.data.buyer_last_saldo,
+            provider_price: response.data.data.price,
+            wa: response.data.data.wa,
+            tele: response.data.data.tele,
+            sn: response.data.data.sn || null,
+
+            admin: response.data.data.admin,
+            customer_name: response.data.data.customer_name,
+            message: response.data.data.message,
+            inquiry_id: data.inquiry_id,
+            periode: response.data.data.periode,
+            price: response.data.data.price,
+            selling_price: response.data.data.selling_price,
+            desc: response.data.data.desc,
+            raw: response.data,
+          }
+        case '01':
+          throw new GatewayTimeoutException(`DF: ${response.data.data.message}`)
+        case '02':
+          return {
+            provider_code: data.provider_code,
+            customer_input: data.customer_input,
+            order_id: data.order_id,
+            max_price: 0,
+            callback_url: null,
+            allow_dot: false,
+            status: OrderStatus.FAILED,
+            buyer_last_saldo: response.data.data.buyer_last_saldo,
+            provider_price: response.data.data.price,
+            wa: response.data.data.wa,
+            tele: response.data.data.tele,
+            sn: response.data.data.sn || null,
+            admin: response.data.data.admin,
+            customer_name: response.data.data.customer_name,
+            message: response.data.data.message,
+            inquiry_id: data.inquiry_id,
+            periode: response.data.data.periode,
+            price: response.data.data.price,
+            selling_price: response.data.data.selling_price,
+            desc: response.data.data.desc,
+            raw: response.data,
+          }
+        case '03':
+          return {
+            provider_code: data.provider_code,
+            customer_input: data.customer_input,
+            order_id: data.order_id,
+            max_price: 0,
+            callback_url: null,
+            allow_dot: false,
+            status: OrderStatus.PENDING,
+            buyer_last_saldo: response.data.data.buyer_last_saldo,
+            provider_price: response.data.data.price,
+            wa: response.data.data.wa,
+            tele: response.data.data.tele,
+            sn: response.data.data.sn || null,
+            admin: response.data.data.admin,
+            customer_name: response.data.data.customer_name,
+            message: response.data.data.message,
+            inquiry_id: data.inquiry_id,
+            periode: response.data.data.periode,
+            price: response.data.data.price,
+            selling_price: response.data.data.selling_price,
+            desc: response.data.data.desc,
+            raw: response.data,
+          }
+        case '99':
+          return {
+            provider_code: data.provider_code,
+            customer_input: data.customer_input,
+            order_id: data.order_id,
+            max_price: 0,
+            callback_url: null,
+            allow_dot: false,
+            status: OrderStatus.PENDING,
+            buyer_last_saldo: response.data.data.buyer_last_saldo,
+            provider_price: response.data.data.price,
+            wa: response.data.data.wa,
+            tele: response.data.data.tele,
+            sn: response.data.data.sn || null,
+            admin: response.data.data.admin,
+            customer_name: response.data.data.customer_name,
+            message: response.data.data.message,
+            inquiry_id: data.inquiry_id,
+            periode: response.data.data.periode,
+            price: response.data.data.price,
+            selling_price: response.data.data.selling_price,
+            desc: response.data.data.desc,
+            raw: response.data,
+          }
+        default:
+          return {
+            provider_code: data.provider_code,
+            customer_input: data.customer_input,
+            order_id: data.order_id,
+            max_price: 0,
+            callback_url: null,
+            allow_dot: false,
+            status: OrderStatus.FAILED,
+            buyer_last_saldo: response.data.data.buyer_last_saldo,
+            provider_price: response.data.data.price,
+            wa: response.data.data.wa,
+            tele: response.data.data.tele,
+            sn: response.data.data.sn || null,
+            admin: response.data.data.admin,
+            customer_name: response.data.data.customer_name,
+            message: response.data.data.message,
+            inquiry_id: data.inquiry_id,
+            periode: response.data.data.periode,
+            price: response.data.data.price,
+            selling_price: response.data.data.selling_price,
+            desc: response.data.data.desc,
+            raw: response.data,
+          }
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new BadRequestException(`DF: ${error.response?.data.message}`)
+      }
+
+      throw new BadRequestException(`DF: ${error.message}`)
+    }
+  }
+
   private generateSignature(value: string) {
     return crypto
       .createHash('md5')
@@ -236,14 +392,12 @@ export class DigiflazzService {
   }
 
   public verifyCallbackSignature(
-    data: {
-      data: DigiflazzCallbackData
-    },
+    payload: DigiflazzPrepaidCallbackData | DigiflazzPostpaidCallbackData,
     signFromPost: string,
   ) {
     const sign = crypto
       .createHmac('sha1', this.callbackSecret)
-      .update(JSON.stringify(data))
+      .update(JSON.stringify(payload.data))
       .digest('hex')
 
     console.log('Generated Sign:', sign, signFromPost)

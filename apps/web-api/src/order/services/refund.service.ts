@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { BalanceMutationRefType, BalanceMutationType, RefundStatus } from '@repo/db/types'
+import { BalanceMutationRefType, BalanceMutationType, RefundStatus, UserRole } from '@repo/db/types'
 import { DatabaseService } from 'src/database/database.service'
 import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
 import { OffersRepository } from 'src/offers/offers.repository'
@@ -20,7 +20,7 @@ export class RefundService {
 
   async handleFailedOrder(order: RefundableOrder) {
     await this.databaseService.db.transaction(async (tx) => {
-      if (order.user_id) {
+      if (order.user.role !== UserRole.GUEST) {
         await this.balanceService.addBalance(
           {
             amount: order.total_price - order.fee,
@@ -37,6 +37,12 @@ export class RefundService {
         await this.orderRepository.updateOrderRefundStatus(
           order.order_id,
           RefundStatus.COMPLETED,
+          tx,
+        )
+      } else {
+        await this.orderRepository.updateOrderRefundStatus(
+          order.order_id,
+          RefundStatus.PROCESSING,
           tx,
         )
       }
@@ -74,4 +80,9 @@ type RefundableOrder = {
   offer_on_orders: {
     offer_id: string
   }[]
+
+  user: {
+    id: string
+    role: UserRole
+  }
 }

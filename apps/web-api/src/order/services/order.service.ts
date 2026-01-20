@@ -25,13 +25,12 @@ import { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
 import { SignatureUtils } from 'src/common/utils/signature'
 import { DatabaseService } from 'src/database/database.service'
+import { DigiflazzCekTagihanResponse } from 'src/integrations/h2h/digiflazz/digiflazz.type'
 import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
 import { OffersRepository } from 'src/offers/offers.repository'
 import { OffersService } from 'src/offers/offers.service'
-import { PaymentsService } from 'src/payments/payments.service'
 import { ProductRepository } from 'src/products/product.repository'
 import { QueueService } from 'src/queue/queue.service'
-import { StorageService } from 'src/storage/storage.service'
 import { InquiryUniversalDto } from '../dto/inquiry.universal.dto'
 import { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from '../dto/order.dto'
 import { OrderRepository } from '../order.repository'
@@ -46,8 +45,6 @@ export class OrderService {
     private readonly queueService: QueueService,
     private readonly offerService: OffersService,
     private readonly offerRepository: OffersRepository,
-    private readonly paymentService: PaymentsService,
-    private readonly storageService: StorageService,
     private readonly inquiryService: InquiryService,
     private readonly orderRepository: OrderRepository,
     private readonly productRepository: ProductRepository,
@@ -144,15 +141,7 @@ export class OrderService {
 
     const isPospaid = product.product_category.billing_type === ProductBillingType.POSTPAID
 
-    let inquiryData = {
-      inquiry_id: '',
-      customer_no: '',
-      customer_name: '',
-      admin: 0,
-      price: 0,
-      selling_price: 0,
-      desc: {} as any,
-    }
+    let inquiryData: DigiflazzCekTagihanResponse | null = null
 
     // Get Inquiry From Third Party
     if (isPospaid) {
@@ -164,21 +153,12 @@ export class OrderService {
         provider_code: product.provider_code,
       })
 
-      inquiryData = {
-        inquiry_id: getInquiryFromProvider.inquiry_id,
-        customer_no: getInquiryFromProvider.customer_input,
-        customer_name: getInquiryFromProvider.customer_name,
-        admin: getInquiryFromProvider.admin,
-        price: getInquiryFromProvider.price,
-        selling_price: getInquiryFromProvider.selling_price,
-        desc: getInquiryFromProvider.desc,
-      }
+      inquiryData = getInquiryFromProvider
     }
 
     const buildPrice = () => {
       if (isPospaid) {
-        // IMPORTANT: fix precedence bug from `... * length || 1`
-        const detailLen = inquiryData.desc?.detail?.length ?? 1
+        const detailLen = 'detail' in inquiryData.desc ? (inquiryData.desc.detail?.length ?? 1) : 1
 
         const profit = product.profit_static * detailLen
 
@@ -329,6 +309,10 @@ export class OrderService {
 
       offer_applied: isUseVoucher ? [{ id: dataVoucher.id, type: OfferType.VOUCHER }] : [],
       expired_at: new Date(inquiryExpired),
+
+      inquiry_response: inquiryData,
+      inquiry_provider_code: product.provider_code,
+      inquiry_ref_id: inquiryData ? inquiryData.inquiry_id : '',
     })
 
     const checkoutToken = SignatureUtils.generateCheckoutToken(
@@ -342,12 +326,7 @@ export class OrderService {
         productPrice: buildResponse.product_price,
         discount: buildResponse.discount,
         totalPrice: buildResponse.total_price,
-        offers: [
-          {
-            id: dataVoucher.id,
-            type: OfferType.VOUCHER,
-          },
-        ],
+        offers: [...(isUseVoucher ? [{ id: dataVoucher.id, type: OfferType.VOUCHER }] : [])],
       },
       this.configService.get<string>('CHECKOUT_TOKEN_SECRET'),
     )
@@ -510,124 +489,129 @@ export class OrderService {
       paymentMethod.fee_static,
     )
 
-    const { createPayment } = await this.databaseService.db.transaction(async (tx) => {
-      // Validate Voucher
-      const voucherAplied = inquiryData.offer_applied.find(
-        (offer) => offer.type === OfferType.VOUCHER,
-      )
-
-      if (inquiryData.offer_applied.length > 0 && voucherAplied) {
-        const validateVoucher = await this.offerService.validateVoucher(
-          voucherAplied.id,
-          inquiryData.product_snapshot.product_id,
-          user,
+    const { createPayment, voucherAplied } = await this.databaseService.db.transaction(
+      async (tx) => {
+        // Validate Voucher
+        const voucherAplied = inquiryData.offer_applied.find(
+          (offer) => offer.type === OfferType.VOUCHER,
         )
-      }
 
-      // Validate Voucher
+        if (inquiryData.offer_applied.length > 0 && voucherAplied) {
+          const validateVoucher = await this.offerService.validateVoucher(
+            voucherAplied.id,
+            inquiryData.product_snapshot.product_id,
+            user,
+          )
+        }
 
-      const createPayment = await this.pgService.createPayment({
-        user_id: user.id,
-        amount: inquiryData.total_price,
-        customer_email: user.email,
-        customer_phone: inquiryData.customer_phone,
-        customer_name: user.name,
-        expired_in: paymentMethod.expired_in,
-        provider_code: paymentMethod.provider_code,
-        fee_in_percent: paymentMethod.fee_percentage,
-        fee_static: paymentMethod.fee_static,
-        fee_type: paymentMethod.fee_type,
-        provider_name: paymentMethod.provider_name,
-        id: orderId,
-        order_items: [
-          {
-            name: `${inquiryData.product_snapshot.category_name} - ${inquiryData.product_snapshot.name}`,
-            price: inquiryData.total_price + calculateFee,
-            quantity: 1,
-            product_id: inquiryData.product_snapshot.product_id,
-            customer_input: inquiryData.customer_input_merged,
-          },
-        ],
-      })
+        // Validate Voucher
 
-      const paymentSnapshot = await this.orderRepository.createPaymentSnapshot(
-        {
-          name: paymentMethod.name,
-          payment_method_id: paymentMethod.id,
-          type: paymentMethod.type,
-          fee_static: paymentMethod.fee_static,
-          fee_percentage: paymentMethod.fee_percentage,
-          fee_type: paymentMethod.fee_type,
-          provider_code: paymentMethod.provider_code,
-          provider_name: paymentMethod.provider_name,
-          allow_access: paymentMethod.allow_access,
-          email: user.email,
-
-          expired_in: paymentMethod.expired_in,
-          expired_at: createPayment.expired_at,
-
-          is_need_email: paymentMethod.is_need_email,
-          is_need_phone_number: paymentMethod.is_need_phone_number,
-          phone_number: data.payment_phone_number,
-
-          provider_ref_id: createPayment.ref_id,
-          qr_code: createPayment.qr_code,
-          pay_code: createPayment.pay_code,
-          pay_url: createPayment.pay_url,
-        },
-        tx,
-      )
-
-      const createOrder = await this.orderRepository.createOrder(
-        {
-          inquiry_id: inquiryData.id,
-          payment_snapshot_id: paymentSnapshot.id,
-          product_snapshot_id: inquiryData.product_snapshot_id,
+        const createPayment = await this.pgService.createPayment({
           user_id: user.id,
-          price: inquiryData.price,
-          total_price: createPayment.amount_total,
-          discount_price: inquiryData.discount_price,
-          cost_price: inquiryData.product_snapshot.provider_price,
-          fee: createPayment.total_fee,
-          profit: inquiryData.profit,
-          sn_number: '',
-          order_id: orderId,
-          payment_status: createPayment.status,
-          order_status:
-            createPayment.status == PaymentStatus.SUCCESS ? OrderStatus.PENDING : OrderStatus.NONE,
-          customer_input: inquiryData.customer_input_merged,
+          amount: inquiryData.total_price,
+          customer_email: user.email,
           customer_phone: inquiryData.customer_phone,
-          customer_email: inquiryData.customer_email,
-          customer_ip: ip,
-          customer_ua: userAgent,
-        },
-        tx,
-      )
+          customer_name: user.name,
+          expired_in: paymentMethod.expired_in,
+          provider_code: paymentMethod.provider_code,
+          fee_in_percent: paymentMethod.fee_percentage,
+          fee_static: paymentMethod.fee_static,
+          fee_type: paymentMethod.fee_type,
+          provider_name: paymentMethod.provider_name,
+          id: orderId,
+          order_items: [
+            {
+              name: `${inquiryData.product_snapshot.category_name} - ${inquiryData.product_snapshot.name}`,
+              price: inquiryData.total_price + calculateFee,
+              quantity: 1,
+              product_id: inquiryData.product_snapshot.product_id,
+              customer_input: inquiryData.customer_input_merged,
+            },
+          ],
+        })
 
-      if (createPayment.status == PaymentStatus.SUCCESS) {
-        await this.queueService.addOrderJob(orderId)
-      }
+        const paymentSnapshot = await this.orderRepository.createPaymentSnapshot(
+          {
+            name: paymentMethod.name,
+            payment_method_id: paymentMethod.id,
+            type: paymentMethod.type,
+            fee_static: paymentMethod.fee_static,
+            fee_percentage: paymentMethod.fee_percentage,
+            fee_type: paymentMethod.fee_type,
+            provider_code: paymentMethod.provider_code,
+            provider_name: paymentMethod.provider_name,
+            allow_access: paymentMethod.allow_access,
+            email: user.email,
 
-      if (createPayment.status == PaymentStatus.PENDING) {
-        const delay = new Date(createPayment.expired_at).getTime() - Date.now()
-        await this.queueService.addExpiredOrderJob(orderId, delay)
-      }
+            expired_in: paymentMethod.expired_in,
+            expired_at: createPayment.expired_at,
 
-      if (voucherAplied) {
-        await this.offerRepository.aplyOfferToOrder(voucherAplied.id, createOrder.id, user.id, tx)
-        await this.offerRepository.incrementOfferUsageCount(voucherAplied.id, tx)
-      }
+            is_need_email: paymentMethod.is_need_email,
+            is_need_phone_number: paymentMethod.is_need_phone_number,
+            phone_number: data.payment_phone_number,
 
-      await this.productRepository.decreaseProductStockByProductId(
-        inquiryData.product_snapshot.product_id,
-        1,
-        tx,
-      )
+            provider_ref_id: createPayment.ref_id,
+            qr_code: createPayment.qr_code,
+            pay_code: createPayment.pay_code,
+            pay_url: createPayment.pay_url,
+          },
+          tx,
+        )
 
-      await this.orderRepository.setInquiryStatus(InquiryStatus.USED, inquiryData.id, tx)
+        const createOrder = await this.orderRepository.createOrder(
+          {
+            inquiry_id: inquiryData.id,
+            payment_snapshot_id: paymentSnapshot.id,
+            product_snapshot_id: inquiryData.product_snapshot_id,
+            user_id: user.id,
+            price: inquiryData.price,
+            total_price: createPayment.amount_total,
+            discount_price: inquiryData.discount_price,
+            cost_price: inquiryData.product_snapshot.provider_price,
+            fee: createPayment.total_fee,
+            profit: inquiryData.profit,
+            sn_number: '',
+            order_id: orderId,
+            payment_status: createPayment.status,
+            order_status:
+              createPayment.status == PaymentStatus.SUCCESS
+                ? OrderStatus.PENDING
+                : OrderStatus.NONE,
+            customer_input: inquiryData.customer_input_merged,
+            customer_phone: inquiryData.customer_phone,
+            customer_email: inquiryData.customer_email,
+            customer_ip: ip,
+            customer_ua: userAgent,
+          },
+          tx,
+        )
 
-      return { createPayment }
-    })
+        if (voucherAplied) {
+          await this.offerRepository.aplyOfferToOrder(voucherAplied.id, createOrder.id, user.id, tx)
+          await this.offerRepository.incrementOfferUsageCount(voucherAplied.id, tx)
+        }
+
+        await this.productRepository.decreaseProductStockByProductId(
+          inquiryData.product_snapshot.product_id,
+          1,
+          tx,
+        )
+
+        await this.orderRepository.setInquiryStatus(InquiryStatus.USED, inquiryData.id, tx)
+
+        return { createPayment, voucherAplied }
+      },
+    )
+
+    // Add queue jobs AFTER transaction commits to ensure order exists in database
+    if (createPayment.status == PaymentStatus.SUCCESS) {
+      await this.queueService.addOrderJob(orderId)
+    }
+
+    if (createPayment.status == PaymentStatus.PENDING) {
+      const delay = new Date(createPayment.expired_at).getTime() - Date.now()
+      await this.queueService.addExpiredOrderJob(orderId, delay)
+    }
 
     return SendResponse.success({
       order_id: orderId,
@@ -646,6 +630,10 @@ export class OrderService {
 
     if (!order) {
       throw new NotFoundException('Order not found or already processed')
+    }
+
+    if (order.payment_status !== PaymentStatus.PENDING) {
+      throw new BadRequestException('Order payment status is not pending or already processed')
     }
 
     if (order.payment_snapshot.provider_name !== expectedProvider) {
@@ -723,6 +711,53 @@ export class OrderService {
     if (order.user_id !== user.id) {
       throw new ForbiddenException(`You do not have permission to access this order.`)
     }
+
+    const mapOrderResponse = () => {
+      return {
+        order_id: order.order_id,
+        order_status: order.order_status,
+        payment_status: order.payment_status,
+        refund_status: order.refund_status,
+        price: order.price,
+        total_price: order.total_price,
+        discount_price: order.discount_price,
+        fee: order.fee,
+        sn_number: order.sn_number,
+        created_at: order.created_at,
+        updated_at: order.updated_at,
+        customer_input: order.customer_input,
+        customer_email: order.customer_email,
+        customer_phone: order.customer_phone,
+        voucher_code: order.voucher_code,
+        product: {
+          name: order.product_snapshot?.name,
+          category_name: order.product_snapshot?.category_name,
+          sub_category_name: order.product_snapshot?.sub_category_name,
+          price: order.product_snapshot?.price,
+        },
+
+        payment: {
+          name: order.payment_snapshot?.name,
+          type: order.payment_snapshot?.type,
+          qr_code: order.payment_snapshot?.qr_code,
+          pay_url: order.payment_snapshot?.pay_url,
+          pay_code: order.payment_snapshot?.pay_code,
+          expired_at: order.payment_snapshot?.expired_at,
+        },
+
+        offers: (order.offer_on_orders || []).map((item: any) => ({
+          name: item.offer?.name,
+          discount_price: item.offer?.discount_static || 0,
+        })),
+
+        user: {
+          email: order.user?.email,
+          name: order.user?.name,
+        },
+      }
+    }
+
+    return SendResponse.success(mapOrderResponse())
   }
 
   async cancelOrder(data: OrderIdDto, user: TUser) {
@@ -743,8 +778,7 @@ export class OrderService {
     if (order.payment_status !== PaymentStatus.PENDING) {
       throw new BadRequestException(`Only orders with pending payment status can be cancelled.`)
     }
-
-    await this.orderRepository.updatePaymentStatus(order.id, PaymentStatus.CANCELLED)
+    await this.orderRepository.updatePaymentStatus(order.order_id, PaymentStatus.CANCELLED)
 
     return SendResponse.success(null, 'Order cancelled successfully.')
   }

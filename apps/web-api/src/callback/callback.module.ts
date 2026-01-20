@@ -9,8 +9,9 @@ import { OffersModule } from 'src/offers/offers.module'
 import { OrderModule } from 'src/order/order.module'
 import { ProductsModule } from 'src/products/products.module'
 import { QueueModule } from 'src/queue/queue.module'
-import { CallbackService } from './callback.service'
-import { DepositCallbackService } from './deposit.callback.service'
+import { DigiflazzH2HCallbackService } from './h2h/digiflazz-h2h-callback.service'
+import { H2HCallbackController } from './h2h/h2h-callback.controller'
+import { H2HCallbackService } from './h2h/h2h-callback.service'
 import { PaymentGatewayCallbackController } from './payment-gateway/payment-gateway-callback.controller'
 import { PaymentGatewayCallbackService } from './payment-gateway/payment-gateway-callback.service'
 
@@ -27,7 +28,7 @@ import { PaymentGatewayCallbackService } from './payment-gateway/payment-gateway
     OffersModule,
     DepositModule,
   ],
-  controllers: [PaymentGatewayCallbackController],
-  providers: [CallbackService, DepositCallbackService, PaymentGatewayCallbackService],
+  controllers: [PaymentGatewayCallbackController, H2HCallbackController],
+  providers: [PaymentGatewayCallbackService, DigiflazzH2HCallbackService, H2HCallbackService],
 })
 export class CallbackModule {}

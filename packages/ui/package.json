@@ -5,7 +5,8 @@
   "scripts": {
     "ui": "npx shadcn@latest",
     "lint": "eslint .",
-    "build": "tsup"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",

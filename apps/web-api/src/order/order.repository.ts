@@ -254,6 +254,7 @@ export class OrderRepository {
             id: true,
             email: true,
             name: true,
+            role: true,
           },
         },
       },
@@ -261,6 +262,7 @@ export class OrderRepository {
         id: true,
         order_id: true,
         order_status: true,
+        inquiry_id: true,
         payment_status: true,
         refund_status: true,
         price: true,
@@ -270,6 +272,7 @@ export class OrderRepository {
         sn_number: true,
         customer_input: true,
         customer_email: true,
+        customer_phone: true,
         user_id: true,
         voucher_code: true,
         notes: true,
@@ -286,6 +289,7 @@ export class OrderRepository {
       where: and(eq(tb.orders.order_id, orderId)),
       columns: {
         id: true,
+        order_id: true,
         order_status: true,
         payment_status: true,
         user_id: true,
@@ -314,6 +318,15 @@ export class OrderRepository {
         order_status: orderStatus,
       })
       .where(eq(tb.orders.order_id, orderId))
+  }
+
+  async updateOrder(
+    orderId: string,
+    data: Partial<InferInsertModel<typeof tb.orders>>,
+    tx?: DBInstance,
+  ) {
+    const db = tx ?? this.databaseService.db
+    return await db.update(tb.orders).set(data).where(eq(tb.orders.order_id, orderId))
   }
 
   async updateOrderRefundStatus(orderId: string, refundStatus: RefundStatus, tx?: DBInstance) {

@@ -1,77 +1,23 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@repo/ui/components/ui/accordion'
-import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/ui/dialog'
 import { useMutation } from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
-import {
-  BuildingIcon,
-  ChevronRightIcon,
-  CreditCardIcon,
-  SmartphoneIcon,
-  StarIcon,
-  StoreIcon,
-  WalletIcon,
-} from 'lucide-react'
+import { ChevronRightIcon, CreditCardIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { userAtom } from '~/store/user'
 import { apiClient } from '~/utils/axios'
 import { formatPrice } from '~/utils/format'
+import PaymentMethodSelector, {
+  type PaymentItem,
+  type PaymentMethod,
+} from './payment-method-selector'
 import type { OrderProducts } from './slug'
 
 type Props = {
   products: OrderProducts | null
   form: UseFormReturn<any>
-}
-
-type PaymentItem = {
-  id: string
-  name: string
-  fee_percentage: number
-  fee_static: number
-  is_available: boolean
-  cut_off_start: string
-  cut_off_end: string
-  image_url: string
-  label: string | null
-  is_featured: boolean
-  min_amount: number
-  max_amount: number
-  is_need_email: boolean
-  is_need_phone_number: boolean
-  payment_fee: number
-  product_price: number
-  discount: number
-  total: number
-}
-
-type PaymentMethod = {
-  name: string
-  items: PaymentItem[]
-}
-
-const getPaymentIcon = (categoryName: string) => {
-  switch (categoryName.toLowerCase()) {
-    case 'balance':
-      return <WalletIcon className="w-5 h-5" />
-    case 'qris':
-      return <SmartphoneIcon className="w-5 h-5" />
-    case 'transfer bank':
-      return <BuildingIcon className="w-5 h-5" />
-    case 'e wallet':
-      return <CreditCardIcon className="w-5 h-5" />
-    case 'gerai retail':
-      return <StoreIcon className="w-5 h-5" />
-    default:
-      return <CreditCardIcon className="w-5 h-5" />
-  }
 }
 
 export default function PaymentSection({ products, form }: Props) {
@@ -84,9 +30,7 @@ export default function PaymentSection({ products, form }: Props) {
     mutationKey: ['paymentMethods', products?.id],
     mutationFn: async () =>
       apiClient
-        .post('/order/products/price', {
-          product_id: products?.id,
-        })
+        .get(`/order/get-product-price/${products!.id}`)
         .then((res) => res.data)
         .catch((error) => {
           throw new Error(error.response?.data?.message || 'Failed to fetch payment methods')
@@ -101,88 +45,54 @@ export default function PaymentSection({ products, form }: Props) {
     }
   }, [products, form])
 
-  // Memoized calculations for user state and payment options
-  const userState = useMemo(() => {
-    const isGuest = !user.data?.role || user.data.role === 'guest'
-    const userBalance = user.data?.balance || 0
-    return { isGuest, userBalance }
-  }, [user.data])
+  // Memoized calculations for payment options
+  const isGuest = !user.data?.role || user.data.role === 'guest'
 
   const paymentOptions = useMemo(() => {
-    if (!paymentMethods.isSuccess || !paymentMethods.data?.data?.payment_methods) {
-      return { balanceItem: null, cheapestItem: null }
+    if (!paymentMethods.isSuccess || !paymentMethods.data?.data) {
+      return { cheapestItem: null }
     }
 
-    const paymentMethodsData = paymentMethods.data.data.payment_methods
+    const paymentMethodsData = paymentMethods.data.data
 
-    // Find balance method
-    const balanceMethod = paymentMethodsData.find(
-      (method: PaymentMethod) => method.name === 'BALANCE',
-    )
-    const balanceItem = balanceMethod?.items?.[0] || null
-
-    // Find cheapest non-balance payment
+    // Find cheapest payment
     const allAvailableItems: PaymentItem[] = []
     paymentMethodsData.forEach((method: PaymentMethod) => {
       if (method.items) {
         method.items.forEach((item: PaymentItem) => {
-          if (item.is_available && method.name !== 'BALANCE') {
+          if (item.is_available) {
             allAvailableItems.push(item)
           }
         })
       }
     })
 
-    const cheapestItem = allAvailableItems.sort((a, b) => a.total - b.total)[0] || null
+    const cheapestItem = allAvailableItems.sort((a, b) => a.total_price - b.total_price)[0] || null
 
-    return { balanceItem, cheapestItem }
+    return { cheapestItem }
   }, [paymentMethods.isSuccess, paymentMethods.data])
 
   // Auto-select payment method after data is loaded
   useEffect(() => {
-    if (!selectedPayment && (paymentOptions.balanceItem || paymentOptions.cheapestItem)) {
-      const { balanceItem, cheapestItem } = paymentOptions
-      const { isGuest, userBalance } = userState
-
-      if (!isGuest && balanceItem?.is_available && userBalance >= balanceItem.total) {
-        // Non-guest users auto-select balance if available and sufficient balance
-        setSelectedPayment(balanceItem)
-        form.setValue('payment_method_id', balanceItem.id)
-      } else if (cheapestItem) {
-        // Guest users or if balance unavailable/insufficient, select cheapest available payment
-        setSelectedPayment(cheapestItem)
-        form.setValue('payment_method_id', cheapestItem.id)
-      }
+    if (!selectedPayment && paymentOptions.cheapestItem) {
+      const { cheapestItem } = paymentOptions
+      // Auto-select cheapest available payment
+      setSelectedPayment(cheapestItem)
+      form.setValue('payment_method_id', cheapestItem.id)
     }
-  }, [selectedPayment, paymentOptions, userState, form])
+  }, [selectedPayment, paymentOptions, form])
 
   const handleSelectPayment = (item: PaymentItem) => {
-    const { isGuest, userBalance } = userState
-
-    // Check if this item belongs to BALANCE method
-    const isBalanceItem = paymentMethods.data?.data?.payment_methods?.some(
-      (method: PaymentMethod) =>
-        method.name === 'BALANCE' && method.items?.some((i: PaymentItem) => i.id === item.id),
-    )
-
-    const isInsufficientBalance = isBalanceItem && userBalance < item.total
-
-    if (item.is_available && !(isBalanceItem && isGuest) && !isInsufficientBalance) {
+    if (item.is_available) {
       setSelectedPayment(item)
       form.setValue('payment_method_id', item.id)
       setIsModalOpen(false) // Close modal after selection
     }
   }
 
-  // Sort payment methods to put BALANCE first (memoized)
+  // Get payment methods from API response
   const sortedPaymentMethods = useMemo(() => {
-    return (
-      paymentMethods.data?.data?.payment_methods?.sort((a: PaymentMethod, b: PaymentMethod) => {
-        if (a.name === 'BALANCE') return -1
-        if (b.name === 'BALANCE') return 1
-        return 0
-      }) || []
-    )
+    return paymentMethods.data?.data || []
   }, [paymentMethods.data])
 
   return (
@@ -222,7 +132,7 @@ export default function PaymentSection({ products, form }: Props) {
               <div className="text-left">
                 <p className="font-medium text-sm">{selectedPayment.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {formatPrice(selectedPayment.total)}
+                  {formatPrice(selectedPayment.total_price)}
                 </p>
               </div>
             </div>
@@ -244,190 +154,14 @@ export default function PaymentSection({ products, form }: Props) {
           </DialogHeader>
 
           <div className="space-y-3 mt-4">
-            {paymentMethods.isPending && (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <span className="ml-2 text-sm text-muted-foreground">
-                  Memuat metode pembayaran...
-                </span>
-              </div>
-            )}
-
-            {paymentMethods.isError && (
-              <div className="text-center py-8">
-                <p className="text-destructive text-sm">Error: {paymentMethods.error.message}</p>
-              </div>
-            )}
-
-            {paymentMethods.isSuccess && (
-              <Accordion type="multiple" className="w-full space-y-2">
-                {sortedPaymentMethods.map((method: PaymentMethod) => {
-                  const hasItems = method.items && method.items.length > 0
-                  const { isGuest, userBalance } = userState
-                  const isBalance = method.name === 'BALANCE'
-
-                  // Make balance unavailable for guests
-                  const effectiveHasItems = isBalance && isGuest ? false : hasItems
-
-                  return (
-                    <AccordionItem
-                      key={method.name}
-                      value={method.name}
-                      className="border border-border dark:border-slate-400 rounded-lg"
-                      disabled={!effectiveHasItems}
-                    >
-                      <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180">
-                        <div className="flex items-center gap-3 w-full">
-                          <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
-                            {getPaymentIcon(method.name)}
-                          </div>
-                          <div className="text-left flex-1">
-                            <p className="font-medium">{method.name}</p>
-
-                            {isBalance && isGuest && (
-                              <p className="text-xs text-muted-foreground">
-                                Login untuk menggunakan saldo
-                              </p>
-                            )}
-                            {!isBalance && (
-                              <p className="text-xs text-muted-foreground">
-                                {effectiveHasItems
-                                  ? `${method.items.length} opsi tersedia`
-                                  : 'Tidak tersedia'}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {method.items.some((item) => item.is_featured) && (
-                              <Badge variant="secondary" className="text-xs">
-                                <StarIcon className="w-3 h-3 mr-1" />
-                                Rekomendasi
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </AccordionTrigger>
-
-                      {effectiveHasItems && (
-                        <AccordionContent className="px-4 pb-4">
-                          <div className="space-y-2 pt-2">
-                            {method.items.map((item: PaymentItem) => {
-                              const { userBalance } = userState
-                              // Check if balance is insufficient for balance payment
-                              const isInsufficientBalance = isBalance && userBalance < item.total
-                              const itemAvailable = item.is_available && !(isBalance && isGuest)
-
-                              return (
-                                <div
-                                  key={item.id}
-                                  onClick={() =>
-                                    itemAvailable &&
-                                    !isInsufficientBalance &&
-                                    handleSelectPayment(item)
-                                  }
-                                  className={`
-                                    relative p-3 rounded-lg border cursor-pointer transition-all duration-200 group
-                                    ${
-                                      selectedPayment?.id === item.id
-                                        ? 'border-primary bg-primary/5 shadow-md ring-2 ring-primary/20 dark:bg-primary/10 dark:border-primary/60'
-                                        : 'border-slate-400 hover:border-primary/50 dark:hover:border-primary/40 dark:hover:opacity-65'
-                                    }
-                                    ${
-                                      !itemAvailable || isInsufficientBalance
-                                        ? 'opacity-60 cursor-not-allowed grayscale'
-                                        : 'hover:shadow-sm'
-                                    }
-                                  `}
-                                >
-                                  {/* Unavailable Overlay */}
-                                  {(!itemAvailable || isInsufficientBalance) && (
-                                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-lg">
-                                      <span className="text-xs bg-gray-800 text-white px-2 py-1 rounded-full">
-                                        {isBalance && isGuest
-                                          ? 'Login Required'
-                                          : isInsufficientBalance
-                                            ? 'Saldo Tidak Cukup'
-                                            : 'Tidak Tersedia'}
-                                      </span>
-                                    </div>
-                                  )}
-
-                                  <div className="flex items-center gap-3">
-                                    <div className="relative shrink-0">
-                                      <img
-                                        src={
-                                          item.image_url.startsWith('http')
-                                            ? item.image_url
-                                            : `https://is3.cloudhost.id/bagusok${item.image_url}`
-                                        }
-                                        alt={item.name}
-                                        className="w-12  object-cover"
-                                      />
-                                      {item.is_featured && (
-                                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                                          <StarIcon className="w-2 h-2 text-white" />
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    <div className="flex-1 min-w-0">
-                                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                        <p className="font-medium text-sm truncate ">{item.name}</p>
-                                        {item.label && (
-                                          <Badge
-                                            variant="outline"
-                                            className="text-xs shrink-0 dark:border-gray-500 dark:text-gray-300"
-                                          >
-                                            {item.label}
-                                          </Badge>
-                                        )}
-                                      </div>
-
-                                      {/* Show balance info for balance payment */}
-                                      {isBalance && !isGuest && (
-                                        <div className="space-y-1">
-                                          <p className="text-xs text-muted-foreground ">
-                                            Saldo Anda: {formatPrice(userBalance)}
-                                          </p>
-                                          {isInsufficientBalance && (
-                                            <p className="text-xs text-destructive dark:text-red-400">
-                                              Silahkan isi saldo terlebih dahulu
-                                            </p>
-                                          )}
-                                        </div>
-                                      )}
-
-                                      {/* Show payment fee if exists */}
-                                      {item.payment_fee > 0 && (
-                                        <p className="text-xs text-muted-foreground ">
-                                          Biaya admin: {formatPrice(item.payment_fee)}
-                                        </p>
-                                      )}
-                                    </div>
-
-                                    <div className="flex flex-col items-end justify-center text-right shrink-0">
-                                      {/* Show original price if there's discount */}
-                                      {item.discount > 0 && (
-                                        <p className="text-xs line-through text-muted-foreground">
-                                          {formatPrice(item.product_price)}
-                                        </p>
-                                      )}
-                                      <p className="text-lg font-bold text-primary">
-                                        {formatPrice(item.total)}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </AccordionContent>
-                      )}
-                    </AccordionItem>
-                  )
-                })}
-              </Accordion>
-            )}
+            <PaymentMethodSelector
+              paymentMethods={sortedPaymentMethods}
+              selectedPayment={selectedPayment}
+              onSelectPayment={handleSelectPayment}
+              isLoading={paymentMethods.isPending}
+              isError={paymentMethods.isError}
+              errorMessage={paymentMethods.error?.message}
+            />
           </div>
         </DialogContent>
       </Dialog>
@@ -472,30 +206,19 @@ export default function PaymentSection({ products, form }: Props) {
               <div className="space-y-2 pt-3 border-t border-muted">
                 <div className="flex justify-between text-sm">
                   <span>Harga Produk</span>
-                  <span>{formatPrice(selectedPayment.product_price)}</span>
+                  <span>{formatPrice(products.price)}</span>
                 </div>
 
-                {selectedPayment.discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>
-                      Diskon (
-                      {Math.round((selectedPayment.discount / selectedPayment.product_price) * 100)}
-                      %)
-                    </span>
-                    <span>-{formatPrice(selectedPayment.discount)}</span>
-                  </div>
-                )}
-
-                {selectedPayment.payment_fee > 0 && (
+                {selectedPayment.total_fee > 0 && (
                   <div className="flex justify-between text-sm">
                     <span>Biaya Admin</span>
-                    <span>{formatPrice(selectedPayment.payment_fee)}</span>
+                    <span>{formatPrice(selectedPayment.total_fee)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-base font-bold pt-2 border-t border-muted">
                   <span>Total Pembayaran</span>
-                  <span className="text-primary">{formatPrice(selectedPayment.total)}</span>
+                  <span className="text-primary">{formatPrice(selectedPayment.total_price)}</span>
                 </div>
               </div>
             </div>

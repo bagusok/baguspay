@@ -7,33 +7,95 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@repo/ui/components/ui/dialog'
-import { useMutation } from '@tanstack/react-query'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { atom, useAtom, useAtomValue } from 'jotai'
-import { CircleCheckIcon, Clock, XIcon } from 'lucide-react'
+import { ChevronRightIcon, CircleCheckIcon, Clock, CreditCardIcon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router'
+import z from 'zod'
 import { apiClient } from '~/utils/axios'
 import { formatPrice, formatTime } from '~/utils/format'
-import type { PreCheckoutForm } from './slug'
+import PaymentMethodSelector, {
+  type PaymentItem,
+  type PaymentMethod,
+} from './payment-method-selector'
+import type { InquiryForm } from './slug'
 
 type Props = {
-  data: PreCheckoutData
+  data: InquiryData
 }
 
+const checkoutSchema = z.object({
+  inquiry_id: z.string(),
+  payment_method_id: z.string(),
+  payment_phone_number: z.string().optional(),
+  checkout_token: z.string(),
+})
+
+export type CheckoutData = z.infer<typeof checkoutSchema>
+
 export const isOpenModalCheckout = atom(false)
-export const preCheckoutTimeAtom = atom<number>(Date.now())
+export const inquiryTimeAtom = atom<number>(Date.now())
 export const checkoutTokenAtom = atom<string | null>(null)
 export const inquiryIdAtom = atom<string | null>(null)
-export const preCheckoutRequestDataAtom = atom<PreCheckoutForm | null>(null)
+export const inquiryRequestDataAtom = atom<InquiryForm | null>(null)
+export const preselectedPaymentMethodIdAtom = atom<string | null>(null)
 
 export default function CheckoutModal({ data }: Props) {
   const [isOpen, setIsOpen] = useAtom(isOpenModalCheckout)
-  const preCheckoutTime = useAtomValue(preCheckoutTimeAtom)
+  const inquiryTime = useAtomValue(inquiryTimeAtom)
   const [timeLeft, setTimeLeft] = useState(360)
   const checkoutToken = useAtomValue(checkoutTokenAtom)
   const inquiryId = useAtomValue(inquiryIdAtom)
+  const preselectedPaymentId = useAtomValue(preselectedPaymentMethodIdAtom)
   const navigate = useNavigate()
+
+  const [selectedPayment, setSelectedPayment] = useState<PaymentItem | null>(null)
+  const [paymentPhoneNumber, setPaymentPhoneNumber] = useState('')
+  const [isPaymentSelectorOpen, setIsPaymentSelectorOpen] = useState(false)
+
+  // Fetch payment methods based on inquiry_id
+  const paymentMethods = useQuery({
+    queryKey: ['paymentMethods', inquiryId],
+    queryFn: async () =>
+      apiClient
+        .get(`/order/payment-method/${inquiryId}`)
+        .then((res) => res.data)
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || 'Failed to fetch payment methods')
+        }),
+    enabled: !!inquiryId && isOpen,
+  })
+
+  // Auto-select payment method
+  useEffect(() => {
+    if (paymentMethods.isSuccess && paymentMethods.data?.data) {
+      const allItems: PaymentItem[] = []
+      paymentMethods.data.data.forEach((method: PaymentMethod) => {
+        if (method.items) {
+          allItems.push(...method.items.filter((item: PaymentItem) => item.is_available))
+        }
+      })
+
+      // Try to find preselected payment
+      if (preselectedPaymentId) {
+        const preselected = allItems.find((item) => item.id === preselectedPaymentId)
+        if (preselected) {
+          setSelectedPayment(preselected)
+          return
+        }
+      }
+
+      // Otherwise select cheapest
+      if (allItems.length > 0 && !selectedPayment) {
+        const cheapest = allItems.sort((a, b) => a.total_price - b.total_price)[0]
+        setSelectedPayment(cheapest)
+      }
+    }
+  }, [paymentMethods.isSuccess, paymentMethods.data, preselectedPaymentId, selectedPayment])
 
   // Countdown timer
   useEffect(() => {
@@ -54,31 +116,53 @@ export default function CheckoutModal({ data }: Props) {
 
   const checkout = useMutation({
     mutationKey: ['checkout'],
-    mutationFn: async () =>
-      apiClient
-        .post(
-          '/v2/order/checkout',
-          {
-            inquiry_id: inquiryId,
-            checkout_token: checkoutToken,
+    mutationFn: async () => {
+      if (!selectedPayment) {
+        throw new Error('Please select a payment method')
+      }
+
+      const payload: any = {
+        inquiry_id: inquiryId,
+        payment_method_id: selectedPayment.id,
+        checkout_token: checkoutToken,
+      }
+
+      if (selectedPayment.is_need_phone_number && paymentPhoneNumber) {
+        payload.payment_phone_number = paymentPhoneNumber
+      }
+
+      return apiClient
+        .post('/order/checkout', payload, {
+          headers: {
+            'X-Time': inquiryTime,
           },
-          {
-            headers: {
-              'X-Time': preCheckoutTime,
-            },
-          },
-        )
+        })
         .then((res) => res.data)
         .catch((error) => {
           toast.error(error.response?.data?.message || 'Checkout failed')
           throw error
-        }),
+        })
+    },
     onSuccess: (data) => {
       toast.success('Checkout successful!')
       setIsOpen(false)
       navigate(`/order/detail/${data.data.order_id}`)
     },
   })
+
+  const handleCheckout = () => {
+    if (!selectedPayment) {
+      toast.error('Silakan pilih metode pembayaran')
+      return
+    }
+
+    if (selectedPayment.is_need_phone_number && !paymentPhoneNumber) {
+      toast.error('Nomor telepon pembayaran diperlukan')
+      return
+    }
+
+    checkout.mutate()
+  }
 
   // Reset timer when modal opens
   useEffect(() => {
@@ -125,20 +209,178 @@ export default function CheckoutModal({ data }: Props) {
               </span>
             </div>
 
-            {/* Input Fields - compact */}
-            {(data.input_fields ?? []).map((field, index) => (
-              <div key={field.name ?? index} className="flex justify-between text-sm">
-                <span className="text-gray-600 capitalize">{field.name}:</span>
-                <span className="font-medium text-right max-w-[60%] wrap-break-word">
-                  {field.value}
-                </span>
-              </div>
-            ))}
+            {/* Bills Detail - for postpaid products */}
+            {data.bills && (
+              <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 space-y-2">
+                <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Detail Tagihan
+                </h4>
 
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Pembayaran:</span>
-              <span className="font-medium">{data.payment_method?.name}</span>
+                {data.bills.customer_name && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-600 dark:text-slate-400">Nama Pelanggan:</span>
+                    <span className="font-medium">{data.bills.customer_name}</span>
+                  </div>
+                )}
+
+                {(data.bills.tarif || data.bills.daya) && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-600 dark:text-slate-400">Tarif / Daya:</span>
+                    <span className="font-medium">
+                      {data.bills.tarif}
+                      {data.bills.daya && ` - ${data.bills.daya} VA`}
+                    </span>
+                  </div>
+                )}
+
+                {/* Bill Period Details */}
+                {data.bills.detail && data.bills.detail.length > 0 && (
+                  <div className="mt-2 pt-2 border-t dark:border-slate-700">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
+                      Periode ({data.bills.lembar_tagihan} Lembar):
+                    </p>
+                    <div className="space-y-1">
+                      {data.bills.detail.map((bill, index) => (
+                        <div
+                          key={index}
+                          className="bg-white dark:bg-slate-800 rounded px-2 py-1.5 text-xs"
+                        >
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">{bill.periode}</span>
+                            <span>{formatPrice(Number(bill.nilai_tagihan))}</span>
+                          </div>
+                          {Number(bill.denda) > 0 && (
+                            <div className="flex justify-between text-red-600 dark:text-red-400 mt-0.5">
+                              <span>Denda</span>
+                              <span>{formatPrice(Number(bill.denda))}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-2 pt-2 border-t dark:border-slate-700 space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-slate-600 dark:text-slate-400">Jumlah Tagihan:</span>
+                    <span className="font-medium">{formatPrice(data.bills.jumlah_tagihan)}</span>
+                  </div>
+                  {data.bills.fee > 0 && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-600 dark:text-slate-400">Biaya Admin:</span>
+                      <span className="font-medium">{formatPrice(data.bills.fee)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Input Fields - compact (only show if no bills) */}
+            {!data.bills &&
+              (data.input_fields ?? []).map((field, index) => (
+                <div key={field.name ?? index} className="flex justify-between text-sm">
+                  <span className="text-gray-600 capitalize">{field.name}:</span>
+                  <span className="font-medium text-right max-w-[60%] wrap-break-word">
+                    {field.value}
+                  </span>
+                </div>
+              ))}
+          </div>
+
+          <hr className="border-slate-300" />
+
+          {/* Payment Method Selection */}
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <CreditCardIcon className="w-4 h-4 text-gray-600" />
+              <Label className="text-sm font-semibold">Metode Pembayaran</Label>
             </div>
+
+            {paymentMethods.isPending && (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                <span className="ml-2 text-xs text-muted-foreground">Memuat...</span>
+              </div>
+            )}
+
+            {paymentMethods.isError && (
+              <div className="text-center py-4">
+                <p className="text-destructive text-xs">Error loading payment methods</p>
+              </div>
+            )}
+
+            {paymentMethods.isSuccess && selectedPayment && (
+              <>
+                <Button
+                  type="button"
+                  onClick={() => setIsPaymentSelectorOpen(true)}
+                  variant="outline"
+                  className="w-full justify-between p-3 h-auto border-dashed border-2 hover:border-primary/50 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        selectedPayment.image_url.startsWith('http')
+                          ? selectedPayment.image_url
+                          : `https://is3.cloudhost.id/bagusok${selectedPayment.image_url}`
+                      }
+                      alt={selectedPayment.name}
+                      className="w-8 h-8 rounded object-cover"
+                    />
+                    <div className="text-left">
+                      <p className="text-xs font-medium">{selectedPayment.name}</p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {formatPrice(selectedPayment.total_price)}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRightIcon className="w-4 h-4" />
+                </Button>
+
+                {/* Payment Selector Dialog */}
+                <Dialog open={isPaymentSelectorOpen} onOpenChange={setIsPaymentSelectorOpen}>
+                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto dark:bg-foreground">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <CreditCardIcon className="w-5 h-5" />
+                        Pilih Metode Pembayaran
+                      </DialogTitle>
+                    </DialogHeader>
+
+                    <div className="space-y-3 mt-4">
+                      <PaymentMethodSelector
+                        paymentMethods={paymentMethods.data.data}
+                        selectedPayment={selectedPayment}
+                        onSelectPayment={(item) => {
+                          setSelectedPayment(item)
+                          setIsPaymentSelectorOpen(false)
+                        }}
+                        isLoading={false}
+                        isError={false}
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
+
+            {/* Payment Phone Number */}
+            {selectedPayment?.is_need_phone_number && (
+              <div className="space-y-1">
+                <Label htmlFor="payment_phone" className="text-xs">
+                  Nomor WhatsApp untuk Pembayaran
+                </Label>
+                <Input
+                  id="payment_phone"
+                  type="text"
+                  placeholder="628123456789"
+                  value={paymentPhoneNumber}
+                  onChange={(e) => setPaymentPhoneNumber(e.target.value)}
+                  className="h-8 text-xs"
+                />
+              </div>
+            )}
           </div>
 
           <hr className="border-slate-300" />
@@ -150,10 +392,10 @@ export default function CheckoutModal({ data }: Props) {
               <span>{formatPrice(data.product_price)}</span>
             </div>
 
-            {data.fee > 0 && (
+            {selectedPayment && selectedPayment.total_fee > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Biaya Admin:</span>
-                <span>{formatPrice(data.fee)}</span>
+                <span>{formatPrice(selectedPayment.total_fee)}</span>
               </div>
             )}
 
@@ -176,7 +418,9 @@ export default function CheckoutModal({ data }: Props) {
             <div className="flex justify-between items-center pt-2">
               <span className="font-semibold">Total:</span>
               <span className="text-lg font-bold text-blue-600">
-                {formatPrice(data.total_price)}
+                {selectedPayment
+                  ? formatPrice(selectedPayment.total_price - data.discount)
+                  : formatPrice(data.total_price)}
               </span>
             </div>
           </div>
@@ -191,8 +435,8 @@ export default function CheckoutModal({ data }: Props) {
             type="button"
             className="w-full"
             size="sm"
-            onClick={() => checkout.mutate()}
-            disabled={checkout.isPending}
+            onClick={handleCheckout}
+            disabled={checkout.isPending || !selectedPayment}
           >
             <CircleCheckIcon />
             {checkout.isPending ? 'Memproses...' : 'Konfirmasi'}
@@ -202,16 +446,16 @@ export default function CheckoutModal({ data }: Props) {
     </Dialog>
   )
 }
-export interface PreCheckoutResponse {
+export interface InquiryResponse {
   success: boolean
   message: string
-  data: PreCheckoutData
+  data: InquiryData
 }
 
-export interface PreCheckoutData {
+export interface InquiryData {
   inquiry_id: string
   product: Product
-  payment_method: PaymentMethod
+  payment_method: InquiryPaymentMethodInfo
   offers: Offer[]
   input_fields: InputField[]
   merged_input: string
@@ -220,6 +464,30 @@ export interface PreCheckoutData {
   discount: number
   total_price: number
   checkout_token: string
+  // PLN Postpaid specific fields (optional)
+  customer_name?: string
+  customer_id?: string
+  power?: string
+  bill_period?: string
+  bill_amount?: number
+  penalty?: number
+  admin_fee?: number
+  total_amount?: number
+  // Bills structure for postpaid products
+  bills?: {
+    jumlah_tagihan: number
+    fee: number
+    customer_name?: string
+    tarif?: string
+    daya?: number
+    lembar_tagihan?: number
+    detail?: Array<{
+      periode: string
+      nilai_tagihan: string
+      admin: string
+      denda: string
+    }>
+  }
 }
 
 export interface Product {
@@ -229,7 +497,7 @@ export interface Product {
   price: number
 }
 
-export interface PaymentMethod {
+export interface InquiryPaymentMethodInfo {
   id: string
   name: string
   type: string

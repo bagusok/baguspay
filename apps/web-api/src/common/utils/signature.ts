@@ -2,6 +2,7 @@ import * as crypto from 'crypto'
 
 export class SignatureUtils {
   public static generateCheckoutToken(data: CheckoutTokenData, secretKey: string): string {
+    console.log('Generating checkout token with data:', data)
     return crypto
       .createHmac('sha256', secretKey)
       .update(

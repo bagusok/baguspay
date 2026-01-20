@@ -29,6 +29,7 @@ export class OrderProcessor {
         return this.digiflazzProcessor.handle({
           id: order.id,
           order_id: order.order_id,
+          inquiry_id: order.inquiry_id,
           user_id: order.user_id,
           customer_input: order.customer_input,
           total_price: order.total_price,
@@ -44,6 +45,11 @@ export class OrderProcessor {
           offer_on_orders: order.offer_on_orders.map((o) => ({
             offer_id: o.offer.id,
           })),
+
+          user: {
+            id: order.user.id,
+            role: order.user.role,
+          },
         })
 
       default:

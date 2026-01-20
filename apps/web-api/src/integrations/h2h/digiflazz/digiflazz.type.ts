@@ -9,6 +9,13 @@ export type DigiflazzTopupData = {
   allow_dot: boolean
 }
 
+export type DigiflazzBayarTagihanData = {
+  provider_code: string
+  customer_input: string
+  inquiry_id: string
+  order_id: string
+}
+
 export type DigiflazzCekTagihanData = {
   inquiry_id: string
   provider_code: string
@@ -30,6 +37,31 @@ export type DigiflazzTopupResponse = {
   wa: string
   tele: string
   sn: string | null
+  raw: any
+}
+
+export type DigiflazzBayarTagihanResponse = {
+  provider_code: string
+  customer_input: string
+  order_id: string
+  inquiry_id: string
+  max_price: number
+  callback_url?: string
+  allow_dot: boolean
+  status: OrderStatus
+  buyer_last_saldo: number
+  provider_price: number
+  wa: string
+  tele: string
+  sn: string | null
+  customer_name: string
+  admin: number
+  message: string
+  periode: string
+  price: number
+  selling_price: number
+  desc: TagihanPLNDesc | BPJSTK | null
+  raw: any
 }
 
 export interface DigiflazzCekTagihanResponse {
@@ -89,16 +121,37 @@ export type DigiflazzApiTopupResponse = {
   }
 }
 
-export type DigiflazzCallbackData = {
-  ref_id: string
-  customer_no: string
-  buyer_sku_code: string
-  message: string
-  rc: string
-  status: 'Pending' | 'Sukses' | 'Gagal'
-  sn: string
-  buyer_last_saldo: number
-  price: number
-  tele: string
-  wa: string
+export type DigiflazzPrepaidCallbackData = {
+  data: {
+    ref_id: string
+    customer_no: string
+    buyer_sku_code: string
+    message: string
+    rc: string
+    status: 'Pending' | 'Sukses' | 'Gagal'
+    sn: string
+    buyer_last_saldo: number
+    price: number
+    tele: string
+    wa: string
+  }
+}
+
+export type DigiflazzPostpaidCallbackData = {
+  data: {
+    ref_id: string
+    customer_no: string
+    customer_name: string
+    buyer_sku_code: string
+    admin: number
+    message: string
+    status: string
+    rc: string
+    sn: string
+    periode: string
+    buyer_last_saldo: number
+    price: number
+    selling_price: number
+    desc: TagihanPLNDesc | BPJSTK | null
+  }
 }

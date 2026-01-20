@@ -28,7 +28,7 @@ import { RefundService } from './services/refund.service'
     ProductsModule,
     BalanceModule,
   ],
-  exports: [OrderProcessor, OrderRepository, OrderService],
+  exports: [OrderProcessor, OrderRepository, OrderService, RefundService],
   controllers: [OrderController],
   providers: [
     OrderRepository,
