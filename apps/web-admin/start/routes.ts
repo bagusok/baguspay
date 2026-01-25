@@ -25,6 +25,7 @@ const BalanceMutationController = () => import('#controllers/balance_mutations_c
 const ConfigHomesController = () => import('#controllers/configs/config_homes_controller')
 const ConfigFastMenuController = () => import('#controllers/configs/config_home_fast_menu')
 const BannerController = () => import('#controllers/configs/banners_controller')
+const ConfigSettingsController = () => import('#controllers/configs/settings_controller')
 
 import router from '@adonisjs/core/services/router'
 import { UserRole } from '@repo/db/types'
@@ -247,6 +248,10 @@ router
     router.get('/', [FileManagerController, 'list']).as('fileManagers.list')
     router.delete('/:id', [FileManagerController, 'destroy']).as('fileManagers.delete')
     router.post('/upload', [FileManagerController, 'upload']).as('fileManagers.upload')
+    router.post('/upload-many', [FileManagerController, 'uploadMany']).as('fileManagers.uploadMany')
+    router
+      .post('/delete-bulk', [FileManagerController, 'destroyBulk'])
+      .as('fileManagers.deleteBulk')
     router.get('/:id', [FileManagerController, 'getById']).as('fileManagers.getById')
   })
   .prefix('/admin/file-managers')
@@ -486,6 +491,9 @@ router
         router.delete('/banner/:id', [BannerController, 'postDelete']).as('banners.delete')
       })
       .prefix('/home')
+
+    router.get('/settings/general', [ConfigSettingsController, 'index'])
+    router.patch('/settings/general', [ConfigSettingsController, 'update'])
   })
   .prefix('/admin/config')
   .middleware(middleware.role(UserRole.ADMIN))

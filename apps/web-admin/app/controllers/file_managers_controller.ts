@@ -3,8 +3,10 @@
 import env from '#start/env'
 import {
   deleteFileValidator,
+  deleteFilesValidator,
   listFileQueryValidator,
   uploadFileValidator,
+  uploadFilesValidator,
 } from '#validators/file_manager'
 import { HttpContext } from '@adonisjs/core/http'
 import drive from '@adonisjs/drive/services/main'
@@ -79,6 +81,68 @@ export default class FileManagersController {
     }
   }
 
+  public async uploadMany(ctx: HttpContext) {
+    try {
+      const data = await ctx.request.validateUsing(vine.compile(uploadFilesValidator))
+
+      const disk = drive.use('s3')
+      const uploaded: { id: string; name: string; url: string }[] = []
+      const errors: { name: string; error: string }[] = []
+
+      for (const file of data.files) {
+        if (file.type !== 'image' || !file.tmpPath) {
+          errors.push({ name: file.clientName, error: 'Unsupported file type' })
+          continue
+        }
+
+        const fileBuffer = await fs.readFile(file.tmpPath)
+        const fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex')
+        const filePath = `storage/images/${fileHash}.webp`
+        const exist = await disk.exists(filePath)
+
+        if (exist) {
+          errors.push({ name: file.clientName, error: 'File already exists' })
+          continue
+        }
+
+        const convertedImage = await sharp(file.tmpPath).toFormat('webp').toBuffer()
+
+        await disk.put(filePath, convertedImage, {
+          visibility: 'public',
+        })
+
+        const fileSize = await disk.getBytes(filePath)
+        const save = await db
+          .insert(tb.fileManager)
+          .values({
+            name: `${fileHash}.webp`,
+            url: `/storage/images/${fileHash}.webp`,
+            size: fileSize.byteLength,
+            mime_type: 'image/webp',
+          })
+          .returning()
+
+        uploaded.push({
+          id: save[0].id,
+          name: `${fileHash}.webp`,
+          url:
+            env.get('S3_ENDPOINT') + env.get('S3_BUCKET_NAME') + `/storage/images/${fileHash}.webp`,
+        })
+      }
+
+      return ctx.response.json({
+        message: 'Files uploaded',
+        files: uploaded,
+        errors,
+      })
+    } catch (error) {
+      console.error('File upload error:', error)
+      return ctx.response.status(500).json({
+        error: 'An error occurred while uploading the files. Please try again later.',
+      })
+    }
+  }
+
   public async destroy(ctx: HttpContext) {
     try {
       const data = await ctx.request.validateUsing(vine.compile(deleteFileValidator), {
@@ -116,6 +180,49 @@ export default class FileManagersController {
       console.error('File deletion error:', error)
       return ctx.response.status(500).json({
         error: 'An error occurred while deleting the file. Please try again later.',
+      })
+    }
+  }
+
+  public async destroyBulk(ctx: HttpContext) {
+    try {
+      const data = await ctx.request.validateUsing(vine.compile(deleteFilesValidator))
+      const disk = drive.use('s3')
+      const deleted: string[] = []
+      const errors: { id: string; error: string }[] = []
+
+      for (const id of data.ids) {
+        const file = await db.query.fileManager.findFirst({
+          where: eq(tb.fileManager.id, id),
+        })
+
+        if (!file) {
+          errors.push({ id, error: 'File not found' })
+          continue
+        }
+
+        const check = await disk.exists(file.url)
+
+        if (!check) {
+          await db.delete(tb.fileManager).where(eq(tb.fileManager.id, id))
+          deleted.push(id)
+          continue
+        }
+
+        await disk.delete(file.url)
+        await db.delete(tb.fileManager).where(eq(tb.fileManager.id, id))
+        deleted.push(id)
+      }
+
+      return ctx.response.json({
+        message: 'Files deleted',
+        deleted,
+        errors,
+      })
+    } catch (error) {
+      console.error('File deletion error:', error)
+      return ctx.response.status(500).json({
+        error: 'An error occurred while deleting the files. Please try again later.',
       })
     }
   }

@@ -4,6 +4,14 @@ import { router } from '@inertiajs/react'
 import { OrderStatus, PaymentStatus } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
 import { Button } from '@repo/ui/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@repo/ui/components/ui/dialog'
 import { cn } from '@repo/ui/lib/utils'
 import { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
@@ -124,8 +132,18 @@ const columns: ColumnDef<Props['recentOrders'][number]>[] = [
 ]
 
 export default function Home(props: Props) {
-  const { range, summary, paymentStatusCounts, orderStatusCounts, recentOrders, revenueTrend } =
-    props
+  const {
+    range,
+    summary,
+    paymentStatusCounts,
+    orderStatusCounts,
+    recentOrders,
+    revenueTrend,
+    salesProfitTrend,
+    topProducts,
+    topCategories,
+    topUsers,
+  } = props
   const [recharts, setRecharts] = useState<RechartsModule | null>(null)
 
   useEffect(() => {
@@ -223,6 +241,274 @@ export default function Home(props: Props) {
         <div className="rounded-lg border bg-white p-4">
           <p className="text-sm text-muted-foreground">Total Users</p>
           <p className="text-2xl font-semibold mt-1">{Number(summary.totalUsers)}</p>
+        </div>
+      </div>
+
+      <div className="grid gap-4 mt-6 grid-cols-1 lg:grid-cols-3">
+        <div className="rounded-lg border bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top Products</p>
+              <p className="text-xs text-muted-foreground">Completed vs total orders</p>
+            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                  Detail
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Top Products</DialogTitle>
+                  <DialogDescription>Completed vs total orders</DialogDescription>
+                </DialogHeader>
+                <div className="overflow-hidden rounded-md border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-xs text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left">Product</th>
+                        <th className="px-3 py-2 text-left">Category</th>
+                        <th className="px-3 py-2 text-right">Completed</th>
+                        <th className="px-3 py-2 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topProducts.map((item) => (
+                        <tr key={`${item.product_name}-${item.category_name}`} className="border-t">
+                          <td className="px-3 py-2 font-medium">{item.product_name}</td>
+                          <td className="px-3 py-2 text-muted-foreground">
+                            {item.category_name || 'Unknown'}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {Number(item.completed_orders).toLocaleString('en-US')}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {Number(item.total_orders).toLocaleString('en-US')}
+                          </td>
+                        </tr>
+                      ))}
+                      {topProducts.length === 0 && (
+                        <tr>
+                          <td colSpan={4} className="px-3 py-6 text-center text-muted-foreground">
+                            No data available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left">Product</th>
+                  <th className="px-3 py-2 text-right">Completed</th>
+                  <th className="px-3 py-2 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topProducts.slice(0, 3).map((item) => (
+                  <tr key={`${item.product_name}-${item.category_name}`} className="border-t">
+                    <td className="px-3 py-2">
+                      <p className="font-medium">{item.product_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.category_name || 'Unknown'}
+                      </p>
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {Number(item.completed_orders).toLocaleString('en-US')}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {Number(item.total_orders).toLocaleString('en-US')}
+                    </td>
+                  </tr>
+                ))}
+                {topProducts.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-3 py-6 text-center text-muted-foreground">
+                      No data available
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="rounded-lg border bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top Categories</p>
+              <p className="text-xs text-muted-foreground">Completed vs total orders</p>
+            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                  Detail
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Top Categories</DialogTitle>
+                  <DialogDescription>Completed vs total orders</DialogDescription>
+                </DialogHeader>
+                <div className="overflow-hidden rounded-md border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-xs text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left">Category</th>
+                        <th className="px-3 py-2 text-right">Completed</th>
+                        <th className="px-3 py-2 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topCategories.map((item) => (
+                        <tr key={item.category_name} className="border-t">
+                          <td className="px-3 py-2 font-medium">
+                            {item.category_name || 'Unknown'}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {Number(item.completed_orders).toLocaleString('en-US')}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {Number(item.total_orders).toLocaleString('en-US')}
+                          </td>
+                        </tr>
+                      ))}
+                      {topCategories.length === 0 && (
+                        <tr>
+                          <td colSpan={3} className="px-3 py-6 text-center text-muted-foreground">
+                            No data available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left">Category</th>
+                  <th className="px-3 py-2 text-right">Completed</th>
+                  <th className="px-3 py-2 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topCategories.slice(0, 3).map((item) => (
+                  <tr key={item.category_name} className="border-t">
+                    <td className="px-3 py-2 font-medium">{item.category_name || 'Unknown'}</td>
+                    <td className="px-3 py-2 text-right">
+                      {Number(item.completed_orders).toLocaleString('en-US')}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {Number(item.total_orders).toLocaleString('en-US')}
+                    </td>
+                  </tr>
+                ))}
+                {topCategories.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-3 py-6 text-center text-muted-foreground">
+                      No data available
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="rounded-lg border bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Top Users</p>
+              <p className="text-xs text-muted-foreground">Completed vs total orders</p>
+            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline">
+                  Detail
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Top Users</DialogTitle>
+                  <DialogDescription>Completed vs total orders</DialogDescription>
+                </DialogHeader>
+                <div className="overflow-hidden rounded-md border">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50 text-xs text-muted-foreground">
+                      <tr>
+                        <th className="px-3 py-2 text-left">User</th>
+                        <th className="px-3 py-2 text-left">Email</th>
+                        <th className="px-3 py-2 text-right">Completed</th>
+                        <th className="px-3 py-2 text-right">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topUsers.map((item) => (
+                        <tr key={item.user_id} className="border-t">
+                          <td className="px-3 py-2 font-medium">{item.user_name}</td>
+                          <td className="px-3 py-2 text-muted-foreground">{item.user_email}</td>
+                          <td className="px-3 py-2 text-right">
+                            {Number(item.completed_orders).toLocaleString('en-US')}
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            {Number(item.total_orders).toLocaleString('en-US')}
+                          </td>
+                        </tr>
+                      ))}
+                      {topUsers.length === 0 && (
+                        <tr>
+                          <td colSpan={4} className="px-3 py-6 text-center text-muted-foreground">
+                            No data available
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+          <div className="mt-3 overflow-hidden rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-xs text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2 text-left">User</th>
+                  <th className="px-3 py-2 text-right">Completed</th>
+                  <th className="px-3 py-2 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topUsers.slice(0, 3).map((item) => (
+                  <tr key={item.user_id} className="border-t">
+                    <td className="px-3 py-2">
+                      <p className="font-medium">{item.user_name}</p>
+                      <p className="text-xs text-muted-foreground">{item.user_email}</p>
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {Number(item.completed_orders).toLocaleString('en-US')}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      {Number(item.total_orders).toLocaleString('en-US')}
+                    </td>
+                  </tr>
+                ))}
+                {topUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={3} className="px-3 py-6 text-center text-muted-foreground">
+                      No data available
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -360,6 +646,64 @@ export default function Home(props: Props) {
                       dataKey="orderFailed"
                       yAxisId="right"
                       stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              )
+            })()}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-6 rounded-lg border bg-white p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-sm font-semibold">Completed Sales & Profit</h2>
+            <p className="text-xs text-muted-foreground">Only completed orders are counted</p>
+          </div>
+        </div>
+        {salesProfitTrend.length === 0 ? (
+          <div className="py-10 text-center text-sm text-muted-foreground">No data available</div>
+        ) : !recharts ? (
+          <div className="py-10 text-center text-sm text-muted-foreground">Loading chart...</div>
+        ) : (
+          <div className="h-[260px] mt-4">
+            {(() => {
+              const { Line, LineChart, ResponsiveContainer, CartesianGrid, Tooltip, XAxis, YAxis } =
+                recharts
+
+              return (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={salesProfitTrend}
+                    margin={{ left: 8, right: 16, top: 10, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" className="opacity-50" />
+                    <XAxis dataKey="date" tickLine={false} axisLine={false} fontSize={12} />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      fontSize={12}
+                      width={70}
+                      tickFormatter={(value: number | string) => formatPrice(Number(value))}
+                    />
+                    <Tooltip
+                      formatter={(value: number | string) => formatPrice(Number(value))}
+                      labelFormatter={(label: number | string) => `Date: ${label}`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="totalSales"
+                      stroke="#0ea5e9"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="totalProfit"
+                      stroke="#22c55e"
                       strokeWidth={2}
                       dot={false}
                     />

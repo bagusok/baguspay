@@ -76,6 +76,7 @@ export default function FileManager({
   defaultFileId?: string
 }) {
   const [files, setFiles] = useState<File[] | null>(null)
+  const [selectedFileIds, setSelectedFileIds] = useState<string[]>([])
   const [selectedFile, setSelectedFile] = useState<InferSelectModel<typeof tb.fileManager> | null>(
     null
   )
@@ -107,26 +108,38 @@ export default function FileManager({
   const filesData = listFile.data?.pages.flatMap((page) => page.data) ?? []
   const { refetch, fetchNextPage, hasNextPage, isFetchingNextPage, isFetching } = listFile
 
-  const uploadFile = useMutation({
-    mutationKey: ['uploadFile'],
-    mutationFn: async (file: File | null) => {
-      if (!file) {
-        throw new Error('No file selected for upload')
+  const uploadFiles = useMutation({
+    mutationKey: ['uploadFiles'],
+    mutationFn: async (uploadItems: File[] | null) => {
+      if (!uploadItems || uploadItems.length === 0) {
+        throw new Error('No files selected for upload')
       }
 
       const formData = new FormData()
-      formData.append('file', file)
+      uploadItems.forEach((file) => {
+        formData.append('files', file)
+      })
 
       return apiClient
-        .post('/admin/file-managers/upload', formData, {
+        .post('/admin/file-managers/upload-many', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
         .then((response) => {
-          toast.success('File uploaded successfully')
-          refetch() // Refetch the file list after upload
-          setFiles(null) // Clear files after successful upload
+          const uploadedCount = response.data?.files?.length ?? 0
+          const errorCount = response.data?.errors?.length ?? 0
+          if (uploadedCount > 0) {
+            toast.success(`Uploaded ${uploadedCount} file(s)`)
+          }
+          if (errorCount > 0) {
+            toast.error(`Failed ${errorCount} file(s)`)
+          }
+          if (uploadedCount === 0 && errorCount === 0) {
+            toast.success('Files uploaded')
+          }
+          refetch()
+          setFiles(null)
           return response.data
         })
         .catch((error) => {
@@ -146,6 +159,35 @@ export default function FileManager({
           toast.success('File deleted successfully')
           refetch()
           setSelectedFile(null)
+          return response.data
+        })
+        .catch((error) => {
+          toast.error(error.response?.data?.error || 'File deletion failed')
+          console.error('File deletion failed:', error)
+          throw new Error('File deletion failed')
+        })
+    },
+  })
+
+  const deleteFiles = useMutation({
+    mutationKey: ['deleteFiles'],
+    mutationFn: async (ids: string[]) => {
+      return apiClient
+        .post('/admin/file-managers/delete-bulk', { ids })
+        .then((response) => {
+          const deletedCount = response.data?.deleted?.length ?? 0
+          const errorCount = response.data?.errors?.length ?? 0
+          if (deletedCount > 0) {
+            toast.success(`Deleted ${deletedCount} file(s)`)
+          }
+          if (errorCount > 0) {
+            toast.error(`Failed ${errorCount} file(s)`)
+          }
+          refetch()
+          setSelectedFileIds([])
+          if (selectedFile && ids.includes(selectedFile.id)) {
+            setSelectedFile(null)
+          }
           return response.data
         })
         .catch((error) => {
@@ -183,6 +225,12 @@ export default function FileManager({
       setOpen(false)
       onFilesSelected(file)
     }
+  }
+
+  const toggleSelectedFileId = (id: string) => {
+    setSelectedFileIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    )
   }
 
   // Fetch file list every time dialog open
@@ -263,17 +311,15 @@ export default function FileManager({
                   {filesData.map((file: InferSelectModel<typeof tb.fileManager>) => (
                     <label key={file.id} className="relative block cursor-pointer group">
                       <input
-                        type="radio"
-                        name="selectedFile"
-                        className="absolute left-2 top-2 z-10"
-                        checked={selectedFile?.id === file.id}
-                        onChange={() => {
-                          setSelectedFile(file)
-                        }}
+                        type="checkbox"
+                        className="absolute right-2 top-2 z-10"
+                        checked={selectedFileIds.includes(file.id)}
+                        onChange={() => toggleSelectedFileId(file.id)}
                       />
                       <img
                         src={`${import.meta.env.VITE_S3_URL}${file.url}`}
                         alt={file.name || ''}
+                        onClick={() => setSelectedFile(file)}
                         className={`shadow rounded border-2 transition-all w-full object-contain ${selectedFile?.id === file.id ? 'border-blue-500' : 'border-transparent'}`}
                       />
                     </label>
@@ -287,24 +333,41 @@ export default function FileManager({
                 )}
                 <div ref={loaderRef} className="h-4" />
               </div>
-              {selectedFile && (
+              {(selectedFile || selectedFileIds.length > 0) && (
                 <div className="sticky z-10 bottom-0 left-0 right-0 bg-white dark:bg-slate-950 pt-4 pb-4 flex flex-wrap justify-end gap-2 border-t border-slate-200 dark:border-slate-800">
+                  {selectedFileIds.length > 0 ? (
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={deleteFiles.isPending}
+                      onClick={() => deleteFiles.mutate(selectedFileIds)}
+                    >
+                      {deleteFiles.isPending
+                        ? 'Deleting...'
+                        : `Delete Selected (${selectedFileIds.length})`}
+                    </Button>
+                  ) : (
+                    selectedFile && (
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        disabled={!selectedFile.id || deleteFile.isPending}
+                        onClick={() => deleteFile.mutate(selectedFile.id)}
+                      >
+                        {deleteFile.isPending ? 'Deleting...' : 'Delete File'}
+                      </Button>
+                    )
+                  )}
                   <Button
                     size="sm"
-                    variant="destructive"
-                    disabled={!selectedFile.id || deleteFile.isPending}
-                    onClick={() => deleteFile.mutate(selectedFile.id)}
-                  >
-                    {deleteFile.isPending ? 'Deleting...' : 'Delete File'}
-                  </Button>
-                  <Button
-                    size="sm"
-                    disabled={!selectedFile || deleteFile.isPending}
+                    disabled={!selectedFile || deleteFiles.isPending || deleteFile.isPending}
                     onClick={() => {
-                      handleFileSelect(selectedFile)
+                      if (selectedFile) {
+                        handleFileSelect(selectedFile)
+                      }
                     }}
                   >
-                    {selectedFile.id ? 'Select File' : 'No File Selected'}
+                    {selectedFile ? 'Select File' : 'No File Selected'}
                   </Button>
                 </div>
               )}
@@ -315,10 +378,10 @@ export default function FileManager({
             <DialogFooter className="mt-4 flex flex-wrap justify-end gap-2">
               <Button
                 size="sm"
-                onClick={() => uploadFile.mutate(files && files.length > 0 ? files[0] : null)}
-                disabled={uploadFile.isPending || !files || files.length === 0}
+                onClick={() => uploadFiles.mutate(files)}
+                disabled={uploadFiles.isPending || !files || files.length === 0}
               >
-                {uploadFile.isPending ? 'Uploading...' : 'Upload File'}
+                {uploadFiles.isPending ? 'Uploading...' : 'Upload Files'}
               </Button>
             </DialogFooter>
           </TabsContent>

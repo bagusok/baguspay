@@ -56,4 +56,8 @@ export default await Env.create(new URL('../', import.meta.url), {
   // R2_ENDPOINT: Env.schema.string(),
 
   VITE_S3_URL: Env.schema.string({ format: 'url' }),
+
+  DIGIFLAZZ_API_KEY: Env.schema.string(),
+  DIGIFLAZZ_USERNAME: Env.schema.string(),
+  DIGIFLAZZ_CALLBACK_SECRET: Env.schema.string(),
 })

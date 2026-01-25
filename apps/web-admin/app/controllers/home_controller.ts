@@ -56,6 +56,81 @@ export default class HomeController {
       .where(orderWhere.length ? and(...orderWhere) : undefined)
       .groupBy(tb.orders.order_status)
 
+    const completedOrderWhere = [...orderWhere, eq(tb.orders.order_status, OrderStatus.COMPLETED)]
+    const salesTrend = await db
+      .select({
+        day: sql`date_trunc('day', ${tb.orders.created_at})`.as('day'),
+        totalSales: sum(tb.orders.total_price),
+        totalProfit: sum(tb.orders.profit),
+      })
+      .from(tb.orders)
+      .where(and(...completedOrderWhere))
+      .groupBy(sql`date_trunc('day', ${tb.orders.created_at})`)
+      .orderBy(asc(sql`date_trunc('day', ${tb.orders.created_at})`))
+
+    const topProducts = await db
+      .select({
+        product_name: tb.productSnapshots.name,
+        category_name: tb.productSnapshots.category_name,
+        total_orders: count(tb.orders.id),
+        completed_orders:
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
+            'completed_orders'
+          ),
+      })
+      .from(tb.orders)
+      .innerJoin(tb.productSnapshots, eq(tb.orders.product_snapshot_id, tb.productSnapshots.id))
+      .where(orderWhere.length ? and(...orderWhere) : undefined)
+      .groupBy(tb.productSnapshots.name, tb.productSnapshots.category_name)
+      .orderBy(
+        desc(
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`
+        )
+      )
+      .limit(10)
+
+    const topCategories = await db
+      .select({
+        category_name: tb.productSnapshots.category_name,
+        total_orders: count(tb.orders.id),
+        completed_orders:
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
+            'completed_orders'
+          ),
+      })
+      .from(tb.orders)
+      .innerJoin(tb.productSnapshots, eq(tb.orders.product_snapshot_id, tb.productSnapshots.id))
+      .where(orderWhere.length ? and(...orderWhere) : undefined)
+      .groupBy(tb.productSnapshots.category_name)
+      .orderBy(
+        desc(
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`
+        )
+      )
+      .limit(10)
+
+    const topUsers = await db
+      .select({
+        user_id: tb.users.id,
+        user_name: tb.users.name,
+        user_email: tb.users.email,
+        total_orders: count(tb.orders.id),
+        completed_orders:
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
+            'completed_orders'
+          ),
+      })
+      .from(tb.orders)
+      .innerJoin(tb.users, eq(tb.orders.user_id, tb.users.id))
+      .where(orderWhere.length ? and(...orderWhere) : undefined)
+      .groupBy(tb.users.id, tb.users.name, tb.users.email)
+      .orderBy(
+        desc(
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`
+        )
+      )
+      .limit(10)
+
     const orderTrend = await db
       .select({
         day: sql`date_trunc('day', ${tb.orders.created_at})`.as('day'),
@@ -141,6 +216,12 @@ export default class HomeController {
       orderFailed: Number(row.orderFailed ?? 0),
     }))
 
+    const salesProfitTrend = salesTrend.map((row) => ({
+      date: row.day instanceof Date ? row.day.toISOString().slice(0, 10) : String(row.day),
+      totalSales: Number(row.totalSales ?? 0),
+      totalProfit: Number(row.totalProfit ?? 0),
+    }))
+
     return ctx.inertia.render('home', {
       title: 'Dashboard',
       description: 'Overview of recent performance and activity.',
@@ -156,6 +237,10 @@ export default class HomeController {
       paymentStatusCounts,
       orderStatusCounts,
       revenueTrend,
+      salesProfitTrend,
+      topProducts,
+      topCategories,
+      topUsers,
       recentOrders,
     })
   }
