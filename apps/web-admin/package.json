@@ -114,6 +114,7 @@
     "react-hot-toast": "^2.5.2",
     "react-hotkeys-hook": "^5.1.0",
     "react-select": "^5.10.2",
+    "recharts": "^2.12.7",
     "react-server-dom-webpack": "^19.2.3",
     "reflect-metadata": "^0.2.2",
     "remove": "^0.1.5",

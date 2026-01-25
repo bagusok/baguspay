@@ -1,4 +1,4 @@
-import { OrderStatus, PaymentStatus, RefundStatus } from '@repo/db/types'
+import { OrderStatus, PaymentStatus, ProductBillingType, RefundStatus } from '@repo/db/types'
 import vine from '@vinejs/vine'
 import { Infer } from '@vinejs/vine/types'
 
@@ -12,6 +12,7 @@ export const getOrderQueryValidator = vine.object({
   orderStatus: vine.enum(OrderStatus).optional(),
   paymentStatus: vine.enum(PaymentStatus).optional(),
   refundStatus: vine.enum(RefundStatus).optional(),
+  billingType: vine.enum(ProductBillingType).optional(),
 })
 
 export type GetOrderQueryValidator = Infer<typeof getOrderQueryValidator>

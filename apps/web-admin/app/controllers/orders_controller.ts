@@ -18,6 +18,120 @@ import {
 import vine from '@vinejs/vine'
 
 export default class OrdersController {
+  async index(ctx: HttpContext) {
+    const {
+      page = 1,
+      limit = 10,
+      orderId,
+      orderStatus,
+      paymentStatus,
+      refundStatus,
+      sortBy = 'desc',
+      sortColumn = 'created_at',
+      userId,
+      billingType,
+    } = await ctx.request.validateUsing(vine.compile(getOrderQueryValidator), {
+      data: ctx.request.qs(),
+    })
+
+    const where = []
+
+    if (orderId) {
+      where.push(eq(tb.orders.order_id, orderId))
+    }
+
+    if (orderStatus) {
+      where.push(eq(tb.orders.order_status, orderStatus))
+    }
+
+    if (paymentStatus) {
+      where.push(eq(tb.orders.payment_status, paymentStatus))
+    }
+
+    if (refundStatus) {
+      where.push(eq(tb.orders.refund_status, refundStatus))
+    }
+
+    if (userId) {
+      where.push(eq(tb.orders.user_id, userId))
+    }
+
+    const orderBy = sortBy === 'asc' ? asc(tb.orders[sortColumn]) : desc(tb.orders[sortColumn])
+
+    let orders = await db.query.orders.findMany({
+      columns: {
+        order_id: true,
+        price: true,
+        cost_price: true,
+        total_price: true,
+        fee: true,
+        profit: true,
+        discount_price: true,
+        order_status: true,
+        payment_status: true,
+        refund_status: true,
+        created_at: true,
+        updated_at: true,
+      },
+      with: {
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        offer_on_orders: true,
+        payment_snapshot: {
+          columns: {
+            name: true,
+            provider_name: true,
+            type: true,
+          },
+        },
+        product_snapshot: {
+          columns: {
+            id: true,
+            name: true,
+            provider_name: true,
+            category_name: true,
+            sub_category_name: true,
+            billing_type: true,
+          },
+        },
+      },
+      where: where.length ? and(...where) : undefined,
+      orderBy,
+    })
+
+    if (billingType) {
+      orders = orders.filter((order) => order.product_snapshot.billing_type === billingType)
+    }
+
+    const total = orders.length
+    const paginatedOrders = orders.slice((page - 1) * limit, page * limit)
+
+    return ctx.inertia.render('orders/index', {
+      orders: paginatedOrders,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+      filters: {
+        orderId,
+        orderStatus,
+        paymentStatus,
+        refundStatus,
+        userId,
+        sortBy,
+        sortColumn,
+        billingType,
+      },
+    })
+  }
+
   async indexPrepaid(ctx: HttpContext) {
     const {
       page = 1,

@@ -24,6 +24,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@repo/ui/components/ui/sidebar'
+import { Link } from '@inertiajs/react'
 import { NavMain } from './nav-main'
 import { NavUser } from './nav-user'
 
@@ -198,18 +199,9 @@ const data = {
     },
     {
       title: 'Orders',
-      url: '#',
+      url: '/admin/orders',
       icon: ArrowLeftRight,
-      items: [
-        {
-          title: 'Prepaid',
-          url: '/admin/orders/prepaid',
-        },
-        {
-          title: 'Postpaid',
-          url: '/admin/orders/postpaid',
-        },
-      ],
+      items: [],
     },
     {
       title: 'Balance Mutations',
@@ -266,7 +258,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
+              <Link href="/admin">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
@@ -274,7 +266,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <span className="truncate font-medium">Baguspay</span>
                   <span className="truncate text-xs">Admin Page</span>
                 </div>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

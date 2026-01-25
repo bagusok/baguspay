@@ -399,6 +399,7 @@ router
 
 router
   .group(() => {
+    router.get('/', [OrderController, 'index']).as('order.index')
     router.get('/prepaid', [OrderController, 'indexPrepaid']).as('order.indexPrepaid')
     router.get('/:id', [OrderController, 'getById']).as('order.getById')
     router
