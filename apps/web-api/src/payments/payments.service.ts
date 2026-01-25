@@ -11,17 +11,20 @@ import {
   PaymentMethodProvider,
   PaymentMethodType,
   tb,
+  UserRole,
 } from '@repo/db/types'
 import { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
 import { DatabaseService } from 'src/database/database.service'
 import { StorageService } from 'src/storage/storage.service'
+import { PaymentsRepository } from './payments.repository'
 
 @Injectable()
 export class PaymentsService {
   constructor(
     private readonly databaseService: DatabaseService,
     private readonly storageService: StorageService,
+    private readonly paymentRepository: PaymentsRepository,
   ) {}
 
   async getAllPayments() {
@@ -163,6 +166,32 @@ export class PaymentsService {
       paymentMethod,
       fee,
     }
+  }
+
+  async getPaymentMethodBalance(user: TUser) {
+    if (user.role == UserRole.GUEST) {
+      return SendResponse.success(null, 'Please login to use balance payment method')
+    }
+
+    const getBalancePaymentMethod = await this.paymentRepository.findBalancePaymentMethod()
+    if (!getBalancePaymentMethod) {
+      throw new NotFoundException('Balance payment method not found')
+    }
+
+    const getUserBalance = await this.paymentRepository.getBalanceByUserId(user.id)
+
+    if (!getUserBalance) {
+      throw new NotFoundException('User balance not found')
+    }
+
+    return SendResponse.success({
+      id: getBalancePaymentMethod.id,
+      name: getBalancePaymentMethod.name,
+      type: getBalancePaymentMethod.type,
+      is_available: getBalancePaymentMethod.is_available,
+      image_url: this.storageService.getFileUrl(getBalancePaymentMethod.image_url),
+      user_balance: getUserBalance,
+    })
   }
 
   /**

@@ -160,6 +160,65 @@ router
       .get('/postpaid/tagihan-pln/:id/edit', [ProductCategoryPostpaidController, 'editTagihanPLN'])
       .as('productCategories.editPostpaidTagihanPln')
 
+    // PDAM
+    router
+      .get('/postpaid/pdam', [ProductCategoryPostpaidController, 'indexPDAM'])
+      .as('productCategories.indexPostpaidPDAM')
+    router
+      .get('/postpaid/pdam/create', [ProductCategoryPostpaidController, 'createPDAM'])
+      .as('productCategories.createPostpaidPDAM')
+    router
+      .get('/postpaid/pdam/:id/edit', [ProductCategoryPostpaidController, 'editPDAM'])
+      .as('productCategories.editPostpaidPDAM')
+
+    // Internet
+    router
+      .get('/postpaid/internet', [ProductCategoryPostpaidController, 'indexInternet'])
+      .as('productCategories.indexPostpaidInternet')
+    router
+      .get('/postpaid/internet/create', [ProductCategoryPostpaidController, 'createInternet'])
+      .as('productCategories.createPostpaidInternet')
+    router
+      .get('/postpaid/internet/:id/edit', [ProductCategoryPostpaidController, 'editInternet'])
+      .as('productCategories.editPostpaidInternet')
+
+    // BPJS Kesehatan
+    router
+      .get('/postpaid/bpjs-kesehatan', [ProductCategoryPostpaidController, 'indexBPJSKesehatan'])
+      .as('productCategories.indexPostpaidBPJSKesehatan')
+    router
+      .get('/postpaid/bpjs-kesehatan/create', [
+        ProductCategoryPostpaidController,
+        'createBPJSKesehatan',
+      ])
+      .as('productCategories.createPostpaidBPJSKesehatan')
+    router
+      .get('/postpaid/bpjs-kesehatan/:id/edit', [
+        ProductCategoryPostpaidController,
+        'editBPJSKesehatan',
+      ])
+      .as('productCategories.editPostpaidBPJSKesehatan')
+
+    // BPJS Ketenagakerjaan
+    router
+      .get('/postpaid/bpjs-ketenagakerjaan', [
+        ProductCategoryPostpaidController,
+        'indexBPJSKetenagakerjaan',
+      ])
+      .as('productCategories.indexPostpaidBPJSKetenagakerjaan')
+    router
+      .get('/postpaid/bpjs-ketenagakerjaan/create', [
+        ProductCategoryPostpaidController,
+        'createBPJSKetenagakerjaan',
+      ])
+      .as('productCategories.createPostpaidBPJSKetenagakerjaan')
+    router
+      .get('/postpaid/bpjs-ketenagakerjaan/:id/edit', [
+        ProductCategoryPostpaidController,
+        'editBPJSKetenagakerjaan',
+      ])
+      .as('productCategories.editPostpaidBPJSKetenagakerjaan')
+
     // any
     router
       .get('/get-json', [ProductCategoryController, 'getProductByCategoryNameJson'])

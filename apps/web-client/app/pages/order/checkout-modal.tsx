@@ -70,32 +70,113 @@ export default function CheckoutModal({ data }: Props) {
     enabled: !!inquiryId && isOpen,
   })
 
+  // Fetch balance payment method
+  const balancePaymentMethod = useQuery({
+    queryKey: ['getBalancePaymentMethod'],
+    queryFn: async () =>
+      apiClient
+        .get('/payments/methods/balance')
+        .then((res) => res.data)
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || 'Failed to fetch balance payment method')
+        }),
+    enabled: isOpen,
+  })
+
   // Auto-select payment method
   useEffect(() => {
-    if (paymentMethods.isSuccess && paymentMethods.data?.data) {
-      const allItems: PaymentItem[] = []
-      paymentMethods.data.data.forEach((method: PaymentMethod) => {
-        if (method.items) {
-          allItems.push(...method.items.filter((item: PaymentItem) => item.is_available))
-        }
-      })
+    // Don't re-select if already selected
+    if (selectedPayment) return
 
-      // Try to find preselected payment
-      if (preselectedPaymentId) {
-        const preselected = allItems.find((item) => item.id === preselectedPaymentId)
-        if (preselected) {
-          setSelectedPayment(preselected)
-          return
+    // Wait for payment methods to load
+    if (!paymentMethods.isSuccess || !paymentMethods.data?.data) return
+
+    const balanceData = balancePaymentMethod.data?.data
+
+    // Build all available items from payment methods
+    const allItems: PaymentItem[] = []
+    paymentMethods.data.data.forEach((method: PaymentMethod) => {
+      if (method.items) {
+        allItems.push(...method.items.filter((item: PaymentItem) => item.is_available))
+      }
+    })
+
+    // Priority 1: If user has preselected a payment method before inquiry, use that
+    if (preselectedPaymentId) {
+      // Check if preselected is balance
+      if (balanceData && preselectedPaymentId === balanceData.id) {
+        const balanceItem: PaymentItem = {
+          id: balanceData.id,
+          name: balanceData.name,
+          fee_percentage: 0,
+          fee_static: 0,
+          is_available: true,
+          cut_off_start: '',
+          cut_off_end: '',
+          image_url: balanceData.image_url,
+          label: null,
+          is_featured: true,
+          min_amount: 0,
+          max_amount: Infinity,
+          is_need_email: false,
+          is_need_phone_number: false,
+          total_fee: 0,
+          total_price: data.total_price,
         }
+        setSelectedPayment(balanceItem)
+        return
       }
 
-      // Otherwise select cheapest
-      if (allItems.length > 0 && !selectedPayment) {
-        const cheapest = allItems.sort((a, b) => a.total_price - b.total_price)[0]
-        setSelectedPayment(cheapest)
+      // Check in other payment methods
+      const preselected = allItems.find((item) => item.id === preselectedPaymentId)
+      if (preselected) {
+        setSelectedPayment(preselected)
+        return
       }
     }
-  }, [paymentMethods.isSuccess, paymentMethods.data, preselectedPaymentId, selectedPayment])
+
+    // Priority 2: If no preselected and balance is sufficient, auto-select balance
+    if (
+      balanceData &&
+      balanceData.is_available &&
+      data?.total_price &&
+      balanceData.user_balance >= data.total_price
+    ) {
+      const balanceItem: PaymentItem = {
+        id: balanceData.id,
+        name: balanceData.name,
+        fee_percentage: 0,
+        fee_static: 0,
+        is_available: true,
+        cut_off_start: '',
+        cut_off_end: '',
+        image_url: balanceData.image_url,
+        label: null,
+        is_featured: true,
+        min_amount: 0,
+        max_amount: Infinity,
+        is_need_email: false,
+        is_need_phone_number: false,
+        total_fee: 0,
+        total_price: data.total_price,
+      }
+      setSelectedPayment(balanceItem)
+      return
+    }
+
+    // Priority 3: Otherwise select cheapest
+    if (allItems.length > 0) {
+      const cheapest = allItems.sort((a, b) => a.total_price - b.total_price)[0]
+      setSelectedPayment(cheapest)
+    }
+  }, [
+    paymentMethods.isSuccess,
+    paymentMethods.data,
+    preselectedPaymentId,
+    selectedPayment,
+    balancePaymentMethod.data,
+    data?.total_price,
+  ])
 
   // Countdown timer
   useEffect(() => {
@@ -358,6 +439,10 @@ export default function CheckoutModal({ data }: Props) {
                         }}
                         isLoading={false}
                         isError={false}
+                        balanceData={balancePaymentMethod.data?.data}
+                        balanceMessage={balancePaymentMethod.data?.message}
+                        isBalanceLoading={balancePaymentMethod.isPending}
+                        productPrice={data.total_price}
                       />
                     </div>
                   </DialogContent>

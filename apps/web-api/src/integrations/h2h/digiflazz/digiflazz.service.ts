@@ -397,7 +397,7 @@ export class DigiflazzService {
   ) {
     const sign = crypto
       .createHmac('sha1', this.callbackSecret)
-      .update(JSON.stringify(payload.data))
+      .update(JSON.stringify(payload))
       .digest('hex')
 
     console.log('Generated Sign:', sign, signFromPost)

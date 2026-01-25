@@ -19,7 +19,7 @@ import {
   UserRole,
 } from '@repo/db/types'
 
-import { arrayContains, eq, gte, lte, ne, or, SQL } from '@repo/db'
+import { arrayContains, eq, gte, lte, ne, SQL } from '@repo/db'
 import * as crypto from 'crypto'
 import { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
@@ -68,16 +68,9 @@ export class OrderService {
       arrayContains(tb.paymentMethods.allow_access, [PaymentMethodAllowAccess.ORDER]),
       gte(tb.paymentMethods.max_amount, product.price),
       lte(tb.paymentMethods.min_amount, product.price),
+      ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
+      ne(tb.paymentMethods.provider_name, PaymentMethodProvider.BALANCE),
     ]
-
-    if (user.role === UserRole.GUEST) {
-      paymentMethodWhere.push(
-        or(
-          ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
-          ne(tb.paymentMethods.provider_name, PaymentMethodProvider.BALANCE),
-        ),
-      )
-    }
 
     const paymentMethods = await this.orderRepository.findAllPaymentMethods(paymentMethodWhere)
 
@@ -106,18 +99,6 @@ export class OrderService {
         }
       }),
     }))
-
-    if (user.role !== UserRole.GUEST) {
-      const balanceIndex = groupedList.findIndex(
-        (category) => category.name.toUpperCase() === 'BALANCE',
-      )
-      if (balanceIndex > 0) {
-        const [balanceCategory] = groupedList.splice(balanceIndex, 1)
-        groupedList = [balanceCategory, ...groupedList]
-      }
-    } else {
-      groupedList = groupedList.filter((category) => category.name.toUpperCase() !== 'BALANCE')
-    }
 
     return SendResponse.success(groupedList)
   }
@@ -284,7 +265,7 @@ export class OrderService {
       total_price: finalTotal,
     }
 
-    const inquiryExpired = new Date().getTime() + 5 * 60 * 1000
+    const inquiryExpired = new Date().getTime() + 15 * 60 * 1000
 
     const inquiry = await this.orderRepository.createInquiry({
       status: InquiryStatus.CONFIRMED,
@@ -335,6 +316,7 @@ export class OrderService {
       inquiry_id: inquiry.id,
       ...buildResponse,
       checkout_token: checkoutToken,
+      expired_at: inquiry.expired_at,
     })
   }
 
@@ -356,16 +338,9 @@ export class OrderService {
       arrayContains(tb.paymentMethods.allow_access, [PaymentMethodAllowAccess.ORDER]),
       gte(tb.paymentMethods.max_amount, inquiryData.total_price),
       lte(tb.paymentMethods.min_amount, inquiryData.total_price),
+      ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
+      ne(tb.paymentMethods.provider_name, PaymentMethodProvider.BALANCE),
     ]
-
-    if (user.role === UserRole.GUEST) {
-      paymentMethodWhere.push(
-        or(
-          ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
-          ne(tb.paymentMethods.provider_name, PaymentMethodProvider.BALANCE),
-        ),
-      )
-    }
 
     const paymentMethods = await this.orderRepository.findAllPaymentMethods(paymentMethodWhere)
 
@@ -398,18 +373,6 @@ export class OrderService {
         }
       }),
     }))
-
-    if (user.role !== UserRole.GUEST) {
-      const balanceIndex = groupedList.findIndex(
-        (category) => category.name.toUpperCase() === 'BALANCE',
-      )
-      if (balanceIndex > 0) {
-        const [balanceCategory] = groupedList.splice(balanceIndex, 1)
-        groupedList = [balanceCategory, ...groupedList]
-      }
-    } else {
-      groupedList = groupedList.filter((category) => category.name.toUpperCase() !== 'BALANCE')
-    }
 
     return SendResponse.success(groupedList)
   }
@@ -688,16 +651,29 @@ export class OrderService {
 
     const total = await this.orderRepository.countAllHistory(query, user.id)
 
-    return SendResponse.success(orders, 'Success', {
-      meta: {
-        pagination: {
-          total: total,
-          total_pages: Math.ceil(total / limit),
-          page: page,
-          limit: limit,
+    return SendResponse.success(
+      orders.map((item) => {
+        const { id, product_snapshot, ...rest } = item
+        return {
+          ...rest,
+          product: {
+            name: `${product_snapshot.category_name} - ${product_snapshot.name}`,
+            billing_type: product_snapshot.billing_type,
+          },
+        }
+      }),
+      'Success',
+      {
+        meta: {
+          pagination: {
+            total: total,
+            total_pages: Math.ceil(total / limit),
+            page: page,
+            limit: limit,
+          },
         },
       },
-    })
+    )
   }
 
   async getOrderDetail(data: OrderIdDto, user: TUser) {

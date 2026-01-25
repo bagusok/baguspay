@@ -112,6 +112,7 @@ export class OrderRepository {
     const [res] = await db.insert(tb.inquiries).values(data).returning({
       id: tb.inquiries.id,
       customer_input: tb.inquiries.customer_input,
+      expired_at: tb.inquiries.expired_at,
     })
     return res
   }
@@ -284,9 +285,118 @@ export class OrderRepository {
     return order
   }
 
+  async findOrderByInquiryWithRelation(inquiryId: string, where: SQL[] = []) {
+    const whereClause: SQL[] = [eq(tb.orders.inquiry_id, inquiryId), ...where]
+
+    const order = await this.databaseService.db.query.orders.findFirst({
+      where: whereClause.length > 1 ? and(...whereClause) : whereClause[0],
+      with: {
+        product_snapshot: {
+          columns: {
+            product_id: true,
+            name: true,
+            category_name: true,
+            sub_category_name: true,
+            price: true,
+            provider_ref_id: true,
+            fullfillment_type: true,
+            billing_type: true,
+            provider_name: true,
+            provider_code: true,
+            provider_price: true,
+            provider_max_price: true,
+          },
+        },
+        payment_snapshot: {
+          columns: {
+            email: true,
+            phone_number: true,
+            payment_method_id: true,
+            qr_code: true,
+            type: true,
+            pay_url: true,
+            pay_code: true,
+            name: true,
+            fee_type: true,
+            fee_static: true,
+            fee_percentage: true,
+            expired_at: true,
+
+            provider_name: true,
+            provider_code: true,
+          },
+        },
+        offer_on_orders: {
+          columns: {
+            discount_total: true,
+          },
+          with: {
+            offer: {
+              columns: {
+                id: true,
+                name: true,
+                type: true,
+                discount_percentage: true,
+                discount_static: true,
+                discount_maximum: true,
+              },
+            },
+          },
+        },
+        user: {
+          columns: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+          },
+        },
+      },
+      columns: {
+        id: true,
+        order_id: true,
+        order_status: true,
+        inquiry_id: true,
+        payment_status: true,
+        refund_status: true,
+        price: true,
+        total_price: true,
+        discount_price: true,
+        fee: true,
+        sn_number: true,
+        customer_input: true,
+        customer_email: true,
+        customer_phone: true,
+        user_id: true,
+        voucher_code: true,
+        notes: true,
+        created_at: true,
+        updated_at: true,
+      },
+    })
+
+    return order
+  }
+
   async findOrderById(orderId: string) {
     const order = await this.databaseService.db.query.orders.findFirst({
       where: and(eq(tb.orders.order_id, orderId)),
+      columns: {
+        id: true,
+        order_id: true,
+        order_status: true,
+        payment_status: true,
+        user_id: true,
+        total_price: true,
+        fee: true,
+      },
+    })
+    return order
+  }
+
+  async findOrderByInquiryId(inquiryId: string) {
+    const order = await this.databaseService.db.query.orders.findFirst({
+      where: and(eq(tb.orders.inquiry_id, inquiryId)),
       columns: {
         id: true,
         order_id: true,
@@ -374,6 +484,16 @@ export class OrderRepository {
         refund_status: true,
         created_at: true,
         updated_at: true,
+      },
+      with: {
+        product_snapshot: {
+          columns: {
+            name: true,
+            category_name: true,
+            sub_category_name: true,
+            billing_type: true,
+          },
+        },
       },
     })
 

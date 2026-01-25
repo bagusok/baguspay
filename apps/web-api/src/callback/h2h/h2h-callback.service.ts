@@ -24,11 +24,27 @@ export class H2HCallbackService {
   ) {
     this.logger.log('Handling Digiflazz callback', JSON.stringify(payload.data))
 
+    //
+    let orderId = payload.data.ref_id
+
+    if (userAgent === 'Digiflazz-Pasca-Hookshot') {
+      const order = await this.orderRepository.findOrderByInquiryId(orderId)
+      if (order) {
+        orderId = order.order_id
+      } else {
+        this.logger.warn('Order not found for inquiry ID', {
+          inquiryId: orderId,
+        })
+        throw new BadRequestException('Order not found for inquiry ID')
+      }
+    }
+
     // Get order to check billing type
-    const order = await this.orderRepository.findOrderByIdWithRelation(payload.data.ref_id)
+    console.log('Payload Ref ID:', payload.data)
+    const order = await this.orderRepository.findOrderByIdWithRelation(orderId)
 
     if (!order) {
-      this.logger.warn('Order not found', {
+      this.logger.warn('Order not found Ban', {
         orderId: payload.data.ref_id,
       })
       throw new BadRequestException('Order not found')
@@ -69,12 +85,14 @@ export class H2HCallbackService {
         payload as DigiflazzPrepaidCallbackData,
         signFromPost,
         event,
+        order,
       )
     } else if (billingType === ProductBillingType.POSTPAID) {
       return this.digiflazzH2HCallbackService.handlePostpaid(
         payload as DigiflazzPostpaidCallbackData,
         signFromPost,
         event,
+        order,
       )
     } else {
       this.logger.warn('Unknown billing type', {

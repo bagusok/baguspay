@@ -24,6 +24,7 @@ export class DigiflazzH2HCallbackService {
     payload: DigiflazzPrepaidCallbackData,
     signFromPost: string,
     event: 'create' | 'update',
+    order: Awaited<ReturnType<typeof this.orderRepository.findOrderByIdWithRelation>>,
   ) {
     if (event == 'create') {
       return {
@@ -42,15 +43,6 @@ export class DigiflazzH2HCallbackService {
         signFromPost,
       })
       throw new BadRequestException('Invalid callback signature')
-    }
-
-    const order = await this.orderRepository.findOrderByIdWithRelation(payload.data.ref_id)
-
-    if (!order) {
-      this.logger.warn('Order not found', {
-        orderId: payload.data.ref_id,
-      })
-      throw new BadRequestException('Order not found or not a Digiflazz order')
     }
 
     if (order.order_status !== OrderStatus.PENDING) {
@@ -119,6 +111,7 @@ export class DigiflazzH2HCallbackService {
     payload: DigiflazzPostpaidCallbackData,
     signFromPost: string,
     event: 'create' | 'update',
+    order: Awaited<ReturnType<typeof this.orderRepository.findOrderByIdWithRelation>>,
   ) {
     if (event == 'create') {
       return {
@@ -137,15 +130,6 @@ export class DigiflazzH2HCallbackService {
         signFromPost,
       })
       throw new BadRequestException('Invalid callback signature')
-    }
-
-    const order = await this.orderRepository.findOrderByIdWithRelation(payload.data.ref_id)
-
-    if (!order) {
-      this.logger.warn('Order not found', {
-        orderId: payload.data.ref_id,
-      })
-      throw new BadRequestException('Order not found or not a Digiflazz order')
     }
 
     if (order.order_status !== OrderStatus.PENDING) {

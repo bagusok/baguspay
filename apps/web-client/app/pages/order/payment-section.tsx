@@ -37,9 +37,21 @@ export default function PaymentSection({ products, form }: Props) {
         }),
   })
 
+  const balancePaymentMethod = useMutation({
+    mutationKey: ['getBalancePaymentMethod'],
+    mutationFn: async () =>
+      apiClient
+        .get('/payments/methods/balance')
+        .then((res) => res.data)
+        .catch((error) => {
+          throw new Error(error.response?.data?.message || 'Failed to fetch payment methods')
+        }),
+  })
+
   useEffect(() => {
     if (products) {
       paymentMethods.mutate()
+      balancePaymentMethod.mutate()
       setSelectedPayment(null)
       form.setValue('payment_method_id', '')
     }
@@ -74,13 +86,58 @@ export default function PaymentSection({ products, form }: Props) {
 
   // Auto-select payment method after data is loaded
   useEffect(() => {
-    if (!selectedPayment && paymentOptions.cheapestItem) {
+    if (selectedPayment) return
+
+    // Wait for both APIs to complete before auto-selecting
+    if (!paymentMethods.isSuccess || balancePaymentMethod.isPending) return
+
+    const balanceData = balancePaymentMethod.data?.data
+
+    // If user is logged in and balance is sufficient, auto-select balance
+    if (
+      balanceData &&
+      balanceData.is_available &&
+      products?.price &&
+      balanceData.user_balance >= products.price
+    ) {
+      const balanceItem: PaymentItem = {
+        id: balanceData.id,
+        name: balanceData.name,
+        fee_percentage: 0,
+        fee_static: 0,
+        is_available: true,
+        cut_off_start: '',
+        cut_off_end: '',
+        image_url: balanceData.image_url,
+        label: null,
+        is_featured: true,
+        min_amount: 0,
+        max_amount: Infinity,
+        is_need_email: false,
+        is_need_phone_number: false,
+        total_fee: 0,
+        total_price: products.price,
+      }
+      setSelectedPayment(balanceItem)
+      form.setValue('payment_method_id', balanceItem.id)
+      return
+    }
+
+    // Otherwise, auto-select cheapest available payment
+    if (paymentOptions.cheapestItem) {
       const { cheapestItem } = paymentOptions
-      // Auto-select cheapest available payment
       setSelectedPayment(cheapestItem)
       form.setValue('payment_method_id', cheapestItem.id)
     }
-  }, [selectedPayment, paymentOptions, form])
+  }, [
+    selectedPayment,
+    paymentOptions,
+    form,
+    balancePaymentMethod.data,
+    balancePaymentMethod.isPending,
+    paymentMethods.isSuccess,
+    products?.price,
+  ])
 
   const handleSelectPayment = (item: PaymentItem) => {
     if (item.is_available) {
@@ -161,6 +218,10 @@ export default function PaymentSection({ products, form }: Props) {
               isLoading={paymentMethods.isPending}
               isError={paymentMethods.isError}
               errorMessage={paymentMethods.error?.message}
+              balanceData={balancePaymentMethod.data?.data}
+              balanceMessage={balancePaymentMethod.data?.message}
+              isBalanceLoading={balancePaymentMethod.isPending}
+              productPrice={products?.price || 0}
             />
           </div>
         </DialogContent>

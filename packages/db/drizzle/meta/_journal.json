@@ -78,6 +78,20 @@
       "when": 1766832377292,
       "tag": "0010_lush_wallflower",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1769233753457,
+      "tag": "0011_equal_mariko_yashida",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1769234125634,
+      "tag": "0012_fixed_shadow_king",
+      "breakpoints": true
     }
   ]
 }

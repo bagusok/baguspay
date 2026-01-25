@@ -1,0 +1,1 @@
+ALTER TYPE "public"."login_is_from" ADD VALUE 'mobile_app' BEFORE 'desktop';

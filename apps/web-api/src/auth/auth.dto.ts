@@ -77,3 +77,12 @@ export class GoogleLoginDto {
   @IsString()
   id_token: string
 }
+
+export class RefreshTokenDto {
+  @ApiProperty({
+    description: 'Refresh token yang diterima saat login',
+    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+  })
+  @IsString()
+  refresh_token: string
+}

@@ -94,6 +94,7 @@ export class HomeService {
         product_categories: products.map((product) => ({
           ...product,
           image_url: this.storageService.getFileUrl(product.image_url),
+          icon_url: this.storageService.getFileUrl(product.icon_url),
         })),
       }
     })

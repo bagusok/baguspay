@@ -136,7 +136,7 @@ export default function OrderSlugPrepaidPage({
             </div>
             <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
               <div className="inline-flex gap-2 items-center">
-                <div className="rounded-full p-2 bg-primary">
+                <div className="rounded-full p-2 bg-primary/40">
                   <KeyRoundIcon className="w-4 h-4" />
                 </div>
                 <h2 className="text-lg font-semibold">Detail Akun</h2>
@@ -314,7 +314,7 @@ export default function OrderSlugPrepaidPage({
             <div className="space-y-4 md:sticky md:top-24 ">
               <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
                 <div className="inline-flex gap-2 items-center">
-                  <div className="rounded-full p-2 bg-primary">
+                  <div className="rounded-full p-2 bg-primary/40">
                     <ContactIcon className="w-4 h-4" />
                   </div>
                   <h2 className="text-lg font-semibold">Kontak</h2>

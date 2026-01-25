@@ -1,4 +1,13 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common'
+import {
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  ParseUUIDPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
 
 import { ApiSecurity } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
@@ -44,5 +53,22 @@ export class UserController {
   @Get('/dashboard')
   async dashboard(@User() user: TUser) {
     return await this.userService.dashboard(user)
+  }
+
+  // Sessions
+  @UseGuards(JwtAuthGuard)
+  @Get('/sessions')
+  async getUserSessions(@User() user: TUser, @Headers('Authorization') authHeader: string) {
+    const accessToken = authHeader?.replace('Bearer ', '')
+    return await this.userService.getAllSessions(user, accessToken)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('/sessions/:sessionId/destroy')
+  async destroyUserSession(
+    @User() user: TUser,
+    @Param('sessionId', ParseUUIDPipe) sessionId: string,
+  ) {
+    return await this.userService.destroySession(user, sessionId)
   }
 }

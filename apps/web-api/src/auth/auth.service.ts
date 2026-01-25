@@ -1,31 +1,76 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtService } from '@nestjs/jwt'
-import { and, eq } from '@repo/db'
-import { tb, UserRegisteredType, UserRole } from '@repo/db/types'
+import { LoginIsFrom, UserRegisteredType, UserRole } from '@repo/db/types'
 import { compare, hash } from 'bcrypt'
-import { DatabaseService } from 'src/database/database.service'
 import { LoginDto, RegisterDto } from './auth.dto'
+import { AuthRepository } from './auth.repository'
+import { DeviceInfo, getDeviceInfo, isSameDevice } from './utils/device-fingerprint'
+
+interface LoginHeaders {
+  deviceId: string
+  ip: string
+  userAgent: string
+}
+
+interface TokenPayload {
+  id: string
+  role: string
+}
+
+// Token expiration constants
+const ACCESS_TOKEN_EXPIRY = '24h'
+const REFRESH_TOKEN_EXPIRY = '7d'
+const ACCESS_TOKEN_MS = 24 * 60 * 60 * 1000 // 24 hours
+const REFRESH_TOKEN_MS = 7 * 24 * 60 * 60 * 1000 // 7 days
+
+/**
+ * Determine login source based on device info
+ */
+function getLoginSource(deviceInfo: DeviceInfo): LoginIsFrom {
+  if (deviceInfo.isBagusPayApp) {
+    return LoginIsFrom.MOBILE_APP
+  }
+  if (deviceInfo.deviceType === 'mobile') {
+    return LoginIsFrom.MOBILE
+  }
+  if (deviceInfo.deviceType === 'desktop') {
+    return LoginIsFrom.DESKTOP
+  }
+  return LoginIsFrom.WEB
+}
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly databaseService: DatabaseService,
+    private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
-  async register(data: RegisterDto) {
-    const user = await this.databaseService.db.query.users.findFirst({
-      where: eq(tb.users.email, data.email),
-    })
+  private generateTokens(payload: TokenPayload) {
+    const accessToken = this.jwtService.sign(payload, { expiresIn: ACCESS_TOKEN_EXPIRY })
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: REFRESH_TOKEN_EXPIRY })
+    const accessTokenExpiresAt = new Date(Date.now() + ACCESS_TOKEN_MS)
+    const refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TOKEN_MS)
 
-    if (user) {
+    return {
+      accessToken,
+      refreshToken,
+      accessTokenExpiresAt,
+      refreshTokenExpiresAt,
+    }
+  }
+
+  async register(data: RegisterDto) {
+    const existingUser = await this.authRepository.findUserByEmail(data.email)
+
+    if (existingUser) {
       throw new BadRequestException('Email already exists')
     }
 
     const hashedPassword = await hash(data.password, 10)
-    await this.databaseService.db.insert(tb.users).values({
+    await this.authRepository.createUser({
       email: data.email,
       password: hashedPassword,
       name: data.name,
@@ -39,87 +84,79 @@ export class AuthService {
     }
   }
 
-  async login(
-    data: LoginDto,
-    headers: {
-      deviceId: string
-      ip: string
-      userAgent: string
-    },
-  ) {
-    const user = await this.databaseService.db.query.users.findFirst({
-      where: eq(tb.users.email, data.email),
-    })
+  async login(data: LoginDto, headers: LoginHeaders) {
+    const user = await this.authRepository.findUserByEmail(data.email)
 
     if (!user) {
       throw new BadRequestException('Invalid email or password')
     }
 
     const isPasswordValid = await compare(data.password, user.password)
-
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid email or password')
     }
 
-    const accesTokenExpiredAt = new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
-    const refreshTokenExpiredAt = new Date(
-      Date.now() + 604800 * 1000, // 7 days
-    )
+    // Generate device info and fingerprint
+    const deviceInfo = getDeviceInfo(headers.deviceId, headers.userAgent)
+    const deviceName = deviceInfo.isBagusPayApp
+      ? `BagusPay App (${deviceInfo.appInfo?.deviceModel || deviceInfo.os})`
+      : `${deviceInfo.browser} on ${deviceInfo.os}`
 
-    const payload = {
-      id: user.id,
-      role: user.role,
+    const tokens = this.generateTokens({ id: user.id, role: user.role })
+
+    const sessionData = {
+      user_id: user.id,
+      device_id: headers.deviceId,
+      device_fingerprint: deviceInfo.fingerprint,
+      device_name: deviceName,
+      ip_address: headers.ip,
+      user_agent: headers.userAgent,
+      login_type: UserRegisteredType.LOCAL,
+      is_from: getLoginSource(deviceInfo),
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+      access_token_expires_at: tokens.accessTokenExpiresAt,
+      refresh_token_expires_at: tokens.refreshTokenExpiresAt,
     }
 
-    const accessToken = this.jwtService.sign(payload, {
-      expiresIn: '24h',
-    })
+    // Find existing session using fingerprint (primary) or device_id (fallback)
+    let existingSession = await this.authRepository.findSessionByUserAndDevice(
+      user.id,
+      headers.deviceId,
+      deviceInfo.fingerprint,
+    )
 
-    const refreshToken = this.jwtService.sign(payload, {
-      expiresIn: '7d',
-    })
+    // If no session found by fingerprint/deviceId, check all user sessions for similar devices
+    if (!existingSession) {
+      const allUserSessions = await this.authRepository.findAllSessionsByUserId(user.id)
 
-    const existingSession = await this.databaseService.db.query.sessions.findFirst({
-      where: and(eq(tb.sessions.user_id, user.id), eq(tb.sessions.device_id, headers.deviceId)),
-    })
+      for (const session of allUserSessions) {
+        const isSame = isSameDevice(
+          { deviceId: headers.deviceId, userAgent: headers.userAgent, ip: headers.ip },
+          { deviceId: session.device_id, userAgent: session.user_agent, ip: session.ip_address },
+        )
+
+        if (isSame) {
+          existingSession = session
+          break
+        }
+      }
+    }
 
     if (existingSession) {
-      await this.databaseService.db
-        .update(tb.sessions)
-        .set({
-          ip_address: headers.ip,
-          user_agent: headers.userAgent,
-          user_id: user.id,
-          device_id: headers.deviceId,
-          login_type: UserRegisteredType.LOCAL,
-          access_token: accessToken,
-          refresh_token: refreshToken,
-          access_token_expires_at: accesTokenExpiredAt,
-          refresh_token_expires_at: refreshTokenExpiredAt,
-        })
-        .where(eq(tb.sessions.id, existingSession.id))
+      await this.authRepository.updateSession(existingSession.id, sessionData)
     } else {
-      await this.databaseService.db.insert(tb.sessions).values({
-        user_id: user.id,
-        device_id: headers.deviceId,
-        ip_address: headers.ip,
-        user_agent: headers.userAgent,
-        login_type: UserRegisteredType.LOCAL,
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        access_token_expires_at: accesTokenExpiredAt,
-        refresh_token_expires_at: refreshTokenExpiredAt,
-      })
+      await this.authRepository.createSession(sessionData)
     }
 
     return {
       success: true,
       message: 'Login successful',
       data: {
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        access_token_expired_at: accesTokenExpiredAt,
-        refresh_token_expired_at: refreshTokenExpiredAt,
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+        access_token_expired_at: tokens.accessTokenExpiresAt,
+        refresh_token_expired_at: tokens.refreshTokenExpiresAt,
         user: {
           id: user.id,
           email: user.email,
@@ -127,24 +164,78 @@ export class AuthService {
           is_banned: user.is_banned,
           role: user.role,
         },
+        device: {
+          name: deviceName,
+          fingerprint: deviceInfo.fingerprint,
+          type: deviceInfo.deviceType,
+          is_baguspay_app: deviceInfo.isBagusPayApp,
+          login_from: getLoginSource(deviceInfo),
+          ...(deviceInfo.isBagusPayApp &&
+            deviceInfo.appInfo && {
+              app_version: deviceInfo.appInfo.appVersion,
+              device_model: deviceInfo.appInfo.deviceModel,
+            }),
+        },
       },
     }
   }
 
   async logout(accessToken: string) {
-    const session = await this.databaseService.db.query.sessions.findFirst({
-      where: eq(tb.sessions.access_token, accessToken),
-    })
+    const session = await this.authRepository.findSessionByAccessToken(accessToken)
 
     if (!session) {
       throw new BadRequestException('Session not found')
     }
 
-    await this.databaseService.db.delete(tb.sessions).where(eq(tb.sessions.id, session.id))
+    await this.authRepository.deleteSession(session.id)
 
     return {
       success: true,
       message: 'Logout successful',
+    }
+  }
+
+  async refreshToken(refreshToken: string) {
+    // Verify refresh token
+    try {
+      await this.jwtService.verify(refreshToken)
+    } catch {
+      throw new BadRequestException('Invalid or expired refresh token')
+    }
+
+    // Find session by refresh token
+    const session = await this.authRepository.findSessionByRefreshToken(refreshToken)
+
+    if (!session) {
+      throw new BadRequestException('Session not found')
+    }
+
+    // Check if refresh token is expired
+    if (session.refresh_token_expires_at < new Date()) {
+      await this.authRepository.deleteSession(session.id)
+      throw new BadRequestException('Refresh token has expired. Please login again.')
+    }
+
+    // Generate new tokens
+    const tokens = this.generateTokens({ id: session.user.id, role: session.user.role })
+
+    // Update session with new tokens
+    await this.authRepository.updateSession(session.id, {
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+      access_token_expires_at: tokens.accessTokenExpiresAt,
+      refresh_token_expires_at: tokens.refreshTokenExpiresAt,
+    })
+
+    return {
+      success: true,
+      message: 'Token refreshed successfully',
+      data: {
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+        access_token_expired_at: tokens.accessTokenExpiresAt,
+        refresh_token_expired_at: tokens.refreshTokenExpiresAt,
+      },
     }
   }
 }

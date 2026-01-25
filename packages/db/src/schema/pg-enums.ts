@@ -194,6 +194,7 @@ export const paymentMethodAllowAccessEnum = pgEnum(
 export enum LoginIsFrom {
   WEB = 'web',
   MOBILE = 'mobile',
+  MOBILE_APP = 'mobile_app',
   DESKTOP = 'desktop',
 }
 

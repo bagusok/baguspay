@@ -1,13 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
-import { and, arrayContains, count, desc, eq, gte, lte, ne, or, SQL } from '@repo/db'
+import { eq, gte, lte, SQL } from '@repo/db'
 import {
   BalanceMutationRefType,
   BalanceMutationType,
   DepositStatus,
-  PaymentMethodAllowAccess,
   PaymentMethodFeeType,
-  PaymentMethodProvider,
-  PaymentMethodType,
   PaymentStatus,
   tb,
 } from '@repo/db/types'
@@ -18,6 +15,7 @@ import { DatabaseService } from 'src/database/database.service'
 import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
 import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
 import { QueueService } from 'src/queue/queue.service'
+import { StorageService } from 'src/storage/storage.service'
 import { CreateDeposit, DepositHistoryQuery } from './deposit.dto'
 import { DepositRepository } from './deposit.repository'
 
@@ -29,42 +27,20 @@ export class DepositService {
     private readonly queueService: QueueService,
     private readonly depositRepository: DepositRepository,
     private readonly balanceService: BalanceService,
+    private readonly storageService: StorageService,
   ) {}
 
   async getDepositMethods() {
-    const payments = await this.databaseService.db.query.paymentMethodCategories.findMany({
-      with: {
-        payment_methods: {
-          columns: {
-            id: true,
-            name: true,
-            fee_type: true,
-            type: true,
-            fee_static: true,
-            fee_percentage: true,
-            image_url: true,
-            is_need_email: true,
-            is_need_phone_number: true,
-            is_available: true,
-            is_featured: true,
-            label: true,
-            min_amount: true,
-            max_amount: true,
-            cut_off_start: true,
-            cut_off_end: true,
-          },
-          where: and(
-            arrayContains(tb.paymentMethods.allow_access, [PaymentMethodAllowAccess.DEPOSIT]),
-            or(
-              ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
-              ne(tb.paymentMethods.provider_name, PaymentMethodProvider.BALANCE),
-            ),
-          ),
-        },
-      },
-    })
-
-    return SendResponse.success<any>(payments)
+    const payments = await this.depositRepository.findPaymentMethod()
+    return SendResponse.success(
+      payments.map((category) => ({
+        ...category,
+        payment_methods: category.payment_methods.map((method) => ({
+          ...method,
+          image_url: this.storageService.getFileUrl(method.image_url),
+        })),
+      })),
+    )
   }
 
   async getDespositHistory(query: DepositHistoryQuery, userId: string) {
@@ -84,103 +60,71 @@ export class DepositService {
       where.push(lte(tb.deposits.created_at, new Date(end_date)))
     }
 
-    const deposits = await this.databaseService.db.query.deposits.findMany({
-      where: and(...where),
-      limit: limit,
-      offset: (page - 1) * limit,
-      orderBy: desc(tb.deposits.created_at),
-      columns: {
-        id: true,
-        deposit_id: true,
-        amount_pay: true,
-        created_at: true,
-        expired_at: true,
-        status: true,
-      },
-      with: {
+    const deposits = await this.depositRepository.findAllDepositHistory(query, userId)
+
+    const total = await this.depositRepository.countDepositHistory(query, userId)
+
+    return SendResponse.success<any>(
+      deposits.map((depo) => ({
+        ...depo,
         payment_method: {
-          columns: {
-            id: true,
-            name: true,
-            type: true,
+          ...depo.payment_method,
+          image_url: this.storageService.getFileUrl(depo.payment_method.image_url),
+        },
+      })),
+      'Deposit history retrieved successfully',
+      {
+        meta: {
+          pagination: {
+            total: total,
+            page: page,
+            limit: limit,
+            total_pages: Math.ceil(total / limit),
           },
         },
       },
-    })
-
-    const [total] = await this.databaseService.db
-      .select({
-        count: count(),
-      })
-      .from(tb.deposits)
-      .where(and(...where))
-
-    return SendResponse.success<any>(deposits, 'Deposit history retrieved successfully', {
-      meta: {
-        pagination: {
-          total: total.count,
-          page: page,
-          limit: limit,
-          total_pages: Math.ceil(total.count / limit),
-        },
-      },
-    })
+    )
   }
 
   async getDepositDetail(deposit_id: string, userId: string) {
-    const deposit = await this.databaseService.db.query.deposits.findFirst({
-      where: and(eq(tb.deposits.deposit_id, deposit_id), eq(tb.deposits.user_id, userId)),
-      with: {
-        payment_method: {
-          columns: {
-            name: true,
-            image_url: true,
-            type: true,
-            is_need_phone_number: true,
-            is_need_email: true,
-            instruction: true,
-          },
-        },
-      },
-      columns: {
-        deposit_id: true,
-        payment_method_id: true,
-        amount_pay: true,
-        amount_received: true,
-        amount_fee: true,
-        phone_number: true,
-        email: true,
-        status: true,
-        pay_code: true,
-        pay_url: true,
-        qr_code: true,
-        expired_at: true,
-        created_at: true,
-        updated_at: true,
-      },
-    })
+    const deposit = await this.depositRepository.findDepositByIdWithRelation(deposit_id)
 
     if (!deposit) {
       throw new NotFoundException('Deposit not found')
     }
 
-    return SendResponse.success<any>(deposit, 'Deposit detail retrieved successfully')
+    if (deposit.user_id !== userId) {
+      throw new BadRequestException('You are not authorized to view this deposit')
+    }
+
+    deposit.payment_method.image_url = this.storageService.getFileUrl(
+      deposit.payment_method.image_url,
+    )
+
+    return SendResponse.success(
+      {
+        deposit_id: deposit.deposit_id,
+        payment_method_id: deposit.payment_method_id,
+        amount_pay: deposit.amount_pay,
+        amount_received: deposit.amount_received,
+        amount_fee: deposit.amount_fee,
+        phone_number: deposit.phone_number,
+        email: deposit.email,
+        status: deposit.status,
+        pay_code: deposit.pay_code,
+        pay_url: deposit.pay_url,
+        qr_code: deposit.qr_code,
+        expired_at: deposit.expired_at,
+        created_at: deposit.created_at,
+        updated_at: deposit.updated_at,
+        payment_method: deposit.payment_method,
+      },
+      'Deposit detail retrieved successfully',
+    )
   }
 
   async createDeposit(data: CreateDeposit, user: TUser) {
-    const payment = await this.databaseService.db.query.paymentMethods.findFirst({
-      where: and(
-        eq(tb.paymentMethods.id, data.payment_method_id),
-        eq(tb.paymentMethods.is_available, true),
-        eq(tb.paymentMethods.is_deleted, false),
-        ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
-        arrayContains(tb.paymentMethods.allow_access, [PaymentMethodAllowAccess.DEPOSIT]),
-        or(
-          ne(tb.paymentMethods.type, PaymentMethodType.BALANCE),
-          ne(tb.paymentMethods.provider_name, PaymentMethodProvider.BALANCE),
-        ),
-      ),
-    })
+    const payment = await this.depositRepository.findPaymentMethodById(data.payment_method_id)
 
     if (!payment) {
       throw new NotFoundException('Payment method not found or not available')
@@ -226,11 +170,8 @@ export class DepositService {
           fee_in_percent: payment.fee_percentage,
         })
 
-        console.log(pg)
-
-        const deposit = await tx
-          .insert(tb.deposits)
-          .values({
+        const deposit = await this.depositRepository.createDeposit(
+          {
             ref_id: pg.ref_id,
             deposit_id: depositId,
             payment_method_id: payment.id,
@@ -245,39 +186,38 @@ export class DepositService {
             pay_code: pg.pay_code,
             pay_url: pg.pay_url,
             qr_code: pg.qr_code,
-          })
-          .returning()
+          },
+          tx,
+        )
 
-        return [pg, deposit[0]]
+        return [pg, deposit]
       })
 
       const delay = new Date(deposit?.expired_at).getTime() - Date.now()
       await this.queueService.addExpiredDepositJob(deposit.deposit_id, delay)
 
-      return SendResponse.success(deposit)
+      return SendResponse.success({
+        deposit_id: deposit.deposit_id,
+      })
     }
   }
 
   async cancelDeposit(depositId: string, userId: string) {
-    const deposit = await this.databaseService.db.query.deposits.findFirst({
-      where: and(
-        eq(tb.deposits.deposit_id, depositId),
-        eq(tb.deposits.user_id, userId),
-        eq(tb.deposits.status, DepositStatus.PENDING),
-      ),
-    })
+    const deposit = await this.depositRepository.findDepositById(depositId)
 
     if (!deposit) {
       throw new NotFoundException('Deposit not found or not cancellable')
     }
 
-    await this.databaseService.db
-      .update(tb.deposits)
-      .set({
-        status: DepositStatus.CANCELED,
-      })
-      .where(eq(tb.deposits.deposit_id, depositId))
-      .execute()
+    if (deposit.user_id !== userId) {
+      throw new BadRequestException('You are not authorized to cancel this deposit')
+    }
+
+    if (deposit.status !== DepositStatus.PENDING) {
+      throw new BadRequestException('Only pending deposits can be cancelled')
+    }
+
+    await this.depositRepository.updateDepositStatus(depositId, DepositStatus.CANCELED)
 
     return SendResponse.success(null, 'Deposit cancelled successfully')
   }

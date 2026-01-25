@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Headers, Ip, Post, UseGuards } from '@nestjs/common'
-import { ApiHeader } from '@nestjs/swagger'
+import { ApiHeader, ApiOperation } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
-import { LoginDto, RegisterDto } from './auth.dto'
+import { LoginDto, RefreshTokenDto, RegisterDto } from './auth.dto'
 import { AuthService } from './auth.service'
 
 @Controller('auth')
@@ -58,5 +58,14 @@ export class AuthController {
   @Post('/logout')
   async logout(@Headers('Authorization') accessToken: string) {
     return this.authService.logout(accessToken.split(' ')[1])
+  }
+
+  @ApiOperation({
+    summary: 'Refresh access token',
+    description: 'Menggunakan refresh token untuk mendapatkan access token baru',
+  })
+  @Post('/refresh')
+  async refreshToken(@Body() body: RefreshTokenDto) {
+    return this.authService.refreshToken(body.refresh_token)
   }
 }

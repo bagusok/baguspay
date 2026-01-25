@@ -1,10 +1,6 @@
-import { varchar } from 'drizzle-orm/pg-core'
-import { uuid } from 'drizzle-orm/pg-core'
-import { pgTable } from 'drizzle-orm/pg-core'
-import { text } from 'drizzle-orm/pg-core'
-import { timestamp } from 'drizzle-orm/pg-core'
 import { users } from '@/schema'
 import { relations } from 'drizzle-orm'
+import { pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import {
   LoginIsFrom,
   loginIsFromEnum,
@@ -30,6 +26,8 @@ export const sessions = pgTable('sessions', {
   user_agent: text('user_agent').notNull(),
   ip_address: varchar('ip_address', { length: 45 }).notNull(),
   device_id: varchar('device_id', { length: 255 }).notNull(),
+  device_fingerprint: varchar('device_fingerprint', { length: 64 }),
+  device_name: varchar('device_name', { length: 255 }),
   is_from: loginIsFromEnum('is_from').default(LoginIsFrom.WEB),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp('updated_at', { withTimezone: true }).$onUpdate(() => new Date()),

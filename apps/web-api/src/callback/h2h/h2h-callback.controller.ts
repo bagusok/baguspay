@@ -1,6 +1,5 @@
-import { BadRequestException, Body, Controller, Headers, Ip, Post } from '@nestjs/common'
+import { Body, Controller, Headers, Ip, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { DIGIFLAZZ_IPS } from 'src/common/constants/ip'
 import {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
@@ -20,9 +19,11 @@ export class H2HCallbackController {
     @Headers('User-Agent') userAgent: 'Digiflazz-Hookshot' | 'Digiflazz-Pasca-Hookshot',
     @Ip() ip: string,
   ) {
-    if (DIGIFLAZZ_IPS.includes(ip) === false) {
-      throw new BadRequestException('Invalid IP Address')
-    }
+    // console.log('Digiflazz Callback Body:', ip)
+
+    // if (DIGIFLAZZ_IPS.includes(ip) === false) {
+    //   throw new BadRequestException('Invalid IP Address')
+    // }
 
     return this.callbackService.handleDigiflazz(body, signFromPost, event, userAgent)
   }

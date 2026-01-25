@@ -85,7 +85,7 @@ export default function NavUser({ user }: Props) {
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link
-            to={`/${locale}/user/order/history`}
+            to={`/${locale}/user/orders`}
             className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             History Transaksi

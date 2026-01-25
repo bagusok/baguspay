@@ -88,6 +88,7 @@ export class DigiflazzOrderProcessor {
         cost_price: cost,
         profit: profit,
         callback_raw_response: topup.raw,
+        metadata: topup.desc,
       })
       return `Bayar Tagihan success`
     }
