@@ -50,7 +50,7 @@ export const ListOrderedIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 ListOrderedIcon.displayName = 'ListOrderedIcon'

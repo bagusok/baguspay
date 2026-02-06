@@ -4,14 +4,22 @@
   "description": "",
   "license": "ISC",
   "author": "",
-  "type": "commonjs",
-  "main": "index.js",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "@repo/db": "workspace:*",
-    "axios": "^1.11.0",
-    "dotenv": "^16.0.3"
+    "axios": "^1.13.2",
+    "cheerio": "^1.2.0",
+    "dotenv": "^16.0.3",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0"
   }
 }

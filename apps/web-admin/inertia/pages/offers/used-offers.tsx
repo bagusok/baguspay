@@ -1,5 +1,4 @@
-import OfferController from '#controllers/offer_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
 import { OrderStatus, PaymentStatus } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -23,8 +22,9 @@ import {
   SelectValue,
 } from '@repo/ui/components/ui/select'
 import { cn } from '@repo/ui/lib/utils'
-import { ColumnDef } from '@tanstack/react-table'
-import { FormEvent, useState } from 'react'
+import type { ColumnDef } from '@tanstack/react-table'
+import { type FormEvent, useState } from 'react'
+import type OfferController from '#controllers/offer_controller'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate, formatPrice } from '~/utils'
 
@@ -82,7 +82,7 @@ const columns: ColumnDef<Props['usedOffer'][number]>[] = [
     header: 'Before Discount',
     cell: ({ row }) =>
       formatPrice(
-        (row.original.order?.total_price || 0) + (row.original.order?.discount_price || 0)
+        (row.original.order?.total_price || 0) + (row.original.order?.discount_price || 0),
       ),
   },
   {
@@ -220,7 +220,7 @@ export default function OrderPrepaidIndex(props: Props) {
       },
       {
         onSuccess: () => setOpen(false),
-      }
+      },
     )
   }
 
@@ -235,7 +235,7 @@ export default function OrderPrepaidIndex(props: Props) {
     router.get(
       '/adminoffers/history',
       { limit: 10, page: 1, sortBy, sortColumn },
-      { onSuccess: () => setOpen(false) }
+      { onSuccess: () => setOpen(false) },
     )
   }
 

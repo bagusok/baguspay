@@ -1,8 +1,8 @@
+import bcrypt from 'bcrypt'
+import type { InferInsertModel } from 'drizzle-orm'
 import { db } from '@/database'
 import { UserRole } from '@/schema'
 import { tb } from '@/table'
-import bcrypt from 'bcrypt'
-import { InferInsertModel } from 'drizzle-orm'
 
 const user: InferInsertModel<typeof tb.users>[] = [
   {

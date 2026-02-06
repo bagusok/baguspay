@@ -1,11 +1,14 @@
+import crypto from 'node:crypto'
 import { HttpException, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types'
-import crypto from 'crypto'
 import { ApiServiceException } from 'src/common/exceptions/api-service.exception'
-import { CreatePaymentGatewayRequest, CreatePaymentGatewayResponse } from '../payment-gateway.type'
-import { PaymentGateway } from '../payment.interface'
-import { DuitkuAPiService } from './duitku.api.service'
+import type { PaymentGateway } from '../payment.interface'
+import type {
+  CreatePaymentGatewayRequest,
+  CreatePaymentGatewayResponse,
+} from '../payment-gateway.type'
+import type { DuitkuAPiService } from './duitku.api.service'
 
 @Injectable()
 export class DuitkuService implements PaymentGateway {
@@ -42,7 +45,7 @@ export class DuitkuService implements PaymentGateway {
         data.fee_static,
       )
 
-      if (data.fee_type == PaymentMethodFeeType.BUYER) {
+      if (data.fee_type === PaymentMethodFeeType.BUYER) {
         totalAmount = data.amount
       } else {
         totalAmount = data.amount + fee
@@ -63,7 +66,7 @@ export class DuitkuService implements PaymentGateway {
         expiryPeriod: expiryPeriod,
         merchantOrderId: data.id,
         signature: signature,
-        returnUrl: data.return_url ?? (this.RETURN_URL ? this.RETURN_URL + '/' + data.id : ''),
+        returnUrl: data.return_url ?? (this.RETURN_URL ? `${this.RETURN_URL}/${data.id}` : ''),
       })
 
       // Data Setelah Revisi Create Payment
@@ -71,7 +74,7 @@ export class DuitkuService implements PaymentGateway {
       let r_amount_received = 0
       const r_amount_total = response.amount
 
-      if (data.fee_type == PaymentMethodFeeType.BUYER) {
+      if (data.fee_type === PaymentMethodFeeType.BUYER) {
         r_fee = response.amount - data.amount
         r_amount_received = response.amount - r_fee
       } else {

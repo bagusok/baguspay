@@ -1,0 +1,33 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "root": false,
+  "extends": ["../../biome.json"],
+  "linter": {
+    "rules": {
+      "correctness": {
+        "useExhaustiveDependencies": "warn",
+        "useHookAtTopLevel": "error",
+        "noInvalidUseBeforeDeclaration": "off",
+        "noInvalidPositionAtImportRule": "off"
+      },
+      "suspicious": {
+        "noDocumentCookie": "off"
+      },
+      "a11y": {
+        "useFocusableInteractive": "warn",
+        "useSemanticElements": "warn"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "linter": {
+      "enabled": false
+    }
+  },
+  "files": {
+    "includes": ["!dist", "!node_modules"]
+  }
+}

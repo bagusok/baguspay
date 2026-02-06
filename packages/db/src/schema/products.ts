@@ -17,12 +17,12 @@ import { inputOnProductCategory } from './input_fields'
 import { offer_products } from './offers'
 import {
   ProductBillingType,
-  productBillingTypeEnum,
   ProductCategoryType,
-  productCategoryTypeEnum,
   ProductFullfillmentType,
-  productFullfillmentTypeEnum,
   ProductProvider,
+  productBillingTypeEnum,
+  productCategoryTypeEnum,
+  productFullfillmentTypeEnum,
   productProviderEnum,
 } from './pg-enums'
 

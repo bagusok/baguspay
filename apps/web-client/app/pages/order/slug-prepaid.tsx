@@ -29,8 +29,8 @@ import { useInquiry } from '../../hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
 import PaymentSection from './payment-section'
 import {
-  inquirySchema,
   type InquiryForm,
+  inquirySchema,
   type LoaderData,
   type OrderProducts,
   type ProductCategoryData,
@@ -59,11 +59,7 @@ export default function OrderSlugPrepaidPage({
     mode: 'onChange',
   })
 
-  const {
-    inquiry,
-    handleInquiry,
-    isLoading: isInquiryLoading,
-  } = useInquiry({
+  const { inquiry, handleInquiry } = useInquiry({
     form,
     mutationKey: ['inquiry', data.product_sub_categories[0]?.products[0]?.id],
   })
@@ -143,7 +139,7 @@ export default function OrderSlugPrepaidPage({
               </div>
               <div className="flex gap-2 mt-4">
                 {data.input_fields.map((input: any, index: number) => {
-                  if (input.type == 'select') {
+                  if (input.type === 'select') {
                     return (
                       <div className="w-full" key={input.title}>
                         <Label htmlFor={`input_fields.${index}.value`} className="text-xs">

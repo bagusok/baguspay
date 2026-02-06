@@ -1,18 +1,20 @@
-import { Injectable, Logger, UnprocessableEntityException } from '@nestjs/common'
+import { Injectable, UnprocessableEntityException } from '@nestjs/common'
 import { eq, sql } from '@repo/db'
 import { BalanceMutationRefType, BalanceMutationType, PaymentStatus, tb } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
+import type { DBInstance } from 'src/common/types/db-instance'
 import { SendResponse } from 'src/common/utils/response'
-import { DatabaseService } from 'src/database/database.service'
-import { CreatePaymentGatewayRequest, CreatePaymentGatewayResponse } from '../payment-gateway.type'
-import { PaymentGateway } from '../payment.interface'
+import type { DatabaseService } from 'src/database/database.service'
+import type { PaymentGateway } from '../payment.interface'
+import type {
+  CreatePaymentGatewayRequest,
+  CreatePaymentGatewayResponse,
+} from '../payment-gateway.type'
 
 @Injectable()
 export class BalanceService implements PaymentGateway {
-  private readonly logger = new Logger(BalanceService.name)
   constructor(private readonly databaseService: DatabaseService) {}
-  handleCallback(data: any): Promise<any> {
-    console.log(data)
+  handleCallback(_): Promise<any> {
+    // console.log(data)
     throw new Error('Method not implemented.')
   }
 

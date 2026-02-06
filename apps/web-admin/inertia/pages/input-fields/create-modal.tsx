@@ -1,4 +1,3 @@
-import { CreateInputFieldValidator } from '#validators/input_field'
 import { useForm } from '@inertiajs/react'
 import { InputFieldType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -20,7 +19,8 @@ import {
   SelectValue,
 } from '@repo/ui/components/ui/select'
 import { Switch } from '@repo/ui/components/ui/switch'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
+import type { CreateInputFieldValidator } from '#validators/input_field'
 
 export default function CreateInputFieldsModal() {
   const { data, setData, errors, processing, post, reset } = useForm<CreateInputFieldValidator>({
@@ -33,10 +33,12 @@ export default function CreateInputFieldsModal() {
     options: [],
   })
 
+  const randId = useId()
+
   const [options, setOptions] = useState<{ label: string; value: string }[]>(
     data.options && Array.isArray(data.options) && data.options.length > 0
       ? data.options
-      : [{ label: '', value: '' }]
+      : [{ label: '', value: '' }],
   )
 
   // Sinkronisasi options ke form data, dan set null jika type bukan SELECT
@@ -47,7 +49,7 @@ export default function CreateInputFieldsModal() {
       setData('options', null as any)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options, data.type])
+  }, [options, data.type, setData])
 
   const handleOptionChange = (idx: number, key: 'label' | 'value', value: string) => {
     setOptions((prev) => prev.map((opt, i) => (i === idx ? { ...opt, [key]: value } : opt)))
@@ -151,7 +153,7 @@ export default function CreateInputFieldsModal() {
               </Label>
               <div className="space-y-2">
                 {options.map((opt, idx) => (
-                  <div key={idx} className="flex gap-2 items-center">
+                  <div key={randId} className="flex gap-2 items-center">
                     <Input
                       className="w-1/2"
                       placeholder="Label"

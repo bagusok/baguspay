@@ -5,6 +5,8 @@ export const updateSettingsValidator = vine.object({
   app_name: vine.string().trim().optional().nullable(),
   app_description: vine.string().trim().optional().nullable(),
   app_icon_url: vine.string().trim().optional().nullable(),
+  app_android_url: vine.string().trim().optional().nullable(),
+  app_ios_url: vine.string().trim().optional().nullable(),
   maintenance_banner_image_url: vine.string().trim().optional().nullable(),
   app_version: vine.string().trim().optional().nullable(),
   api_version: vine.string().trim().optional().nullable(),

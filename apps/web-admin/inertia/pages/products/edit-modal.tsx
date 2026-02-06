@@ -1,6 +1,11 @@
-import { UpdateProductValidator } from '#validators/product'
 import { useForm } from '@inertiajs/react'
-import { ProductBillingType, ProductFullfillmentType, ProductProvider, tb } from '@repo/db/types'
+import type { InferSelectModel } from '@repo/db'
+import {
+  ProductBillingType,
+  ProductFullfillmentType,
+  ProductProvider,
+  type tb,
+} from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
@@ -21,11 +26,11 @@ import {
 } from '@repo/ui/components/ui/select'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { FormEvent, useEffect, useMemo, useState } from 'react'
-import FileManager from '~/components/file-manager'
 import { PencilIcon } from 'lucide-react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import type { UpdateProductValidator } from '#validators/product'
+import FileManager from '~/components/file-manager'
 import { apiClient } from '~/utils/axios'
-import { InferSelectModel } from '@repo/db'
 
 type Props = {
   productId: string
@@ -69,7 +74,7 @@ export default function EditProductModal({ productId }: Props) {
       apiClient
         .get(`/admin/products/${productId}`)
         .then((res) => {
-          console.log('Fetched product:', res.data)
+          // console.log('Fetched product:', res.data)
           setData({
             name: res.data.data.name,
             sub_name: res.data.data.sub_name,
@@ -100,8 +105,8 @@ export default function EditProductModal({ productId }: Props) {
           })
           return res.data
         })
-        .catch((err) => {
-          console.error('Error fetching product:', err)
+        .catch((_) => {
+          // console.error('Error fetching product:', err)
           throw new Error('Failed to fetch product')
         }),
   })
@@ -110,14 +115,14 @@ export default function EditProductModal({ productId }: Props) {
     if (open) {
       getProduct.mutate()
     }
-  }, [open])
+  }, [open, getProduct])
 
   const totalPrice = useMemo(
     () =>
       Number(data.provider_price) +
       Number(data.profit_static) +
       (Number(data.provider_price) * Number(data.profit_percentage)) / 100,
-    [data.provider_price, data.profit_static, data.profit_percentage]
+    [data.provider_price, data.profit_static, data.profit_percentage],
   )
 
   const handleSubmit = (e: FormEvent) => {
@@ -128,7 +133,7 @@ export default function EditProductModal({ productId }: Props) {
         queryClient.invalidateQueries({ queryKey: ['products'], exact: false })
       },
       onError: () => {
-        console.error('Failed to create product', errors)
+        // console.error('Failed to create product', errors)
       },
     })
   }
@@ -244,6 +249,7 @@ export default function EditProductModal({ productId }: Props) {
                       id="is_available"
                       type="checkbox"
                       role="switch"
+                      aria-checked={data.is_available}
                       checked={data.is_available}
                       onChange={(e) => setData('is_available', e.target.checked)}
                       className="accent-primary h-5 w-10"
@@ -254,7 +260,6 @@ export default function EditProductModal({ productId }: Props) {
                     <input
                       id="is_featured"
                       type="checkbox"
-                      role="switch"
                       checked={data.is_featured}
                       onChange={(e) => setData('is_featured', e.target.checked)}
                       className="accent-primary h-5 w-10"
@@ -400,7 +405,7 @@ export default function EditProductModal({ productId }: Props) {
                   </Label>
                   <Input
                     type="number"
-                    value={isNaN(totalPrice) ? '' : totalPrice}
+                    value={Number.isNaN(totalPrice) ? '' : totalPrice}
                     readOnly
                     className="bg-gray-100 cursor-not-allowed"
                   />

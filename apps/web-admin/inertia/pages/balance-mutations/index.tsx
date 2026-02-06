@@ -1,5 +1,4 @@
-import BalanceMutationsController from '#controllers/balance_mutations_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
 import { BalanceMutationRefType, BalanceMutationType } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -23,8 +22,9 @@ import {
   SelectValue,
 } from '@repo/ui/components/ui/select'
 import { cn } from '@repo/ui/lib/utils'
-import { ColumnDef } from '@tanstack/react-table'
-import { FormEvent, useState } from 'react'
+import type { ColumnDef } from '@tanstack/react-table'
+import { type FormEvent, useState } from 'react'
+import type BalanceMutationsController from '#controllers/balance_mutations_controller'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate, formatPrice } from '~/utils'
 
@@ -142,7 +142,7 @@ export default function OrderPrepaidIndex(props: Props) {
       },
       {
         onSuccess: () => setOpen(false),
-      }
+      },
     )
   }
 
@@ -158,7 +158,7 @@ export default function OrderPrepaidIndex(props: Props) {
     router.get(
       '/admin/balance-mutations',
       { limit: 10, page: 1, sortBy, sortColumn },
-      { onSuccess: () => setOpen(false) }
+      { onSuccess: () => setOpen(false) },
     )
   }
 

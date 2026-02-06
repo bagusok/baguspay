@@ -1,5 +1,8 @@
-import { db } from '@repo/db'
-import { CreatePaymentGatewayRequest, CreatePaymentGatewayResponse } from './payment-gateway.type'
+import type { db } from '@repo/db'
+import type {
+  CreatePaymentGatewayRequest,
+  CreatePaymentGatewayResponse,
+} from './payment-gateway.type'
 
 export interface PaymentGateway {
   createTransaction(

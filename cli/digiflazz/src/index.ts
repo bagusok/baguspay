@@ -1,1 +1,2 @@
-console.log('DigiFlazz CLI is running...')
+export * from './digiflazz.service'
+export * from './digiflazz.tools'

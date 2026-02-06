@@ -13,8 +13,6 @@ apiClient.interceptors.request.use((config) => {
   const deviceId = store.get(deviceIdAtom)
   const accessToken = store.get(authTokenAtom)
 
-  console.log('Access Token From Interceptor:', accessToken?.accessToken)
-  console.log('Device ID From Interceptor:', deviceId)
   if (deviceId) {
     config.headers = config.headers || {}
     config.headers['X-Device-ID'] = deviceId
@@ -22,7 +20,7 @@ apiClient.interceptors.request.use((config) => {
 
   if (accessToken?.accessToken) {
     config.headers = config.headers || {}
-    config.headers['Authorization'] = `Bearer ${accessToken.accessToken}`
+    config.headers.Authorization = `Bearer ${accessToken.accessToken}`
   }
 
   config.headers['X-Version'] = '1.0.0'

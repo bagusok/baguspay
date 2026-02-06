@@ -1,4 +1,3 @@
-import { AddBalanceValidator } from '#validators/user'
 import { useForm } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import {
@@ -17,6 +16,7 @@ import { Textarea } from '@repo/ui/components/ui/textarea'
 import { ArrowDownLeftIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import type { AddBalanceValidator } from '#validators/user'
 import { formatPrice } from '~/utils'
 
 export default function DeductAddBalanceModal({

@@ -1,5 +1,4 @@
-import SettingsController from '#controllers/configs/settings_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import { Input } from '@repo/ui/components/ui/input'
@@ -9,6 +8,7 @@ import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import type SettingsController from '#controllers/configs/settings_controller'
 import FileManager from '~/components/file-manager'
 import AdminLayout from '~/components/layout/admin-layout'
 
@@ -17,13 +17,15 @@ type Props = InferPageProps<SettingsController, 'index'>
 export default function GeneralSettings(props: Props) {
   const [appIconId, setAppIconId] = useState(props.settings.app_icon_file_id || '')
   const [maintenanceBannerId, setMaintenanceBannerId] = useState(
-    props.settings.maintenance_banner_file_id || ''
+    props.settings.maintenance_banner_file_id || '',
   )
   const { data, setData, patch, processing } = useForm({
     maintenance_enabled: props.settings.maintenance_enabled,
     app_name: props.settings.app_name,
     app_description: props.settings.app_description,
     app_icon_url: props.settings.app_icon_url,
+    app_android_url: props.settings.app_android_url,
+    app_ios_url: props.settings.app_ios_url,
     maintenance_banner_image_url: props.settings.maintenance_banner_image_url,
     app_version: props.settings.app_version,
     api_version: props.settings.api_version,
@@ -152,6 +154,29 @@ export default function GeneralSettings(props: Props) {
               }}
             />
             <p className="text-xs text-muted-foreground">Recommended size: 512x512.</p>
+          </div>
+        </div>
+
+        <div className="rounded-lg border bg-white p-6 space-y-4">
+          <h2 className="text-sm font-semibold">App Download Links</h2>
+          <Separator />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Android Download URL</Label>
+              <Input
+                value={data.app_android_url}
+                onChange={(e) => setData('app_android_url', e.target.value)}
+                placeholder="https://play.google.com/store/..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>iOS Download URL</Label>
+              <Input
+                value={data.app_ios_url}
+                onChange={(e) => setData('app_ios_url', e.target.value)}
+                placeholder="https://apps.apple.com/..."
+              />
+            </div>
           </div>
         </div>
 

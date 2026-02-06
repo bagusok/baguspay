@@ -1,4 +1,4 @@
-import * as React from 'react'
+import type * as React from 'react'
 import '~/components/tiptap/tiptap-ui-primitive/input/input.scss'
 import { cn } from '~/utils/tiptap_utils'
 

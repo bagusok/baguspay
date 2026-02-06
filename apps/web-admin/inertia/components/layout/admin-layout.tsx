@@ -1,4 +1,4 @@
-import { SharedProps } from '@adonisjs/inertia/types'
+import type { SharedProps } from '@adonisjs/inertia/types'
 import { usePage } from '@inertiajs/react'
 import { SidebarInset, SidebarProvider } from '@repo/ui/components/ui/sidebar'
 import { QueryClient } from '@tanstack/react-query'

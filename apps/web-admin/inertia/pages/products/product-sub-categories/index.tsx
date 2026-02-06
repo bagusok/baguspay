@@ -1,5 +1,4 @@
-import ProductsCategoriesController from '#controllers/product_categories_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import {
@@ -13,6 +12,7 @@ import {
 } from '@repo/ui/components/ui/dialog'
 import { cn } from '@repo/ui/lib/utils'
 import { Trash2 } from 'lucide-react'
+import type ProductsCategoriesController from '#controllers/product_categories_controller'
 import Image from '~/components/image'
 import AddProductSubCategoryModal from './add-modal'
 import EditProductSubCategoryModal from './edit-modal'
@@ -49,7 +49,7 @@ export default function SectionProductSubCategory({
               'group relative bg-card border rounded-lg p-2 cursor-pointer transition-all duration-300 hover:shadow-soft',
               {
                 'border-primary shadow-soft': sub.id === selectedSubId,
-              }
+              },
             )}
             onClick={() => setSelectedSubId(sub.id)}
           >

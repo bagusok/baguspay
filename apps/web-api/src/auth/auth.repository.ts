@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
-import { and, eq, InferInsertModel } from '@repo/db'
+import { and, eq, type InferInsertModel } from '@repo/db'
 import { tb } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
-import { DatabaseService } from 'src/database/database.service'
+import type { DBInstance } from 'src/common/types/db-instance'
+import type { DatabaseService } from 'src/database/database.service'
 
 type SessionInsert = InferInsertModel<typeof tb.sessions>
 type UserInsert = InferInsertModel<typeof tb.users>

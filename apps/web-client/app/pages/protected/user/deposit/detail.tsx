@@ -23,7 +23,7 @@ import { formatPrice } from '~/utils/format'
 import type { Route } from './+types/detail'
 
 export default function DepositDetail({ params }: Route.ComponentProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+  const [_copiedField, setCopiedField] = useState<string | null>(null)
 
   const depositDetail = useQuery({
     queryKey: ['depositDetail', params.id],
@@ -298,6 +298,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
                   </h4>
                   <div
                     className="text-sm text-amber-700 dark:text-amber-300"
+                    // biome-ignore lint/security/noDangerouslySetInnerHtml: alkjalk
                     dangerouslySetInnerHTML={{
                       __html: data.payment_method.instruction,
                     }}

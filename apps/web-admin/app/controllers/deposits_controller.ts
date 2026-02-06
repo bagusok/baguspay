@@ -1,12 +1,12 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, asc, count, db, desc, eq } from '@repo/db'
+import { BalanceMutationRefType, BalanceMutationType, DepositStatus, tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
 import {
   changeStatusValidator,
   depositIdValidator,
   getDepositQueryValidator,
 } from '#validators/deposit'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, asc, count, db, desc, eq } from '@repo/db'
-import { BalanceMutationRefType, BalanceMutationType, DepositStatus, tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 
 export default class DepositsController {
   async index(ctx: HttpContext) {
@@ -134,7 +134,7 @@ export default class DepositsController {
       vine.compile(changeStatusValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const id = await ctx.request.validateUsing(vine.compile(depositIdValidator), {

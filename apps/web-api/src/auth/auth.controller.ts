@@ -1,8 +1,8 @@
 import { BadRequestException, Body, Controller, Headers, Ip, Post, UseGuards } from '@nestjs/common'
 import { ApiHeader, ApiOperation } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
-import { LoginDto, RefreshTokenDto, RegisterDto } from './auth.dto'
-import { AuthService } from './auth.service'
+import type { LoginDto, RefreshTokenDto, RegisterDto } from './auth.dto'
+import type { AuthService } from './auth.service'
 
 @Controller('auth')
 export class AuthController {

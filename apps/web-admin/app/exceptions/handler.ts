@@ -1,4 +1,5 @@
-import { ExceptionHandler, HttpContext } from '@adonisjs/core/http'
+/** biome-ignore-all lint/suspicious/noConsole: aaa */
+import { ExceptionHandler, type HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import type { StatusPageRange, StatusPageRenderer } from '@adonisjs/core/types/http'
 import { DrizzleError } from '@repo/db'

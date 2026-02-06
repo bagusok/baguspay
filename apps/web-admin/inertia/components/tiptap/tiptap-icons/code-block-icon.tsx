@@ -32,7 +32,7 @@ export const CodeBlockIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 CodeBlockIcon.displayName = 'CodeBlockIcon'

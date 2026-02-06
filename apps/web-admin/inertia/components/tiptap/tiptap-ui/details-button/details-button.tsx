@@ -29,7 +29,7 @@ export const DetailsButton = React.forwardRef<HTMLButtonElement, DetailsButtonPr
         if (!editor) return
         editor.chain().focus().setDetails().run()
       },
-      [editor]
+      [editor],
     )
 
     return (
@@ -57,7 +57,7 @@ export const DetailsButton = React.forwardRef<HTMLButtonElement, DetailsButtonPr
         )}
       </Button>
     )
-  }
+  },
 )
 
 DetailsButton.displayName = 'DetailsButton'

@@ -14,7 +14,7 @@ export function setServerErrors(errors: any, setError: UseFormSetError<any>, par
 
   for (const key in errors) {
     // Pastikan kita tidak memproses properti dari prototype
-    if (Object.prototype.hasOwnProperty.call(errors, key)) {
+    if (Object.hasOwn(errors, key)) {
       const value = errors[key]
       // Bangun nama field yang dikenali React Hook Form, contoh: "users.0.name"
       const fieldName = parentPath ? `${parentPath}.${key}` : key

@@ -30,7 +30,7 @@ export const HeadingThreeIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 HeadingThreeIcon.displayName = 'HeadingThreeIcon'

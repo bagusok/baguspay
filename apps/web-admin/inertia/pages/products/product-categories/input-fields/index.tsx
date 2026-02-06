@@ -1,10 +1,10 @@
-import ProductsCategoriesController from '#controllers/product_categories_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
-import AddInputFields from './add-input-fields'
+import type { InferPageProps } from '@adonisjs/inertia/types'
+import { router } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import { LoaderCircle, Trash2Icon } from 'lucide-react'
 import { useState } from 'react'
-import { router } from '@inertiajs/react'
+import type ProductsCategoriesController from '#controllers/product_categories_controller'
+import AddInputFields from './add-input-fields'
 
 type Props = {
   productCategory: InferPageProps<ProductsCategoriesController, 'detail'>['productCategory']

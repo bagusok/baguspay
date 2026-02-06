@@ -20,7 +20,7 @@ export const ImagePlusIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 ImagePlusIcon.displayName = 'ImagePlusIcon'

@@ -11,32 +11,32 @@ export default function PaymentCountdown({ expiredAt, paymentStatus }: Props) {
   const [timeRemaining, setTimeRemaining] = useState<string>('')
   const [isExpired, setIsExpired] = useState(false)
 
-  // Format countdown timer
-  const formatTimeRemaining = (expiredAt: string | Date) => {
-    const now = new Date().getTime()
-    const expiry = new Date(expiredAt).getTime()
-    const difference = expiry - now
-
-    if (difference <= 0) {
-      setIsExpired(true)
-      return 'Kedaluwarsa'
-    }
-
-    const hours = Math.floor(difference / (1000 * 60 * 60))
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-    const seconds = Math.floor((difference % (1000 * 60)) / 1000)
-
-    if (hours > 0) {
-      return `${hours}j ${minutes}m ${seconds}d`
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds}d`
-    } else {
-      return `${seconds}d`
-    }
-  }
-
   // Update countdown every second
   useEffect(() => {
+    // Format countdown timer
+    const formatTimeRemaining = (expiredAt: string | Date) => {
+      const now = Date.now()
+      const expiry = new Date(expiredAt).getTime()
+      const difference = expiry - now
+
+      if (difference <= 0) {
+        setIsExpired(true)
+        return 'Kedaluwarsa'
+      }
+
+      const hours = Math.floor(difference / (1000 * 60 * 60))
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000)
+
+      if (hours > 0) {
+        return `${hours}j ${minutes}m ${seconds}d`
+      } else if (minutes > 0) {
+        return `${minutes}m ${seconds}d`
+      } else {
+        return `${seconds}d`
+      }
+    }
+
     // Don't run countdown for non-pending/expired/failed statuses
     if (!['pending', 'expired', 'failed'].includes(paymentStatus)) return
 
@@ -81,7 +81,7 @@ export default function PaymentCountdown({ expiredAt, paymentStatus }: Props) {
     !displayExpired &&
     timeRemaining.includes('m') &&
     !timeRemaining.includes('j') &&
-    parseInt(timeRemaining.split('m')[0]) <= 10
+    parseInt(timeRemaining.split('m')[0], 10) <= 10
 
   return (
     <div

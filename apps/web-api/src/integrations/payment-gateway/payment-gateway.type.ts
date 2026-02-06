@@ -1,5 +1,5 @@
-import { PaymentMethodFeeType, PaymentMethodProvider, PaymentStatus } from '@repo/db/types'
-import { TripayOrderItem } from './tripay/tripay.type'
+import type { PaymentMethodFeeType, PaymentMethodProvider, PaymentStatus } from '@repo/db/types'
+import type { TripayOrderItem } from './tripay/tripay.type'
 
 export interface CreatePaymentGatewayRequest {
   provider_name: PaymentMethodProvider

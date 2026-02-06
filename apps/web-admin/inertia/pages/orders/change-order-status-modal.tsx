@@ -1,4 +1,3 @@
-import { UpdateOrderStatusValidator } from '#validators/order'
 import { useForm } from '@inertiajs/react'
 import { OrderStatus } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -20,6 +19,7 @@ import {
 import { PencilIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import type { UpdateOrderStatusValidator } from '#validators/order'
 
 export default function ChangeOrderStatusModal({
   orderId,
@@ -41,7 +41,7 @@ export default function ChangeOrderStatusModal({
         setOpen(false)
       },
       onError: (error) => {
-        toast.error('Error changing status: ' + error.error)
+        toast.error(`Error changing status: ${error.error}`)
         console.error('Error changing status:', error)
       },
     })
@@ -51,7 +51,7 @@ export default function ChangeOrderStatusModal({
     if (open) {
       form.setData('status', status)
     }
-  }, [open])
+  }, [open, form, status])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -89,9 +89,8 @@ export default function ChangeOrderStatusModal({
             )}
             <small className="text-xs text-red-500 italic">
               * Mengubah status order secara manual akan mempengaruhi proses order.
-              <br />
-              * Mengubah disini tidak akan melakukan ekseskui ototomatis pada sistem order (Hanya
-              mengubah statusnya saja).
+              <br />* Mengubah disini tidak akan melakukan ekseskui ototomatis pada sistem order
+              (Hanya mengubah statusnya saja).
               <br />* Jika ada masalah order sebaiknya di set saja ke failed. lalu di refund manual
               (pake tombol refund jika bukan guest order).
               <br />

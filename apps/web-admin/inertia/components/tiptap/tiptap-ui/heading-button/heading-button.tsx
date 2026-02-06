@@ -1,17 +1,14 @@
 import * as React from 'react'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
 // --- Tiptap UI ---
 import type { Level, UseHeadingConfig } from '~/components/tiptap/tiptap-ui/heading-button'
 import { HEADING_SHORTCUT_KEYS, useHeading } from '~/components/tiptap/tiptap-ui/heading-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface HeadingButtonProps extends Omit<ButtonProps, 'type'>, UseHeadingConfig {
   /**
@@ -53,7 +50,7 @@ export const HeadingButton = React.forwardRef<HTMLButtonElement, HeadingButtonPr
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, canToggle, isActive, handleToggle, label, Icon, shortcutKeys } = useHeading({
@@ -69,7 +66,7 @@ export const HeadingButton = React.forwardRef<HTMLButtonElement, HeadingButtonPr
         if (event.defaultPrevented) return
         handleToggle()
       },
-      [handleToggle, onClick]
+      [handleToggle, onClick],
     )
 
     if (!isVisible) {
@@ -101,7 +98,7 @@ export const HeadingButton = React.forwardRef<HTMLButtonElement, HeadingButtonPr
         )}
       </Button>
     )
-  }
+  },
 )
 
 HeadingButton.displayName = 'HeadingButton'

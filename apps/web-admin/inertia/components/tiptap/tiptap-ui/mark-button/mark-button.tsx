@@ -1,19 +1,15 @@
 import * as React from 'react'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Tiptap UI ---
 import type { Mark, UseMarkConfig } from '~/components/tiptap/tiptap-ui/mark-button'
 import { MARK_SHORTCUT_KEYS, useMark } from '~/components/tiptap/tiptap-ui/mark-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface MarkButtonProps extends Omit<ButtonProps, 'type'>, UseMarkConfig {
   /**
@@ -55,7 +51,7 @@ export const MarkButton = React.forwardRef<HTMLButtonElement, MarkButtonProps>(
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, handleMark, label, canToggle, isActive, Icon, shortcutKeys } = useMark({
@@ -71,7 +67,7 @@ export const MarkButton = React.forwardRef<HTMLButtonElement, MarkButtonProps>(
         if (event.defaultPrevented) return
         handleMark()
       },
-      [handleMark, onClick]
+      [handleMark, onClick],
     )
 
     if (!isVisible) {
@@ -103,7 +99,7 @@ export const MarkButton = React.forwardRef<HTMLButtonElement, MarkButtonProps>(
         )}
       </Button>
     )
-  }
+  },
 )
 
 MarkButton.displayName = 'MarkButton'

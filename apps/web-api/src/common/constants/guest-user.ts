@@ -1,5 +1,5 @@
-import { InferSelectModel } from '@repo/db'
-import { tb, UserRegisteredType, UserRole } from '@repo/db/types'
+import type { InferSelectModel } from '@repo/db'
+import { type tb, UserRegisteredType, UserRole } from '@repo/db/types'
 
 export const GUEST_USER: InferSelectModel<typeof tb.users> = {
   id: '00000000-0000-0000-0000-000000000000',

@@ -1,8 +1,5 @@
 import { router, useForm } from '@inertiajs/react'
-import { useState, FormEvent, useEffect } from 'react'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -11,6 +8,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
+import { type FormEvent, useEffect, useState } from 'react'
 
 export function EditPaymentCategoryModal({ id, name }: { id: number | string; name: string }) {
   const [open, setOpen] = useState(false)
@@ -20,7 +20,7 @@ export function EditPaymentCategoryModal({ id, name }: { id: number | string; na
 
   useEffect(() => {
     form.setData('name', name)
-  }, [name])
+  }, [name, form])
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()

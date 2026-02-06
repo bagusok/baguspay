@@ -1,16 +1,16 @@
-import { ExtractJwt, Strategy } from 'passport-jwt'
-import { PassportStrategy } from '@nestjs/passport'
 import { Injectable, UnauthorizedException } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { DatabaseService } from 'src/database/database.service'
+import type { ConfigService } from '@nestjs/config'
+import { PassportStrategy } from '@nestjs/passport'
 import { eq } from '@repo/db'
-import { tb, UserRole } from '@repo/db/types'
-import { Request } from 'express'
+import { tb, type UserRole } from '@repo/db/types'
+import type { Request } from 'express'
+import { ExtractJwt, Strategy } from 'passport-jwt'
+import type { DatabaseService } from 'src/database/database.service'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    private readonly configService: ConfigService,
+    readonly configService: ConfigService,
     private readonly databaseService: DatabaseService,
   ) {
     const secret = configService.get<string>('JWT_SECRET')

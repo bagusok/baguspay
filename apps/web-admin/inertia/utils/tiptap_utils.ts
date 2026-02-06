@@ -108,19 +108,19 @@ export function cn(...classes: (string | boolean | undefined | null)[]): string 
  */
 export function isExtensionAvailable(
   editor: Editor | null,
-  extensionNames: string | string[]
+  extensionNames: string | string[],
 ): boolean {
   if (!editor) return false
 
   const names = Array.isArray(extensionNames) ? extensionNames : [extensionNames]
 
   const found = names.some((name) =>
-    editor.extensionManager.extensions.some((ext) => ext.name === name)
+    editor.extensionManager.extensions.some((ext) => ext.name === name),
   )
 
   if (!found) {
     console.warn(
-      `None of the extensions [${names.join(', ')}] were found in the editor schema. Ensure they are included in the editor configuration.`
+      `None of the extensions [${names.join(', ')}] were found in the editor schema. Ensure they are included in the editor configuration.`,
     )
   }
 
@@ -236,7 +236,7 @@ export function isNodeTypeSelected(editor: Editor, types: string[] = []): boolea
 export const handleImageUpload = async (
   file: File,
   onProgress?: (event: { progress: number }) => void,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): Promise<string> => {
   // Validate file
   if (!file) {
@@ -313,9 +313,9 @@ export function isAllowedUri(uri: string | undefined, protocols?: ProtocolConfig
       .replace(ATTR_WHITESPACE, '')
       .match(
         new RegExp(
-          `^(?:(?:${allowedProtocols.join('|')}):|[^a-z]|[a-z0-9+.\-]+(?:[^a-z+.\-:]|$))`,
-          'i'
-        )
+          `^(?:(?:${allowedProtocols.join('|')}):|[^a-z]|[a-z0-9+.-]+(?:[^a-z+.-:]|$))`,
+          'i',
+        ),
       )
   )
 }

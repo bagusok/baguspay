@@ -5,9 +5,15 @@
     "build": "turbo run build",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "lint:root": "biome lint .",
     "start": "turbo run start",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "turbo run format",
+    "format:root": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
     "check-types": "turbo run check-types",
+    "prepare": "husky",
     "ui": "npm run -w @repo/ui ui --",
     "db:pull": "npm run -w @repo/db db:pull",
     "db:migrate": "npm run -w @repo/db db:migrate",
@@ -16,7 +22,8 @@
     "db:seed": "npm run -w @repo/db db:seed"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "@biomejs/biome": "^2.3.14",
+    "husky": "^9.1.7",
     "turbo": "^2.7.2",
     "typescript": "5.8.3"
   },

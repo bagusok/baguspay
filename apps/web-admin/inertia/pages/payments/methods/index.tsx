@@ -1,5 +1,4 @@
-import PaymentsController from '#controllers/payments_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router, usePage } from '@inertiajs/react'
 import { DataTable } from '@repo/ui/components/data-table'
 import { Button } from '@repo/ui/components/ui/button'
@@ -20,8 +19,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
+import type PaymentsController from '#controllers/payments_controller'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate, formatPrice } from '~/utils/index'
 import { AddPaymentMethodModal } from './add-modal'

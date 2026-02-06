@@ -80,7 +80,6 @@ export type LoaderProps = {
 const Loader = ({
   color = '#29d',
   height = 3,
-  showSpinner,
   crawl,
   crawlSpeed,
   initialPosition,
@@ -100,7 +99,7 @@ const Loader = ({
     function getGlobalState() {
       const states = [
         transition.state,
-        // @ts-ignore
+        // @ts-expect-error
         ...fetchers.map((fetcher) => fetcher.state),
       ]
       if (states.every((state) => state === 'idle')) return 'idle'
@@ -143,7 +142,7 @@ const Loader = ({
     if (state === 'loading') NProgress.start()
     // when the state is idle then we can to complete the progress bar
     if (state === 'idle') NProgress.done()
-  }, [transition.state])
+  }, [state, crawl, crawlSpeed, initialPosition, easing, speed, template])
 
   return styles
 }

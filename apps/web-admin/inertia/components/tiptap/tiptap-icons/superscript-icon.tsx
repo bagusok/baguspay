@@ -32,7 +32,7 @@ export const SuperscriptIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 SuperscriptIcon.displayName = 'SuperscriptIcon'

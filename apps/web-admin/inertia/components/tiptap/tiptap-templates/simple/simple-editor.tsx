@@ -1,6 +1,3 @@
-import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
-import * as React from 'react'
-
 // --- Tiptap Core Extensions ---
 import { Highlight } from '@tiptap/extension-highlight'
 import { Image } from '@tiptap/extension-image'
@@ -9,6 +6,8 @@ import { Superscript } from '@tiptap/extension-superscript'
 import { TextAlign } from '@tiptap/extension-text-align'
 import { Typography } from '@tiptap/extension-typography'
 import { Placeholder, Selection } from '@tiptap/extensions'
+import { EditorContent, EditorContext, useEditor } from '@tiptap/react'
+import * as React from 'react'
 
 // --- UI Primitives ---
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
@@ -31,6 +30,10 @@ import '~/components/tiptap/tiptap-node/paragraph-node/paragraph-node.scss'
 
 // --- Tiptap UI ---
 import { Details, DetailsContent, DetailsSummary } from '@tiptap/extension-details'
+// --- Icons ---
+import { ArrowLeftIcon } from '~/components/tiptap/tiptap-icons/arrow-left-icon'
+import { HighlighterIcon } from '~/components/tiptap/tiptap-icons/highlighter-icon'
+import { LinkIcon } from '~/components/tiptap/tiptap-icons/link-icon'
 import { BlockquoteButton } from '~/components/tiptap/tiptap-ui/blockquote-button'
 import { CodeBlockButton } from '~/components/tiptap/tiptap-ui/code-block-button'
 import {
@@ -46,11 +49,6 @@ import { MarkButton } from '~/components/tiptap/tiptap-ui/mark-button'
 import { TextAlignButton } from '~/components/tiptap/tiptap-ui/text-align-button'
 import { UndoRedoButton } from '~/components/tiptap/tiptap-ui/undo-redo-button'
 
-// --- Icons ---
-import { ArrowLeftIcon } from '~/components/tiptap/tiptap-icons/arrow-left-icon'
-import { HighlighterIcon } from '~/components/tiptap/tiptap-icons/highlighter-icon'
-import { LinkIcon } from '~/components/tiptap/tiptap-icons/link-icon'
-
 // --- Hooks ---
 import { useCursorVisibility } from '~/hooks/use-cursor-visibility'
 import { useIsMobile } from '~/hooks/use-mobile'
@@ -61,15 +59,20 @@ import { useWindowSize } from '~/hooks/use-window-size'
 // --- Styles ---
 import StarterKit from '@tiptap/starter-kit'
 import '~/components/tiptap/tiptap-templates/simple/simple-editor.scss'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/ui/dialog'
+import FileManager from '~/components/file-manager'
+import { ImagePlusIcon } from '~/components/tiptap/tiptap-icons/image-plus-icon'
 import { DetailsButton } from '~/components/tiptap/tiptap-ui/details-button/details-button'
 
 const MainToolbarContent = ({
   onHighlighterClick,
   onLinkClick,
+  onMediaClick,
   isMobile,
 }: {
   onHighlighterClick: () => void
   onLinkClick: () => void
+  onMediaClick: () => void
   isMobile: boolean
 }) => {
   return (
@@ -125,7 +128,11 @@ const MainToolbarContent = ({
       <ToolbarSeparator />
 
       <ToolbarGroup>
-        <ImageUploadButton text="Add" />
+        <ImageUploadButton text="Upload" />
+        <Button type="button" data-style="ghost" onClick={onMediaClick}>
+          <ImagePlusIcon className="tiptap-button-icon" />
+          {!isMobile && <span className="tiptap-button-text">Media Library</span>}
+        </Button>
       </ToolbarGroup>
 
       <Spacer />
@@ -174,18 +181,44 @@ export function SimpleEditor({
   const isMobile = useIsMobile()
   const windowSize = useWindowSize()
   const [mobileView, setMobileView] = React.useState<'main' | 'highlighter' | 'link'>('main')
+  const [isMediaOpen, setIsMediaOpen] = React.useState(false)
   const toolbarRef = React.useRef<HTMLDivElement>(null)
+  const lastValueRef = React.useRef<string>('')
+  const s3BaseUrl = import.meta.env.VITE_S3_URL || ''
+
+  const resolveSrc = React.useCallback((src: string) => {
+    if (!src) return src
+    if (/^https?:\/\//i.test(src)) return src
+    const base = s3BaseUrl.replace(/\/+$/g, '')
+    if (!base) return src
+    if (src.startsWith('/')) return `${base}${src}`
+    return `${base}/${src}`
+  }, [])
+
+  const normalizeImageSrc = React.useCallback(
+    (html: string) => {
+      if (!html) return html
+      return html.replace(/<img[^>]+src=["']([^"']+)["'][^>]*>/gi, (match, src) => {
+        const resolved = resolveSrc(src)
+        if (!resolved || resolved === src) return match
+        return match.replace(src, resolved)
+      })
+    },
+    [resolveSrc],
+  )
+
+  const normalizedValue = React.useMemo(() => normalizeImageSrc(value), [value, normalizeImageSrc])
 
   const editor = useEditor({
     immediatelyRender: false,
     shouldRerenderOnTransaction: false,
     editorProps: {
       attributes: {
-        'autocomplete': 'off',
-        'autocorrect': 'off',
-        'autocapitalize': 'off',
+        autocomplete: 'off',
+        autocorrect: 'off',
+        autocapitalize: 'off',
         'aria-label': 'Main content area, start typing to enter text.',
-        'class': 'simple-editor',
+        class: 'simple-editor',
         // class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
       },
     },
@@ -226,11 +259,30 @@ export function SimpleEditor({
       //   onError: (error) => console.error('Upload failed:', error),
       // }),
     ],
-    content: value,
+    content: normalizedValue,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      const nextValue = normalizeImageSrc(editor.getHTML())
+      lastValueRef.current = nextValue
+      onChange(nextValue)
     },
   })
+
+  React.useEffect(() => {
+    if (!editor) return
+    if (normalizedValue === lastValueRef.current) return
+    if (normalizedValue === editor.getHTML()) return
+    editor.commands.setContent(normalizedValue)
+  }, [editor, normalizedValue])
+
+  const handleMediaSelect = React.useCallback(
+    (file: { url: string }) => {
+      if (!editor) return
+      const src = resolveSrc(file.url)
+      editor.chain().focus().setImage({ src }).run()
+      setIsMediaOpen(false)
+    },
+    [editor, resolveSrc],
+  )
 
   const bodyRect = useCursorVisibility({
     editor,
@@ -260,6 +312,7 @@ export function SimpleEditor({
             <MainToolbarContent
               onHighlighterClick={() => setMobileView('highlighter')}
               onLinkClick={() => setMobileView('link')}
+              onMediaClick={() => setIsMediaOpen(true)}
               isMobile={isMobile}
             />
           ) : (
@@ -272,6 +325,15 @@ export function SimpleEditor({
 
         <EditorContent editor={editor} role="presentation" className="simple-editor-content" />
       </EditorContext.Provider>
+
+      <Dialog open={isMediaOpen} onOpenChange={setIsMediaOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Pilih Gambar</DialogTitle>
+          </DialogHeader>
+          <FileManager onFilesSelected={handleMediaSelect} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

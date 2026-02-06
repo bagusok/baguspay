@@ -2,11 +2,14 @@
 
 import {
   autoUpdate,
-  flip,
   FloatingDelayGroup,
   FloatingPortal,
+  flip,
   offset,
+  type Placement,
+  type ReferenceType,
   shift,
+  type UseFloatingReturn,
   useDismiss,
   useFloating,
   useFocus,
@@ -14,9 +17,6 @@ import {
   useInteractions,
   useMergeRefs,
   useRole,
-  type Placement,
-  type ReferenceType,
-  type UseFloatingReturn,
 } from '@floating-ui/react'
 import * as React from 'react'
 import '~/components/tiptap/tiptap-ui-primitive/tooltip/tooltip.scss'
@@ -106,7 +106,7 @@ function useTooltip({
       ...interactions,
       ...data,
     }),
-    [open, setOpen, interactions, data]
+    [open, setOpen, interactions, data],
   )
 }
 
@@ -163,7 +163,7 @@ export const TooltipTrigger = React.forwardRef<HTMLElement, TooltipTriggerProps>
           ...props,
           ...(typeof children.props === 'object' ? children.props : {}),
           ...dataAttributes,
-        })
+        }),
       )
     }
 
@@ -176,7 +176,7 @@ export const TooltipTrigger = React.forwardRef<HTMLElement, TooltipTriggerProps>
         {children}
       </button>
     )
-  }
+  },
 )
 
 export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentProps>(
@@ -205,7 +205,7 @@ export const TooltipContent = React.forwardRef<HTMLDivElement, TooltipContentPro
     }
 
     return content
-  }
+  },
 )
 
 Tooltip.displayName = 'Tooltip'

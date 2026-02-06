@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { eq, gte, lte, SQL } from '@repo/db'
+import { eq, gte, lte, type SQL } from '@repo/db'
 import { BalanceMutationType, LoginIsFrom, tb } from '@repo/db/types'
 import { getDeviceInfo, isBagusPayMobileApp } from 'src/auth/utils/device-fingerprint'
-import { MetaPaginated, TUser } from 'src/common/types/meta.type'
+import type { MetaPaginated, TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import { StorageService } from 'src/storage/storage.service'
-import { GetBalanceMutationHistoryQuery } from './user.dto'
-import { DateRange, UserRepository } from './user.repository'
+import type { StorageService } from 'src/storage/storage.service'
+import type { GetBalanceMutationHistoryQuery } from './user.dto'
+import type { DateRange, UserRepository } from './user.repository'
 
 /**
  * Get human-readable client type label
@@ -19,7 +19,6 @@ function getClientTypeLabel(isFrom: LoginIsFrom | null): string {
       return 'Mobile Browser'
     case LoginIsFrom.DESKTOP:
       return 'Desktop'
-    case LoginIsFrom.WEB:
     default:
       return 'Browser'
   }
@@ -50,6 +49,8 @@ export class UserService {
     if (user.image_url) {
       user.image_url = this.storageService.getFileUrl(user.image_url)
     }
+
+    delete user.password
 
     return SendResponse.success(user, 'User profile retrieved successfully')
   }

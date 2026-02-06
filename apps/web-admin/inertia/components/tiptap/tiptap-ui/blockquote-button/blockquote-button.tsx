@@ -6,17 +6,14 @@ import {
   BLOCKQUOTE_SHORTCUT_KEY,
   useBlockquote,
 } from '~/components/tiptap/tiptap-ui/blockquote-button'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface BlockquoteButtonProps extends Omit<ButtonProps, 'type'>, UseBlockquoteConfig {
   /**
@@ -55,7 +52,7 @@ export const BlockquoteButton = React.forwardRef<HTMLButtonElement, BlockquoteBu
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, canToggle, isActive, handleToggle, label, shortcutKeys, Icon } =
@@ -71,7 +68,7 @@ export const BlockquoteButton = React.forwardRef<HTMLButtonElement, BlockquoteBu
         if (event.defaultPrevented) return
         handleToggle()
       },
-      [handleToggle, onClick]
+      [handleToggle, onClick],
     )
 
     if (!isVisible) {
@@ -103,7 +100,7 @@ export const BlockquoteButton = React.forwardRef<HTMLButtonElement, BlockquoteBu
         )}
       </Button>
     )
-  }
+  },
 )
 
 BlockquoteButton.displayName = 'BlockquoteButton'

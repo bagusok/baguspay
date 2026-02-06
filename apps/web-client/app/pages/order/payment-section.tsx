@@ -55,10 +55,10 @@ export default function PaymentSection({ products, form }: Props) {
       setSelectedPayment(null)
       form.setValue('payment_method_id', '')
     }
-  }, [products, form])
+  }, [products, form, balancePaymentMethod, paymentMethods])
 
   // Memoized calculations for payment options
-  const isGuest = !user.data?.role || user.data.role === 'guest'
+  const _isGuest = !user.data?.role || user.data.role === 'guest'
 
   const paymentOptions = useMemo(() => {
     if (!paymentMethods.isSuccess || !paymentMethods.data?.data) {
@@ -95,8 +95,7 @@ export default function PaymentSection({ products, form }: Props) {
 
     // If user is logged in and balance is sufficient, auto-select balance
     if (
-      balanceData &&
-      balanceData.is_available &&
+      balanceData?.is_available &&
       products?.price &&
       balanceData.user_balance >= products.price
     ) {

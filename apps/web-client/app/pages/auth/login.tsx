@@ -60,11 +60,10 @@ export default function Login({ loaderData }: Route.ComponentProps) {
         .post('/auth/login', data)
         .then((res) => res.data.data)
         .catch((err) => {
-          console.error('Login error:', err)
           throw new Error(err.response?.data?.message || 'Login failed. Please try again.')
         }),
     onError: (error) => {
-      console.error('Login error:', error)
+      toast.error(error.message)
     },
     onSuccess: (data) => {
       toast.success(t('loginSuccess'))

@@ -1,5 +1,6 @@
+import crypto from 'node:crypto'
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
-import { eq, gte, lte, SQL } from '@repo/db'
+import { eq, gte, lte, type SQL } from '@repo/db'
 import {
   BalanceMutationRefType,
   BalanceMutationType,
@@ -8,16 +9,15 @@ import {
   PaymentStatus,
   tb,
 } from '@repo/db/types'
-import crypto from 'crypto'
-import { TUser } from 'src/common/types/meta.type'
+import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import { DatabaseService } from 'src/database/database.service'
-import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
-import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
-import { QueueService } from 'src/queue/queue.service'
-import { StorageService } from 'src/storage/storage.service'
-import { CreateDeposit, DepositHistoryQuery } from './deposit.dto'
-import { DepositRepository } from './deposit.repository'
+import type { DatabaseService } from 'src/database/database.service'
+import type { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
+import type { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
+import type { QueueService } from 'src/queue/queue.service'
+import type { StorageService } from 'src/storage/storage.service'
+import type { CreateDeposit, DepositHistoryQuery } from './deposit.dto'
+import type { DepositRepository } from './deposit.repository'
 
 @Injectable()
 export class DepositService {

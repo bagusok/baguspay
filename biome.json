@@ -1,0 +1,118 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "root": true,
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/build",
+      "!**/.next",
+      "!**/.turbo",
+      "!**/coverage",
+      "!**/*.min.js",
+      "!**/pnpm-lock.yaml"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto"
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedImports": "warn",
+        "noUnusedVariables": "warn",
+        "useExhaustiveDependencies": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "useConst": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn",
+        "noConsole": "off",
+        "noArrayIndexKey": "warn"
+      },
+      "complexity": {
+        "noUselessFragments": "warn"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      },
+      "a11y": {
+        "noAccessKey": "warn",
+        "noAriaHiddenOnFocusable": "warn",
+        "noAriaUnsupportedElements": "warn",
+        "noAutofocus": "off",
+        "noDistractingElements": "warn",
+        "noHeaderScope": "warn",
+        "noInteractiveElementToNoninteractiveRole": "warn",
+        "noNoninteractiveElementToInteractiveRole": "warn",
+        "noNoninteractiveTabindex": "warn",
+        "noPositiveTabindex": "warn",
+        "noRedundantAlt": "warn",
+        "noRedundantRoles": "warn",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "warn",
+        "useAnchorContent": "warn",
+        "useAriaActivedescendantWithTabindex": "warn",
+        "useAriaPropsForRole": "warn",
+        "useButtonType": "off",
+        "useFocusableInteractive": "warn",
+        "useGenericFontNames": "warn",
+        "useHeadingContent": "warn",
+        "useHtmlLang": "warn",
+        "useIframeTitle": "warn",
+        "useKeyWithClickEvents": "off",
+        "useKeyWithMouseEvents": "off",
+        "useMediaCaption": "warn",
+        "useSemanticElements": "warn",
+        "useValidAnchor": "warn",
+        "useValidAriaProps": "warn",
+        "useValidAriaRole": "warn",
+        "useValidAriaValues": "warn",
+        "useValidLang": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
+  }
+}

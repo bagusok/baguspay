@@ -1,6 +1,6 @@
 import { useNProgress } from '@tanem/react-nprogress'
 import { useEffect, useState } from 'react'
-import { useFetchers, useNavigation, type Fetcher } from 'react-router'
+import { type Fetcher, useFetchers, useNavigation } from 'react-router'
 
 function useIsAnimating() {
   const navigation = useNavigation()

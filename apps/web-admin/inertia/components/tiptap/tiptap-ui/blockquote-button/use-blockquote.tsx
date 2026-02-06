@@ -2,13 +2,11 @@ import { NodeSelection, TextSelection } from '@tiptap/pm/state'
 import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
+// --- Icons ---
+import { BlockquoteIcon } from '~/components/tiptap/tiptap-icons/blockquote-icon'
 // --- Hooks ---
 import { useIsMobile } from '~/hooks/use-mobile'
 import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
-// --- Icons ---
-import { BlockquoteIcon } from '~/components/tiptap/tiptap-icons/blockquote-icon'
 
 // --- UI Utils ---
 import {
@@ -224,7 +222,7 @@ export function useBlockquote(config?: UseBlockquoteConfig) {
       enabled: isVisible && canToggle,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

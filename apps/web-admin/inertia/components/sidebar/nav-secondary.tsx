@@ -1,6 +1,4 @@
-import * as React from 'react'
-import { type LucideIcon } from 'lucide-react'
-
+import { Link, usePage } from '@inertiajs/react'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -8,7 +6,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@repo/ui/components/ui/sidebar'
-import { Link, usePage } from '@inertiajs/react'
+import type { LucideIcon } from 'lucide-react'
+import type * as React from 'react'
 
 export function NavSecondary({
   items,

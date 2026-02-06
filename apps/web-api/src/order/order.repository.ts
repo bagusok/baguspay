@@ -1,16 +1,27 @@
 import { Injectable } from '@nestjs/common'
-import { and, arrayContains, asc, count, desc, eq, gte, InferInsertModel, lte, SQL } from '@repo/db'
 import {
-  InquiryStatus,
-  OrderStatus,
+  and,
+  arrayContains,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  type InferInsertModel,
+  lte,
+  type SQL,
+} from '@repo/db'
+import {
+  type InquiryStatus,
+  type OrderStatus,
   PaymentMethodAllowAccess,
-  PaymentStatus,
-  RefundStatus,
+  type PaymentStatus,
+  type RefundStatus,
   tb,
 } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
-import { DatabaseService } from 'src/database/database.service'
-import { GetOrderHistoryQueryDto } from './dto/order.dto'
+import type { DBInstance } from 'src/common/types/db-instance'
+import type { DatabaseService } from 'src/database/database.service'
+import type { GetOrderHistoryQueryDto } from './dto/order.dto'
 
 @Injectable()
 export class OrderRepository {

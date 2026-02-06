@@ -2,15 +2,10 @@ import * as React from 'react'
 
 // --- Icons ---
 import { ChevronDownIcon } from '~/components/tiptap/tiptap-icons/chevron-down-icon'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Tiptap UI ---
 import { HeadingButton } from '~/components/tiptap/tiptap-ui/heading-button'
 import type { UseHeadingDropdownMenuConfig } from '~/components/tiptap/tiptap-ui/heading-dropdown-menu'
 import { useHeadingDropdownMenu } from '~/components/tiptap/tiptap-ui/heading-dropdown-menu'
-
 // --- UI Primitives ---
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button, ButtonGroup } from '~/components/tiptap/tiptap-ui-primitive/button'
@@ -21,9 +16,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/tiptap/tiptap-ui-primitive/dropdown-menu'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
 
 export interface HeadingDropdownMenuProps
-  extends Omit<ButtonProps, 'type'>, UseHeadingDropdownMenuConfig {
+  extends Omit<ButtonProps, 'type'>,
+    UseHeadingDropdownMenuConfig {
   /**
    * Whether to render the dropdown menu in a portal
    * @default false
@@ -50,7 +48,7 @@ export const HeadingDropdownMenu = React.forwardRef<HTMLButtonElement, HeadingDr
       onOpenChange,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const [isOpen, setIsOpen] = React.useState(false)
@@ -66,7 +64,7 @@ export const HeadingDropdownMenu = React.forwardRef<HTMLButtonElement, HeadingDr
         setIsOpen(open)
         onOpenChange?.(open)
       },
-      [canToggle, editor, onOpenChange]
+      [canToggle, editor, onOpenChange],
     )
 
     if (!isVisible) {
@@ -115,7 +113,7 @@ export const HeadingDropdownMenu = React.forwardRef<HTMLButtonElement, HeadingDr
         </DropdownMenuContent>
       </DropdownMenu>
     )
-  }
+  },
 )
 
 HeadingDropdownMenu.displayName = 'HeadingDropdownMenu'

@@ -1,13 +1,13 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, db, desc, eq } from '@repo/db'
+import { tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
 import {
   connectInputFieldValidator,
   createInputFieldValidator,
   inputIdValidator,
   updateInputFieldValidator,
 } from '#validators/input_field'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, db, desc, eq } from '@repo/db'
-import { tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 
 export default class InputFieldsController {
   /**
@@ -100,7 +100,7 @@ export default class InputFieldsController {
     const existingConnection = await db.query.inputOnProductCategory.findFirst({
       where: and(
         eq(tb.inputOnProductCategory.input_field_id, data.input_field_id),
-        eq(tb.inputOnProductCategory.product_category_id, data.product_category_id)
+        eq(tb.inputOnProductCategory.product_category_id, data.product_category_id),
       ),
     })
 

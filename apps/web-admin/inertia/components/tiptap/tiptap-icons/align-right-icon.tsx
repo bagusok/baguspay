@@ -32,7 +32,7 @@ export const AlignRightIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 AlignRightIcon.displayName = 'AlignRightIcon'

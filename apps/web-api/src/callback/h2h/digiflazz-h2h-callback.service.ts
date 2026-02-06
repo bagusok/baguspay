@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { OrderStatus } from '@repo/db/types'
-import { DepositService } from 'src/deposit/deposit.service'
-import { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
-import {
+import type { DepositService } from 'src/deposit/deposit.service'
+import type { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
+import type {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
 } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import { OrderRepository } from 'src/order/order.repository'
-import { RefundService } from 'src/order/services/refund.service'
+import type { OrderRepository } from 'src/order/order.repository'
+import type { RefundService } from 'src/order/services/refund.service'
 
 @Injectable()
 export class DigiflazzH2HCallbackService {
@@ -15,7 +15,7 @@ export class DigiflazzH2HCallbackService {
 
   constructor(
     private readonly orderRepository: OrderRepository,
-    private readonly depositService: DepositService,
+    readonly _depositService: DepositService,
     private readonly digiflazzService: DigiflazzService,
     private readonly refundService: RefundService,
   ) {}
@@ -26,7 +26,7 @@ export class DigiflazzH2HCallbackService {
     event: 'create' | 'update',
     order: Awaited<ReturnType<typeof this.orderRepository.findOrderByIdWithRelation>>,
   ) {
-    if (event == 'create') {
+    if (event === 'create') {
       return {
         succes: true,
         message: 'Digiflazz prepaid callback received (create event), no action taken',
@@ -53,7 +53,7 @@ export class DigiflazzH2HCallbackService {
       throw new BadRequestException('Order already processed (not pending)')
     }
 
-    if (payload.data.status == 'Sukses') {
+    if (payload.data.status === 'Sukses') {
       // hitung cost dan profit
       const cost = payload.data.price
       const profit = order.total_price - order.fee - cost
@@ -75,7 +75,7 @@ export class DigiflazzH2HCallbackService {
         succes: true,
         message: `Digiflazz prepaid callback processed: order completed`,
       }
-    } else if (payload.data.status == 'Gagal') {
+    } else if (payload.data.status === 'Gagal') {
       await this.orderRepository.updateOrderStatus(order.order_id, OrderStatus.FAILED)
       await this.refundService.handleFailedOrder({
         fee: order.fee,
@@ -94,7 +94,7 @@ export class DigiflazzH2HCallbackService {
         succes: true,
         message: `Digiflazz prepaid callback processed: order failed and refunded`,
       }
-    } else if (payload.data.status == 'Pending') {
+    } else if (payload.data.status === 'Pending') {
       return {
         succes: true,
         message: 'Digiflazz prepaid callback received with Pending status, no action taken',
@@ -113,7 +113,7 @@ export class DigiflazzH2HCallbackService {
     event: 'create' | 'update',
     order: Awaited<ReturnType<typeof this.orderRepository.findOrderByIdWithRelation>>,
   ) {
-    if (event == 'create') {
+    if (event === 'create') {
       return {
         succes: true,
         message: 'Digiflazz postpaid callback received (create event), no action taken',
@@ -140,7 +140,7 @@ export class DigiflazzH2HCallbackService {
       throw new BadRequestException('Order already processed (not pending)')
     }
 
-    if (payload.data.status == 'Sukses') {
+    if (payload.data.status === 'Sukses') {
       // hitung cost dan profit
       const cost = payload.data.price
       const profit = order.total_price - order.fee - cost
@@ -163,7 +163,7 @@ export class DigiflazzH2HCallbackService {
         succes: true,
         message: `Digiflazz prepaid callback processed: order completed`,
       }
-    } else if (payload.data.status == 'Gagal') {
+    } else if (payload.data.status === 'Gagal') {
       await this.orderRepository.updateOrderStatus(order.order_id, OrderStatus.FAILED)
       await this.refundService.handleFailedOrder({
         fee: order.fee,
@@ -182,7 +182,7 @@ export class DigiflazzH2HCallbackService {
         succes: true,
         message: `Digiflazz prepaid callback processed: order failed and refunded`,
       }
-    } else if (payload.data.status == 'Pending') {
+    } else if (payload.data.status === 'Pending') {
       return {
         succes: true,
         message: 'Digiflazz prepaid callback received with Pending status, no action taken',

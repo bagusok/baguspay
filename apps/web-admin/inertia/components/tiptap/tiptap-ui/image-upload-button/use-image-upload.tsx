@@ -1,18 +1,15 @@
 'use client'
 
-import { type Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
+// --- Icons ---
+import { ImagePlusIcon } from '~/components/tiptap/tiptap-icons/image-plus-icon'
 // --- Hooks ---
 import { useIsMobile } from '~/hooks/use-mobile'
 import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Lib ---
 import { isExtensionAvailable, isNodeTypeSelected } from '~/utils/tiptap_utils'
-
-// --- Icons ---
-import { ImagePlusIcon } from '~/components/tiptap/tiptap-icons/image-plus-icon'
 
 export const IMAGE_UPLOAD_SHORTCUT_KEY = 'mod+shift+i'
 
@@ -174,7 +171,7 @@ export function useImageUpload(config?: UseImageUploadConfig) {
       enabled: isVisible && canInsert,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

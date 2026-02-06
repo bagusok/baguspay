@@ -1,9 +1,8 @@
-import { productCategoriesQueryValidator, productCategoryIdValidator } from '#validators/product'
 import type { HttpContext } from '@adonisjs/core/http'
 import { and, asc, count, db, desc, eq, ilike, inArray } from '@repo/db'
 import { ProductBillingType, ProductCategoryType, tb } from '@repo/db/types'
-
 import vine from '@vinejs/vine'
+import { productCategoriesQueryValidator, productCategoryIdValidator } from '#validators/product'
 
 export default class ProductsCategoriesPostpaidController {
   // Pulsa Section
@@ -95,7 +94,7 @@ export default class ProductsCategoriesPostpaidController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/postpaid/tagihan-pln/edit', {
@@ -200,7 +199,7 @@ export default class ProductsCategoriesPostpaidController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/postpaid/pdam/edit', {
@@ -305,7 +304,7 @@ export default class ProductsCategoriesPostpaidController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/postpaid/internet/edit', {
@@ -410,7 +409,7 @@ export default class ProductsCategoriesPostpaidController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/postpaid/bpjs-kesehatan/edit', {
@@ -515,7 +514,7 @@ export default class ProductsCategoriesPostpaidController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/postpaid/bpjs-ketenagakerjaan/edit', {

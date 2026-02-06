@@ -22,7 +22,7 @@ export const ExternalLinkIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 ExternalLinkIcon.displayName = 'ExternalLinkIcon'

@@ -1,11 +1,7 @@
-import PaymentsController from '#controllers/payments_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
-import { AddPaymentCategoryModal } from './add-payment-category-modal'
-import AdminLayout from '~/components/layout/admin-layout'
-import { DataTable } from '@repo/ui/components/data-table'
-import { formatDate } from '~/utils/index'
-import { Button } from '@repo/ui/components/ui/button'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
+import { DataTable } from '@repo/ui/components/data-table'
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -15,8 +11,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
-
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
+import type PaymentsController from '#controllers/payments_controller'
+import AdminLayout from '~/components/layout/admin-layout'
+import { formatDate } from '~/utils/index'
+import { AddPaymentCategoryModal } from './add-payment-category-modal'
 import { EditPaymentCategoryModal } from './edit-payment-category-modal'
 
 // Props type

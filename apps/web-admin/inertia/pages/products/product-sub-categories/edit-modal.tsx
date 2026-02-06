@@ -1,4 +1,3 @@
-import { UpdateProductSubCategoryValidator } from '#validators/product'
 import { useForm } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import {
@@ -14,10 +13,11 @@ import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
-import { useEffect, useState } from 'react'
-import FileManager from '~/components/file-manager'
-import { EditIcon } from 'lucide-react'
 import { useMutation } from '@tanstack/react-query'
+import { EditIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import type { UpdateProductSubCategoryValidator } from '#validators/product'
+import FileManager from '~/components/file-manager'
 import { apiClient } from '~/utils/axios'
 
 type Props = {
@@ -67,7 +67,7 @@ export default function EditProductSubCategoryModal({ productSubCategoryId }: Pr
     if (open) {
       productSubCategory.mutate()
     }
-  }, [open])
+  }, [open, productSubCategory])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

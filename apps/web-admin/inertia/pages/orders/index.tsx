@@ -1,5 +1,4 @@
-import OrdersController from '#controllers/orders_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
 import { OrderStatus, PaymentStatus, ProductBillingType, RefundStatus } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -23,8 +22,9 @@ import {
   SelectValue,
 } from '@repo/ui/components/ui/select'
 import { cn } from '@repo/ui/lib/utils'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
+import type OrdersController from '#controllers/orders_controller'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate, formatPrice } from '~/utils'
 import ChangeOrderStatusModal from './change-order-status-modal'
@@ -59,7 +59,7 @@ const columns: ColumnDef<Props['orders'][number]>[] = [
             'inline-flex items-center px-2 py-1 rounded text-xs font-medium',
             billingType === ProductBillingType.PREPAID
               ? 'text-blue-500 bg-blue-100'
-              : 'text-purple-500 bg-purple-100'
+              : 'text-purple-500 bg-purple-100',
           )}
         >
           {billingType === ProductBillingType.PREPAID ? 'Prepaid' : 'Postpaid'}
@@ -265,14 +265,14 @@ const columns: ColumnDef<Props['orders'][number]>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         {row.original.user &&
-          row.original.payment_status == PaymentStatus.SUCCESS &&
-          row.original.order_status == OrderStatus.FAILED &&
+          row.original.payment_status === PaymentStatus.SUCCESS &&
+          row.original.order_status === OrderStatus.FAILED &&
           row.original.refund_status !== RefundStatus.COMPLETED && (
             <RefundOrderModal orderId={row.original.order_id} />
           )}
         {!row.original.user &&
-          row.original.payment_status == PaymentStatus.SUCCESS &&
-          row.original.order_status == OrderStatus.FAILED &&
+          row.original.payment_status === PaymentStatus.SUCCESS &&
+          row.original.order_status === OrderStatus.FAILED &&
           row.original.refund_status !== RefundStatus.COMPLETED && <p>Refund Manual</p>}
         <OrderDetailModal orderId={row.original.order_id} />
       </div>
@@ -310,7 +310,7 @@ export default function OrderIndex(props: Props) {
       },
       {
         onSuccess: () => setOpen(false),
-      }
+      },
     )
   }
 
@@ -327,7 +327,7 @@ export default function OrderIndex(props: Props) {
     router.get(
       '/admin/orders',
       { limit: 10, page: 1, sortBy, sortColumn },
-      { onSuccess: () => setOpen(false) }
+      { onSuccess: () => setOpen(false) },
     )
   }
 

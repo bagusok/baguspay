@@ -1,6 +1,6 @@
 import { InjectQueue } from '@nestjs/bullmq'
 import { Injectable, Logger } from '@nestjs/common'
-import { Queue } from 'bullmq'
+import type { Queue } from 'bullmq'
 
 @Injectable()
 export class QueueService {

@@ -18,3 +18,9 @@ export class ProductCategoriesQueryDto {
   @IsString()
   search: string
 }
+
+export class ProductCategoryGetByTypeParamsDto {
+  @ApiProperty()
+  @IsEnum(ProductCategoryType)
+  type: ProductCategoryType
+}

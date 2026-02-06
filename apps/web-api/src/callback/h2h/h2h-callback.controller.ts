@@ -1,10 +1,10 @@
 import { Body, Controller, Headers, Ip, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import {
+import type {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
 } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import { H2HCallbackService } from './h2h-callback.service'
+import type { H2HCallbackService } from './h2h-callback.service'
 
 @ApiTags('Callback')
 @Controller('callback/h2h')
@@ -17,7 +17,7 @@ export class H2HCallbackController {
     @Headers('X-Digiflazz-Event') event: 'create' | 'update',
     @Headers('X-Hub-Signature') signFromPost: string,
     @Headers('User-Agent') userAgent: 'Digiflazz-Hookshot' | 'Digiflazz-Pasca-Hookshot',
-    @Ip() ip: string,
+    @Ip() _ip: string,
   ) {
     // console.log('Digiflazz Callback Body:', ip)
 

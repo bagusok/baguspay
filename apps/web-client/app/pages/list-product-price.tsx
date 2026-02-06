@@ -4,7 +4,7 @@ import { Input } from '@repo/ui/components/ui/input'
 import { Skeleton } from '@repo/ui/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
 import { LayoutList } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import Image from '~/components/image'
 import { apiClient } from '~/utils/axios'
 import { formatPrice } from '~/utils/format'
@@ -38,6 +38,8 @@ interface ApiListResponse<T> {
 }
 
 export default function ListProductPricePage() {
+  const randId = useId()
+
   const [productQuery, setProductQuery] = useState({
     category_id: '',
     search: '',
@@ -122,8 +124,8 @@ export default function ListProductPricePage() {
       <section className="mt-10 rounded-2xl border border-border bg-card/50 p-4 md:p-6 space-y-5">
         <div className="flex gap-2 overflow-x-auto pb-1">
           {categoriesQuery.isLoading &&
-            Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-8 w-32 shrink-0" />
+            Array.from({ length: 6 }).map((_) => (
+              <Skeleton key={randId} className="h-8 w-32 shrink-0" />
             ))}
           {categoriesQuery.isSuccess && (
             <>
@@ -193,8 +195,8 @@ export default function ListProductPricePage() {
             </thead>
             <tbody>
               {productsQuery.isLoading &&
-                Array.from({ length: 8 }).map((_, i) => (
-                  <tr key={i} className="border-t">
+                Array.from({ length: 8 }).map((_) => (
+                  <tr key={randId} className="border-t">
                     <td className="p-2" colSpan={5}>
                       <Skeleton className="h-4 w-full" />
                     </td>

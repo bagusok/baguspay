@@ -1,14 +1,14 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, asc, count, db, desc, eq, type InferSelectModel, ilike, inArray } from '@repo/db'
+import { ProductBillingType, ProductCategoryType, tb } from '@repo/db/types'
+import slugify from '@sindresorhus/slugify'
+import vine from '@vinejs/vine'
 import {
   createProductCategoryValidator,
   productCategoriesQueryValidator,
   productCategoryIdValidator,
   updateProductCategoryValidator,
 } from '#validators/product'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, asc, count, db, desc, eq, ilike, inArray, InferSelectModel } from '@repo/db'
-import { ProductBillingType, ProductCategoryType, tb } from '@repo/db/types'
-import slugify from '@sindresorhus/slugify'
-import vine from '@vinejs/vine'
 
 export default class ProductsCategoriesController {
   public async index(ctx: HttpContext) {
@@ -221,7 +221,7 @@ export default class ProductsCategoriesController {
           productCategory.banner_url,
           productCategory.image_url,
           ...seoImage,
-        ])
+        ]),
       )
 
     return inertia.render('products/product-categories/edit-product-category', {
@@ -241,7 +241,7 @@ export default class ProductsCategoriesController {
       vine.compile(productCategoryIdValidator),
       {
         data: ctx.request.params(),
-      }
+      },
     )
 
     const data = await ctx.request.validateUsing(vine.compile(updateProductCategoryValidator), {
@@ -257,7 +257,7 @@ export default class ProductsCategoriesController {
       return ctx.response.redirect().back()
     }
 
-    let updatedData: Partial<InferSelectModel<typeof tb.productCategories>> = {
+    const updatedData: Partial<InferSelectModel<typeof tb.productCategories>> = {
       name: data.name,
       slug: productCategory.slug,
       sub_name: data.sub_name,
@@ -356,7 +356,10 @@ export default class ProductsCategoriesController {
       data: request.params(),
     })
 
-    console.log(data)
+    const { type } = request.params()
+    if (!Object.values(ProductCategoryType).includes(type)) {
+      return response.notFound('Product category type not found')
+    }
 
     const productCategory = await db.query.productCategories.findFirst({
       where: eq(tb.productCategories.id, data.id),
@@ -367,18 +370,54 @@ export default class ProductsCategoriesController {
       return response.redirect().withQs().back()
     }
 
-    await db.delete(tb.productCategories).where(eq(tb.productCategories.id, data.id))
+    try {
+      await db.transaction(async (tx) => {
+        await tx
+          .delete(tb.inputOnProductCategory)
+          .where(eq(tb.inputOnProductCategory.product_category_id, data.id))
+
+        await tx
+          .delete(tb.productGroupingToProductCategories)
+          .where(eq(tb.productGroupingToProductCategories.product_category_id, data.id))
+
+        await tx.delete(tb.banners).where(eq(tb.banners.product_category_id, data.id))
+
+        const subCategories = await tx
+          .select({ id: tb.productSubCategories.id })
+          .from(tb.productSubCategories)
+          .where(eq(tb.productSubCategories.product_category_id, data.id))
+
+        const subCategoryIds = subCategories.map((item) => item.id)
+
+        if (subCategoryIds.length > 0) {
+          await tx
+            .delete(tb.products)
+            .where(inArray(tb.products.product_sub_category_id, subCategoryIds))
+        }
+
+        await tx
+          .delete(tb.productSubCategories)
+          .where(eq(tb.productSubCategories.product_category_id, data.id))
+
+        await tx.delete(tb.productCategories).where(eq(tb.productCategories.id, data.id))
+      })
+    } catch (_) {
+      session.flash('error', 'Failed to delete product category. Remove dependencies first.')
+      return response.redirect().withQs().back()
+    }
 
     session.flash('success', 'Product category deleted successfully')
     return response.redirect().withQs().back()
   }
 
-  public async getProductByCategoryNameJson(ctx: HttpContext) {
+  public async getProductCategoryByCategoryNameJson(ctx: HttpContext) {
     const {
       limit = 100,
       page = 1,
       searchBy,
       searchQuery,
+      categoryId,
+      subCategoryId,
     } = await ctx.request.validateUsing(vine.compile(productCategoriesQueryValidator), {
       data: ctx.request.qs(),
     })
@@ -392,41 +431,28 @@ export default class ProductsCategoriesController {
       }
     }
 
-    const offset = (page - 1) * limit
-    const products = await db
-      .select({
-        product_category_id: tb.productCategories.id,
-        product_category_name: tb.productCategories.name,
-        product_sub_category_id: tb.productSubCategories.id,
-        product_sub_category_name: tb.productSubCategories.name,
-        product_id: tb.products.id,
-        product_name: tb.products.name,
-        product_price: tb.products.price,
-        is_product_available: tb.products.is_available,
-        is_product_sub_category_available: tb.productSubCategories.is_available,
-        is_product_category_available: tb.productCategories.is_available,
-      })
-      .from(tb.productCategories)
-      .innerJoin(
-        tb.productSubCategories,
-        eq(tb.productCategories.id, tb.productSubCategories.product_category_id)
-      )
-      .innerJoin(tb.products, eq(tb.productSubCategories.id, tb.products.product_sub_category_id))
-      .where(where.length ? and(...where) : undefined)
-      .limit(limit)
-      .offset(offset)
+    if (categoryId) {
+      where.push(eq(tb.productCategories.id, categoryId))
+    }
 
-    const [total] = await db
-      .select({
-        count: count(),
-      })
-      .from(tb.productCategories)
-      .innerJoin(
-        tb.productSubCategories,
-        eq(tb.productCategories.id, tb.productSubCategories.product_category_id)
-      )
-      .innerJoin(tb.products, eq(tb.productSubCategories.id, tb.products.product_sub_category_id))
-      .where(where.length ? and(...where) : undefined)
+    if (subCategoryId) {
+      where.push(eq(tb.productSubCategories.id, subCategoryId))
+    }
+
+    const categoryWhere = []
+    if (searchQuery) {
+      if (searchBy === 'name') {
+        categoryWhere.push(ilike(tb.productCategories.name, `%${searchQuery}%`))
+      } else if (searchBy === 'id') {
+        categoryWhere.push(eq(tb.productCategories.id, searchQuery))
+      }
+    }
+
+    if (categoryId) {
+      categoryWhere.push(eq(tb.productCategories.id, categoryId))
+    }
+
+    const offset = (page - 1) * limit
 
     const productCategories = await db.query.productCategories.findMany({
       columns: {
@@ -435,14 +461,21 @@ export default class ProductsCategoriesController {
         slug: true,
         is_available: true,
       },
-      where: where.length ? and(...where) : undefined,
+      where: categoryWhere.length ? and(...categoryWhere) : undefined,
       orderBy: [desc(tb.productCategories.created_at)],
-      limit: 20,
+      limit,
+      offset,
     })
 
+    const [total] = await db
+      .select({
+        count: count(),
+      })
+      .from(tb.productCategories)
+      .where(categoryWhere.length ? and(...categoryWhere) : undefined)
+
     return ctx.response.json({
-      data: products,
-      productCategories,
+      data: productCategories,
       meta: {
         page: page,
         limit,
@@ -451,7 +484,6 @@ export default class ProductsCategoriesController {
       },
     })
   }
-
   // Pulsa Section
   public async indexGames(ctx: HttpContext) {
     const {
@@ -541,7 +573,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/games/edit', {
@@ -646,7 +678,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/pulsa/edit', {
@@ -751,7 +783,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/kuota/edit', {
@@ -856,7 +888,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/kuota/edit', {
@@ -961,7 +993,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/e-wallet/edit', {
@@ -1066,7 +1098,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/voucher/edit', {
@@ -1170,7 +1202,7 @@ export default class ProductsCategoriesController {
           productCategory.image_url,
           ...seoImage,
           ...iconUrl,
-        ])
+        ]),
       )
 
     return inertia.render('products/prepaid/other-prepaid/edit', {

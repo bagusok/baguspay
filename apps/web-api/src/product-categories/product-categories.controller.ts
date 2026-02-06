@@ -1,6 +1,9 @@
 import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common'
-import { ProductCategoriesQueryDto } from './product-categories.dto'
-import { ProductCategoriesService } from './product-categories.service'
+import type {
+  ProductCategoriesQueryDto,
+  ProductCategoryGetByTypeParamsDto,
+} from './product-categories.dto'
+import type { ProductCategoriesService } from './product-categories.service'
 
 // @ApiSecurity('access-token')
 // @UseGuards(JwtAuthGuard)
@@ -16,6 +19,11 @@ export class ProductCategoriesController {
   @Get('/slug/:slug')
   getCategoryBySlug(@Param('slug') slug: string) {
     return this.productCategoriesService.getBySlug(slug)
+  }
+
+  @Get('/type/:type')
+  getCategoryByType(@Param() params: ProductCategoryGetByTypeParamsDto) {
+    return this.productCategoriesService.getByType(params)
   }
 
   @Get('/:id')

@@ -1,8 +1,8 @@
-import * as crypto from 'crypto'
+import * as crypto from 'node:crypto'
 
 export class SignatureUtils {
   public static generateCheckoutToken(data: CheckoutTokenData, secretKey: string): string {
-    console.log('Generating checkout token with data:', data)
+    // console.log('Generating checkout token with data:', data)
     return crypto
       .createHmac('sha256', secretKey)
       .update(
@@ -24,7 +24,7 @@ export class SignatureUtils {
     secretKey: string,
     signature: string,
   ): boolean {
-    const expectedSignature = this.generateCheckoutToken(data, secretKey)
+    const expectedSignature = SignatureUtils.generateCheckoutToken(data, secretKey)
 
     return crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature))
   }

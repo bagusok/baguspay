@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
+import { Injectable, Logger, type OnModuleDestroy, type OnModuleInit } from '@nestjs/common'
 import { db } from '@repo/db'
 
 @Injectable()

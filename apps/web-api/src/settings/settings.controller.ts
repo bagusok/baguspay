@@ -2,12 +2,12 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
-import { TUser } from 'src/common/types/meta.type'
-import { ChangeEmailDto } from './dtos/change-email.dto'
-import { ChangePasswordDto } from './dtos/change-password.dto'
-import { changePhoneNumberDto } from './dtos/change-phone.dto'
-import { ChangeProfileDto } from './dtos/change-profile.dto'
-import { SettingsService } from './settings.service'
+import type { TUser } from 'src/common/types/meta.type'
+import type { ChangeEmailDto } from './dtos/change-email.dto'
+import type { ChangePasswordDto } from './dtos/change-password.dto'
+import type { changePhoneNumberDto } from './dtos/change-phone.dto'
+import type { ChangeProfileDto } from './dtos/change-profile.dto'
+import type { SettingsService } from './settings.service'
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard)

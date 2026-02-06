@@ -1,6 +1,6 @@
 import { InputFieldType } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 export const createInputFieldValidator = vine.object({
   identifier: vine.string(),
@@ -14,7 +14,7 @@ export const createInputFieldValidator = vine.object({
       vine.object({
         label: vine.string(),
         value: vine.string(),
-      })
+      }),
     )
     .optional()
     .requiredWhen('type', '=', InputFieldType.SELECT),
@@ -34,7 +34,7 @@ export const updateInputFieldValidator = vine.object({
       vine.object({
         label: vine.string(),
         value: vine.string(),
-      })
+      }),
     )
     .optional()
     .requiredWhen('type', '=', InputFieldType.SELECT),

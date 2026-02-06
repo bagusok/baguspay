@@ -11,6 +11,8 @@ interface ToolbarProps extends BaseProps {
   variant?: 'floating' | 'fixed'
 }
 
+type FieldsetProps = React.FieldsetHTMLAttributes<HTMLFieldSetElement>
+
 const mergeRefs = <T,>(refs: Array<React.Ref<T> | null | undefined>): React.RefCallback<T> => {
   return (value) => {
     refs.forEach((ref) => {
@@ -25,7 +27,7 @@ const mergeRefs = <T,>(refs: Array<React.Ref<T> | null | undefined>): React.RefC
 
 const useObserveVisibility = (
   ref: React.RefObject<HTMLElement | null>,
-  callback: () => void
+  callback: () => void,
 ): void => {
   React.useEffect(() => {
     const element = ref.current
@@ -64,8 +66,8 @@ const useToolbarKeyboardNav = (toolbarRef: React.RefObject<HTMLDivElement | null
     const getFocusableElements = () =>
       Array.from(
         toolbar.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [role="button"]:not([disabled]), [tabindex="0"]:not([disabled])'
-        )
+          'button:not([disabled]), [role="button"]:not([disabled]), [tabindex="0"]:not([disabled])',
+        ),
       )
 
     const navigateToIndex = (e: KeyboardEvent, targetIndex: number, elements: HTMLElement[]) => {
@@ -176,7 +178,7 @@ const useToolbarVisibility = (ref: React.RefObject<HTMLDivElement | null>): bool
   return isVisible
 }
 
-const useGroupVisibility = (ref: React.RefObject<HTMLDivElement | null>): boolean => {
+const useGroupVisibility = (ref: React.RefObject<HTMLElement | null>): boolean => {
   const [isVisible, setIsVisible] = React.useState<boolean>(true)
   const isMountedRef = React.useRef(false)
 
@@ -263,29 +265,28 @@ export const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(
         {children}
       </div>
     )
-  }
+  },
 )
 
 Toolbar.displayName = 'Toolbar'
 
-export const ToolbarGroup = React.forwardRef<HTMLDivElement, BaseProps>(
+export const ToolbarGroup = React.forwardRef<HTMLFieldSetElement, FieldsetProps>(
   ({ children, className, ...props }, ref) => {
-    const groupRef = React.useRef<HTMLDivElement>(null)
+    const groupRef = React.useRef<HTMLFieldSetElement>(null)
     const isVisible = useGroupVisibility(groupRef)
 
     if (!isVisible) return null
 
     return (
-      <div
+      <fieldset
         ref={mergeRefs([groupRef, ref])}
-        role="group"
         className={cn('tiptap-toolbar-group', className)}
         {...props}
       >
         {children}
-      </div>
+      </fieldset>
     )
-  }
+  },
 )
 
 ToolbarGroup.displayName = 'ToolbarGroup'

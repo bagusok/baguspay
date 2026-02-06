@@ -3,13 +3,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { and, asc, count, eq, gte, lte, ne, or, SQL } from '@repo/db'
+import { and, asc, count, eq, gte, lte, ne, or, type SQL } from '@repo/db'
 import { OfferType, tb } from '@repo/db/types'
-import { MetaPaginated } from 'src/common/types/meta.type'
+import type { MetaPaginated } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import { DatabaseService } from 'src/database/database.service'
-import { StorageService } from 'src/storage/storage.service'
-import { GetAllProductsDto } from './products.dto'
+import type { DatabaseService } from 'src/database/database.service'
+import type { StorageService } from 'src/storage/storage.service'
+import type { GetAllProductsDto } from './products.dto'
 
 @Injectable()
 export class ProductsService {

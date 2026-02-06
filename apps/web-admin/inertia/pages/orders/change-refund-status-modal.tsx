@@ -1,4 +1,3 @@
-import { UpdateOrderRefundStatusValidator } from '#validators/order'
 import { useForm } from '@inertiajs/react'
 import { RefundStatus } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -20,6 +19,7 @@ import {
 import { PencilIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import type { UpdateOrderRefundStatusValidator } from '#validators/order'
 
 export default function ChangeRefundStatusModal({
   orderId,
@@ -41,7 +41,7 @@ export default function ChangeRefundStatusModal({
         setOpen(false)
       },
       onError: (error) => {
-        toast.error('Error changing status: ' + error.error)
+        toast.error(`Error changing status: ${error.error}`)
         console.error('Error changing status:', error)
       },
     })
@@ -51,7 +51,7 @@ export default function ChangeRefundStatusModal({
     if (open) {
       form.setData('status', status)
     }
-  }, [open])
+  }, [open, form, status])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -89,9 +89,8 @@ export default function ChangeRefundStatusModal({
             )}
             <small className="text-xs text-red-500 italic">
               * Mengubah status refund secara manual tidak otomatis melakukan refund balance.
-              <br />
-              * Mengubah disini tidak akan melakukan ekseskui ototomatis pada sistem refund (Hanya
-              mengubah statusnya saja).
+              <br />* Mengubah disini tidak akan melakukan ekseskui ototomatis pada sistem refund
+              (Hanya mengubah statusnya saja).
               <br />* Untuk refund dilahkan pake tombol refund (Akan muncul jika payment status
               SUUCCESS dan Order status FAILED).
               <br />

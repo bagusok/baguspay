@@ -6,7 +6,7 @@ export default function LinkWithLocale(props: React.ComponentPropsWithoutRef<typ
   const { to, ...rest } = props
 
   // Pastikan to selalu diawali dengan /<locale>
-  let toWithLocale =
+  const toWithLocale =
     typeof to === 'string'
       ? to.startsWith(`/${locale}`)
         ? to

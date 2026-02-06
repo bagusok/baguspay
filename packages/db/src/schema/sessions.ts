@@ -1,6 +1,6 @@
-import { users } from '@/schema'
 import { relations } from 'drizzle-orm'
 import { pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { users } from '@/schema'
 import {
   LoginIsFrom,
   loginIsFromEnum,

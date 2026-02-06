@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react'
 import { Switch } from '@repo/ui/components/ui/switch'
-import { useState } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
+import { useState } from 'react'
 
 type Props = {
   offerId: string
@@ -28,7 +28,7 @@ export default function IsAvailableSwicthOffer({ offerId, isAvailable }: Props) 
         onFinish: () => {
           setIsLoading(false)
         },
-      }
+      },
     )
   }
 

@@ -1,5 +1,5 @@
-import { InferSelectModel } from '@repo/db'
-import { tb } from '@repo/db/types'
+import type { InferSelectModel } from '@repo/db'
+import type { tb } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
@@ -30,12 +30,15 @@ type FileListResponse = {
 function FileUploadDropzone({ onFilesSelected }: { onFilesSelected?: (files: File[]) => void }) {
   const [files, setFiles] = useState<File[]>([])
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFiles(acceptedFiles)
-    if (onFilesSelected) {
-      onFilesSelected(acceptedFiles)
-    }
-  }, [])
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFiles(acceptedFiles)
+      if (onFilesSelected) {
+        onFilesSelected(acceptedFiles)
+      }
+    },
+    [onFilesSelected],
+  )
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -78,7 +81,7 @@ export default function FileManager({
   const [files, setFiles] = useState<File[] | null>(null)
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([])
   const [selectedFile, setSelectedFile] = useState<InferSelectModel<typeof tb.fileManager> | null>(
-    null
+    null,
   )
   const [open, setOpen] = useState(false)
   const loaderRef = useRef<HTMLDivElement | null>(null)
@@ -229,7 +232,7 @@ export default function FileManager({
 
   const toggleSelectedFileId = (id: string) => {
     setSelectedFileIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     )
   }
 
@@ -262,7 +265,7 @@ export default function FileManager({
     return () => {
       observer.disconnect()
     }
-  }, [open, filesData.length, fetchNextPage, hasNextPage, isFetchingNextPage])
+  }, [open, fetchNextPage, hasNextPage, isFetchingNextPage])
 
   // Fetch default file only once on mount or when defaultFileId changes
   useEffect(() => {
@@ -270,12 +273,12 @@ export default function FileManager({
       getDefaultFile.mutate()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultFileId])
+  }, [defaultFileId, getDefaultFile, selectedFile])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {selectedFile && selectedFile.url ? (
+        {selectedFile?.url ? (
           <div className="rounded-md border flex items-center justify-center overflow-hidden">
             <img
               src={`${import.meta.env.VITE_S3_URL}${selectedFile.url}`}

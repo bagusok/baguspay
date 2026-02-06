@@ -1,4 +1,3 @@
-import { ChangeStatusValidator } from '#validators/deposit'
 import { useForm } from '@inertiajs/react'
 import { DepositStatus } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -21,6 +20,7 @@ import {
 import { PencilIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import type { ChangeStatusValidator } from '#validators/deposit'
 
 export default function ChangeStatusModal({
   depositId,
@@ -43,7 +43,7 @@ export default function ChangeStatusModal({
         setOpen(false)
       },
       onError: (error) => {
-        toast.error('Error changing status: ' + error.error)
+        toast.error(`Error changing status: ${error.error}`)
         console.error('Error changing status:', error)
       },
     })
@@ -53,7 +53,7 @@ export default function ChangeStatusModal({
     if (open) {
       form.setData('status', status)
     }
-  }, [open])
+  }, [open, form, status])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -98,7 +98,7 @@ export default function ChangeStatusModal({
               </Label>
               <Checkbox
                 checked={form.data.updateBalance}
-                onCheckedChange={(c) => form.setData('updateBalance', c ? true : false)}
+                onCheckedChange={(c) => form.setData('updateBalance', !!c)}
               />
               {form.errors.status && (
                 <p className="text-red-500 text-sm mt-1">{form.errors.status}</p>

@@ -1,7 +1,10 @@
 import { HelpCircle } from 'lucide-react'
+import { useId } from 'react'
 import { Link } from 'react-router'
 
 export default function Faq() {
+  const randId = useId()
+
   const faqs: { q: string; a: string }[] = [
     {
       q: 'Apa itu Baguspay?',
@@ -28,7 +31,7 @@ export default function Faq() {
   return (
     <div className="md:max-w-7xl mx-auto">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
+      <section className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
         <div className="relative z-10">
           <p className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             <HelpCircle className="size-4" />
@@ -47,8 +50,8 @@ export default function Faq() {
       {/* FAQ list */}
       <section className="mt-10 rounded-2xl border border-border bg-card/50 p-4 md:p-6">
         <div className="divide-y divide-border">
-          {faqs.map((item, idx) => (
-            <details key={idx} className="group py-3">
+          {faqs.map((item) => (
+            <details key={randId} className="group py-3">
               <summary className="cursor-pointer list-none select-none flex items-start justify-between gap-4 py-2 text-sm font-medium hover:underline">
                 <span className="text-foreground">{item.q}</span>
                 <svg

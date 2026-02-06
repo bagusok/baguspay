@@ -50,20 +50,15 @@
   --shadow-2xs: 0px 1px 2px 0px oklch(0.12 0.012 264 / 0.05);
   --shadow-xs: 0px 1px 3px 0px oklch(0.12 0.012 264 / 0.08);
   --shadow-sm:
-    0px 1px 2px 0px oklch(0.12 0.012 264 / 0.05),
-    0px 2px 4px -1px oklch(0.12 0.012 264 / 0.1);
+    0px 1px 2px 0px oklch(0.12 0.012 264 / 0.05), 0px 2px 4px -1px oklch(0.12 0.012 264 / 0.1);
   --shadow:
-    0px 1px 3px 0px oklch(0.12 0.012 264 / 0.1),
-    0px 4px 6px -2px oklch(0.12 0.012 264 / 0.1);
+    0px 1px 3px 0px oklch(0.12 0.012 264 / 0.1), 0px 4px 6px -2px oklch(0.12 0.012 264 / 0.1);
   --shadow-md:
-    0px 4px 6px -1px oklch(0.12 0.012 264 / 0.1),
-    0px 2px 4px -1px oklch(0.12 0.012 264 / 0.06);
+    0px 4px 6px -1px oklch(0.12 0.012 264 / 0.1), 0px 2px 4px -1px oklch(0.12 0.012 264 / 0.06);
   --shadow-lg:
-    0px 10px 15px -3px oklch(0.12 0.012 264 / 0.1),
-    0px 4px 6px -2px oklch(0.12 0.012 264 / 0.05);
+    0px 10px 15px -3px oklch(0.12 0.012 264 / 0.1), 0px 4px 6px -2px oklch(0.12 0.012 264 / 0.05);
   --shadow-xl:
-    0px 20px 25px -5px oklch(0.12 0.012 264 / 0.1),
-    0px 10px 10px -5px oklch(0.12 0.012 264 / 0.04);
+    0px 20px 25px -5px oklch(0.12 0.012 264 / 0.1), 0px 10px 10px -5px oklch(0.12 0.012 264 / 0.04);
   --shadow-2xl: 0px 25px 50px -12px oklch(0.12 0.012 264 / 0.25);
 
   /* Spacing */
@@ -118,20 +113,14 @@
   --shadow-2xs: 0px 1px 2px 0px oklch(0.08 0.01 250 / 0.3);
   --shadow-xs: 0px 1px 3px 0px oklch(0.08 0.01 250 / 0.4);
   --shadow-sm:
-    0px 1px 2px 0px oklch(0.08 0.01 250 / 0.3),
-    0px 2px 4px -1px oklch(0.08 0.01 250 / 0.5);
-  --shadow:
-    0px 1px 3px 0px oklch(0.08 0.01 250 / 0.4),
-    0px 4px 6px -2px oklch(0.08 0.01 250 / 0.5);
+    0px 1px 2px 0px oklch(0.08 0.01 250 / 0.3), 0px 2px 4px -1px oklch(0.08 0.01 250 / 0.5);
+  --shadow: 0px 1px 3px 0px oklch(0.08 0.01 250 / 0.4), 0px 4px 6px -2px oklch(0.08 0.01 250 / 0.5);
   --shadow-md:
-    0px 4px 6px -1px oklch(0.08 0.01 250 / 0.5),
-    0px 2px 4px -1px oklch(0.08 0.01 250 / 0.3);
+    0px 4px 6px -1px oklch(0.08 0.01 250 / 0.5), 0px 2px 4px -1px oklch(0.08 0.01 250 / 0.3);
   --shadow-lg:
-    0px 10px 15px -3px oklch(0.08 0.01 250 / 0.5),
-    0px 4px 6px -2px oklch(0.08 0.01 250 / 0.2);
+    0px 10px 15px -3px oklch(0.08 0.01 250 / 0.5), 0px 4px 6px -2px oklch(0.08 0.01 250 / 0.2);
   --shadow-xl:
-    0px 20px 25px -5px oklch(0.08 0.01 250 / 0.5),
-    0px 10px 10px -5px oklch(0.08 0.01 250 / 0.2);
+    0px 20px 25px -5px oklch(0.08 0.01 250 / 0.5), 0px 10px 10px -5px oklch(0.08 0.01 250 / 0.2);
   --shadow-2xl: 0px 25px 50px -12px oklch(0.08 0.01 250 / 0.7);
 }
 
@@ -205,11 +194,7 @@
 }
 
 .gradient-text {
-  background: linear-gradient(
-    135deg,
-    oklch(var(--primary)),
-    oklch(var(--chart-2))
-  );
+  background: linear-gradient(135deg, oklch(var(--primary)), oklch(var(--chart-2)));
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

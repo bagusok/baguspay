@@ -1,11 +1,4 @@
 import * as React from 'react'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Tiptap UI ---
 import type {
   UndoRedoAction,
@@ -15,11 +8,14 @@ import {
   UNDO_REDO_SHORTCUT_KEYS,
   useUndoRedo,
 } from '~/components/tiptap/tiptap-ui/undo-redo-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface UndoRedoButtonProps extends Omit<ButtonProps, 'type'>, UseUndoRedoConfig {
   /**
@@ -61,7 +57,7 @@ export const UndoRedoButton = React.forwardRef<HTMLButtonElement, UndoRedoButton
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, handleAction, label, canExecute, Icon, shortcutKeys } = useUndoRedo({
@@ -77,7 +73,7 @@ export const UndoRedoButton = React.forwardRef<HTMLButtonElement, UndoRedoButton
         if (event.defaultPrevented) return
         handleAction()
       },
-      [handleAction, onClick]
+      [handleAction, onClick],
     )
 
     if (!isVisible) {
@@ -107,7 +103,7 @@ export const UndoRedoButton = React.forwardRef<HTMLButtonElement, UndoRedoButton
         )}
       </Button>
     )
-  }
+  },
 )
 
 UndoRedoButton.displayName = 'UndoRedoButton'

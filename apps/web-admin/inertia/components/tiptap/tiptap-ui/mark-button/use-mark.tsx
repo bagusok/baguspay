@@ -3,14 +3,6 @@
 import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
-// --- Hooks ---
-import { useIsMobile } from '~/hooks/use-mobile'
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
-// --- Lib ---
-import { isMarkInSchema, isNodeTypeSelected } from '~/utils/tiptap_utils'
-
 // --- Icons ---
 import { BoldIcon } from '~/components/tiptap/tiptap-icons/bold-icon'
 import { Code2Icon } from '~/components/tiptap/tiptap-icons/code2-icon'
@@ -19,6 +11,11 @@ import { StrikeIcon } from '~/components/tiptap/tiptap-icons/strike-icon'
 import { SubscriptIcon } from '~/components/tiptap/tiptap-icons/subscript-icon'
 import { SuperscriptIcon } from '~/components/tiptap/tiptap-icons/superscript-icon'
 import { UnderlineIcon } from '~/components/tiptap/tiptap-icons/underline-icon'
+// --- Hooks ---
+import { useIsMobile } from '~/hooks/use-mobile'
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { isMarkInSchema, isNodeTypeSelected } from '~/utils/tiptap_utils'
 
 export type Mark = 'bold' | 'italic' | 'strike' | 'code' | 'underline' | 'superscript' | 'subscript'
 
@@ -202,7 +199,7 @@ export function useMark(config: UseMarkConfig) {
       enabled: isVisible && canToggle,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

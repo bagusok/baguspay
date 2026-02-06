@@ -1,10 +1,3 @@
-import {
-  getOrderQueryValidator,
-  orderIdValidator,
-  updateOrderPaymentStatusValidator,
-  updateOrderRefundStatusValidator,
-  updateOrderStatusValidator,
-} from '#validators/order'
 import type { HttpContext } from '@adonisjs/core/http'
 import { and, asc, count, db, desc, eq } from '@repo/db'
 import {
@@ -16,6 +9,13 @@ import {
   tb,
 } from '@repo/db/types'
 import vine from '@vinejs/vine'
+import {
+  getOrderQueryValidator,
+  orderIdValidator,
+  updateOrderPaymentStatusValidator,
+  updateOrderRefundStatusValidator,
+  updateOrderStatusValidator,
+} from '#validators/order'
 
 export default class OrdersController {
   async index(ctx: HttpContext) {
@@ -287,7 +287,7 @@ export default class OrdersController {
       vine.compile(updateOrderPaymentStatusValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const order = await db.query.orders.findFirst({
@@ -367,7 +367,7 @@ export default class OrdersController {
       vine.compile(updateOrderRefundStatusValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const order = await db.query.orders.findFirst({

@@ -20,7 +20,7 @@ export const UnderlineIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 UnderlineIcon.displayName = 'UnderlineIcon'

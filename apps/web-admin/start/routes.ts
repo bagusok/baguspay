@@ -17,6 +17,7 @@ const FileManagerController = () => import('#controllers/file_managers_controlle
 const InputFieldController = () => import('#controllers/input_fields_controller')
 const ProductSubCategoryController = () => import('#controllers/product_sub_categories_controller')
 const ProductController = () => import('#controllers/products_controller')
+const ProvidersController = () => import('#controllers/providers_controller')
 const PaymentController = () => import('#controllers/payments_controller')
 const OfferController = () => import('#controllers/offer_controller')
 const DepositController = () => import('#controllers/deposits_controller')
@@ -26,10 +27,14 @@ const ConfigHomesController = () => import('#controllers/configs/config_homes_co
 const ConfigFastMenuController = () => import('#controllers/configs/config_home_fast_menu')
 const BannerController = () => import('#controllers/configs/banners_controller')
 const ConfigSettingsController = () => import('#controllers/configs/settings_controller')
+const PagesController = () => import('#controllers/configs/pages_controller')
+const ArticleCategoriesController = () => import('#controllers/blog/article_categories_controller')
+const ArticlesController = () => import('#controllers/blog/articles_controller')
 
 import router from '@adonisjs/core/services/router'
 import { UserRole } from '@repo/db/types'
 import { middleware } from './kernel.js'
+
 router.get('/', async ({ response }) => {
   return response.send('Hmm, sepertinya ada yang salah.')
 })
@@ -222,8 +227,8 @@ router
 
     // any
     router
-      .get('/get-json', [ProductCategoryController, 'getProductByCategoryNameJson'])
-      .as('productCategories.getProductByCategoryNameJson')
+      .get('/get-json', [ProductCategoryController, 'getProductCategoryByCategoryNameJson'])
+      .as('productCategories.getProductCategoryByCategoryNameJson')
 
     router
       .get('/:billingType/:type/:id', [ProductCategoryController, 'detail'])
@@ -294,15 +299,30 @@ router
   .group(() => {
     router.post('/', [ProductController, 'postCreate']).as('products.postCreate')
     router.get('/all', [ProductController, 'getAll']).as('products.getAll')
+    router
+      .get('/get-json', [ProductController, 'getProductByCategoryNameJson'])
+      .as('products.getProductByCategoryNameJson')
+    router.get('/existing', [ProductController, 'getExistingProviderCodes']).as('products.exists')
+    router.get('/provider-map', [ProductController, 'getProviderMap']).as('products.providerMap')
 
     router.get('/:id', [ProductController, 'detail']).as('products.detail')
     router.patch('/:id', [ProductController, 'postUpdate']).as('products.postEdit')
     router
       .patch('/:id/update-is-available', [ProductController, 'updateIsAvailable'])
       .as('products.postUpdateIsAvailable')
+    router
+      .patch('/:id/update-provider-price', [ProductController, 'updateProviderPrice'])
+      .as('products.updateProviderPrice')
     router.delete('/:id', [ProductController, 'postDelete']).as('products.delete')
   })
   .prefix('/admin/products')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router.get('/digiflazz/products', [ProvidersController, 'digiflazzProducts'])
+  })
+  .prefix('/admin/providers')
   .middleware(middleware.role(UserRole.ADMIN))
 
 router
@@ -443,6 +463,13 @@ router
               .post('/:id/connect-product', [ConfigFastMenuController, 'connectProductToSection'])
               .as('configFastMenu.connectProductToSection')
 
+            router
+              .post('/:id/bulk-connect-product', [
+                ConfigFastMenuController,
+                'bulkConnectProductToSection',
+              ])
+              .as('configFastMenu.bulkConnectProductToSection')
+
             router.post('/:id/disconnect-product', [
               ConfigFastMenuController,
               'disconnectProductFromSection',
@@ -470,6 +497,13 @@ router
           ])
           .as('configHomes.connectProductToSection')
 
+        router
+          .post('/product-sections/:id/bulk-connect-product', [
+            ConfigHomesController,
+            'bulkConnectProductToSection',
+          ])
+          .as('configHomes.bulkConnectProductToSection')
+
         router.post('/product-sections/:id/disconnect-product', [
           ConfigHomesController,
           'disconnectProductFromSection',
@@ -494,6 +528,53 @@ router
 
     router.get('/settings/general', [ConfigSettingsController, 'index'])
     router.patch('/settings/general', [ConfigSettingsController, 'update'])
+
+    router
+      .group(() => {
+        router.get('/', [PagesController, 'index']).as('pages.index')
+        router.get('/create', [PagesController, 'create']).as('pages.create')
+        router.post('/', [PagesController, 'store']).as('pages.store')
+        router.get('/:id/edit', [PagesController, 'edit']).as('pages.edit')
+        router.patch('/:id', [PagesController, 'update']).as('pages.update')
+        router.delete('/:id', [PagesController, 'destroy']).as('pages.destroy')
+      })
+      .prefix('/pages')
   })
   .prefix('/admin/config')
+  .middleware(middleware.role(UserRole.ADMIN))
+
+router
+  .group(() => {
+    router
+      .group(() => {
+        router.get('/', [ArticleCategoriesController, 'index']).as('articleCategories.index')
+        router.post('/', [ArticleCategoriesController, 'store']).as('articleCategories.store')
+        router
+          .get('/get-json', [ArticleCategoriesController, 'getJson'])
+          .as('articleCategories.getJson')
+        router.patch('/:id', [ArticleCategoriesController, 'update']).as('articleCategories.update')
+        router
+          .delete('/:id', [ArticleCategoriesController, 'destroy'])
+          .as('articleCategories.destroy')
+      })
+      .prefix('/categories')
+
+    router
+      .group(() => {
+        router.get('/', [ArticlesController, 'index']).as('articles.index')
+        router.get('/create', [ArticlesController, 'create']).as('articles.create')
+        router.post('/', [ArticlesController, 'store']).as('articles.store')
+        router.get('/:id/edit', [ArticlesController, 'edit']).as('articles.edit')
+        router.patch('/:id', [ArticlesController, 'update']).as('articles.update')
+        router.delete('/:id', [ArticlesController, 'destroy']).as('articles.destroy')
+        router
+          .post('/:id/toggle-publish', [ArticlesController, 'togglePublish'])
+          .as('articles.togglePublish')
+        router
+          .post('/:id/toggle-featured', [ArticlesController, 'toggleFeatured'])
+          .as('articles.toggleFeatured')
+      })
+      .prefix('/articles')
+  })
+  .prefix('/admin/blog')
   .middleware(middleware.role(UserRole.ADMIN))

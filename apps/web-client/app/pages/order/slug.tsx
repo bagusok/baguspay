@@ -16,18 +16,18 @@ export async function loader({ params }: Route.LoaderArgs) {
 
     const response = await apiClient.get(`/product-categories/slug/${slug}`)
 
-    console.log(
-      'Order slug page loaded successfully:',
-      response.data.data.product_sub_categories[0],
-    )
+    // console.log(
+    //   'Order slug page loaded successfully:',
+    //   response.data.data.product_sub_categories[0],
+    // )
 
     return data({
       success: true,
       message: 'Order details loaded successfully',
       data: response?.data.data,
     })
-  } catch (error) {
-    console.error('Error loading order slug page:', error)
+  } catch (_) {
+    // console.error('Error loading order slug page:', error)
     return data({
       success: false,
       message: 'Failed to load order details. Please try again later.',

@@ -20,7 +20,7 @@ export const ChevronDownIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 ChevronDownIcon.displayName = 'ChevronDownIcon'

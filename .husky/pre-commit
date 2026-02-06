@@ -1,1 +1,9 @@
-npx lint-staged
+#!/bin/sh
+
+# Pre-commit hook using Biome
+# Check and auto-fix staged files before commit
+
+pnpm biome check --staged --write --no-errors-on-unmatched
+
+# Re-stage any files that were auto-fixed
+git update-index --again

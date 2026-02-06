@@ -4,11 +4,11 @@ import { Button } from '@repo/ui/components/ui/button'
 import { Input } from '@repo/ui/components/ui/input'
 import { Label } from '@repo/ui/components/ui/label'
 import { BoltIcon, CheckCircle2Icon, InfoIcon, LoaderCircleIcon, ZapIcon } from 'lucide-react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import Image from '~/components/image'
 import { useInquiry } from '~/hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
-import { inquirySchema, type InquiryForm, type ProductCategoryData } from './slug'
+import { type InquiryForm, inquirySchema, type ProductCategoryData } from './slug'
 
 type Props = {
   data: ProductCategoryData | null
@@ -41,11 +41,6 @@ export default function OrderSlugPlnPostpaidPage({ data }: Props) {
       'inquiry-pln-postpaid',
       data?.product_sub_categories[0]?.products[0]?.id || 'unknown',
     ],
-  })
-
-  const { update } = useFieldArray({
-    control: form.control,
-    name: 'input_fields',
   })
 
   const onSubmit = handleInquiry

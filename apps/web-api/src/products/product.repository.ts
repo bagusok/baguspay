@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { eq, sql } from '@repo/db'
 import { tb } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
-import { DatabaseService } from 'src/database/database.service'
+import type { DBInstance } from 'src/common/types/db-instance'
+import type { DatabaseService } from 'src/database/database.service'
 
 @Injectable()
 export class ProductRepository {

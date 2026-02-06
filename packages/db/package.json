@@ -28,14 +28,16 @@
     "db:generate": "drizzle-kit generate",
     "db:pull": "drizzle-kit pull",
     "generate": "drizzle-kit generate:pg",
-    "lint": "eslint . --ext .ts,.tsx --fix"
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.8.4",
     "drizzle-kit": "^0.31.4",
-    "eslint-plugin-unused-imports": "^4.3.0",
     "tsup": "^8.5.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"

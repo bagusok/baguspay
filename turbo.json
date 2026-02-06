@@ -9,7 +9,24 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**", "build/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"],
+      "outputs": []
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"],
+      "outputs": [],
+      "cache": false
+    },
+    "format": {
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"],
+      "outputs": []
+    },
+    "check": {
+      "dependsOn": ["^check"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"],
+      "outputs": []
     },
     "check-types": {
       "dependsOn": ["^check-types"]

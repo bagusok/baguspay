@@ -25,8 +25,8 @@ import PaymentMethodDisplay from './payment-method-display'
 import StatusBadge from './status-badge'
 
 export default function OrderDetailPage({ params }: Route.ComponentProps) {
-  const [copiedField, setCopiedField] = useState<string | null>(null)
-  const [isCanceling, setIsCanceling] = useState(false)
+  const [, setCopiedField] = useState<string | null>(null)
+  const [isCanceling] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
 
   const orderDetail = useQuery({
@@ -278,21 +278,22 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                   <span className="text-sm font-medium">{formatPrice(data.price)}</span>
                 </div>
 
-                {data.offers && data.offers.length > 0 && (
-                  <>
-                    {data.offers.map((offer, index) => (
-                      <div key={index} className="flex justify-between">
-                        <span className="text-sm flex items-center gap-1 text-green-600">
-                          <GiftIcon className="w-3 h-3" />
-                          {offer.name}
-                        </span>
-                        <span className="text-sm font-medium text-green-600">
-                          -{formatPrice(offer.discount_total)}
-                        </span>
-                      </div>
-                    ))}
-                  </>
-                )}
+                {data.offers &&
+                  data.offers.length > 0 &&
+                  data.offers.map((offer) => (
+                    <div
+                      key={`${offer.name}-${offer.discount_total}`}
+                      className="flex justify-between"
+                    >
+                      <span className="text-sm flex items-center gap-1 text-green-600">
+                        <GiftIcon className="w-3 h-3" />
+                        {offer.name}
+                      </span>
+                      <span className="text-sm font-medium text-green-600">
+                        -{formatPrice(offer.discount_total)}
+                      </span>
+                    </div>
+                  ))}
 
                 <div className="flex justify-between">
                   <span className="text-sm">Biaya Admin</span>

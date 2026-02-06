@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { and, count, desc, eq, gte, InferInsertModel, lte, sql, SQL, sum } from '@repo/db'
-import { BalanceMutationType, DepositStatus, OrderStatus, tb } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
-import { DatabaseService } from 'src/database/database.service'
-import { GetBalanceMutationHistoryQuery } from './user.dto'
+import { and, count, desc, eq, gte, type InferInsertModel, lte, type SQL, sql, sum } from '@repo/db'
+import { type BalanceMutationType, DepositStatus, OrderStatus, tb } from '@repo/db/types'
+import type { DBInstance } from 'src/common/types/db-instance'
+import type { DatabaseService } from 'src/database/database.service'
+import type { GetBalanceMutationHistoryQuery } from './user.dto'
 
 export interface DateRange {
   start: Date

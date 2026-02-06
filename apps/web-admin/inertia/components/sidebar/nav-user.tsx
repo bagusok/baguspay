@@ -1,7 +1,5 @@
 'use client'
 
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react'
-
 import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar'
 import {
   DropdownMenu,
@@ -19,6 +17,7 @@ import {
   useSidebar,
 } from '@repo/ui/components/ui/sidebar'
 import { useAtom } from 'jotai'
+import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react'
 import { userAtom } from '~/store/user'
 
 export function NavUser({

@@ -1,6 +1,4 @@
-import BannersController from '#controllers/banners_controller'
-import { CreateBannerValidator } from '#validators/banners'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router, useForm } from '@inertiajs/react'
 import { BannerLocation } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -27,8 +25,10 @@ import {
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import { useMutation } from '@tanstack/react-query'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useMemo, useState } from 'react'
+import type BannersController from '#controllers/banners_controller'
+import type { CreateBannerValidator } from '#validators/banners'
 import FileManager from '~/components/file-manager'
 import Image from '~/components/image'
 import AdminLayout from '~/components/layout/admin-layout'
@@ -80,7 +80,7 @@ function AddBannerDialog() {
     },
     onSuccess: (items) =>
       setCategoryResults(
-        items.map((x) => ({ id: x.id, name: (x as any).name ?? (x as any).slug ?? x.id }))
+        items.map((x) => ({ id: x.id, name: (x as any).name ?? (x as any).slug ?? x.id })),
       ),
   })
 
@@ -91,7 +91,7 @@ function AddBannerDialog() {
     }
     const t = setTimeout(() => searchCategories.mutate(categoryQuery), 300)
     return () => clearTimeout(t)
-  }, [categoryQuery])
+  }, [categoryQuery, searchCategories])
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -285,7 +285,7 @@ function DeleteBannerDialog({ title, onConfirm }: { title: string; onConfirm?: (
 
 export default function BannersIndex({ banners }: Props) {
   const [items, setItems] = useState<Banner[]>(() =>
-    Array.isArray(banners) ? (banners as any) : []
+    Array.isArray(banners) ? (banners as any) : [],
   )
   useEffect(() => {
     setItems(Array.isArray(banners) ? (banners as any) : [])
@@ -362,7 +362,7 @@ export default function BannersIndex({ banners }: Props) {
         ),
       },
     ],
-    []
+    [],
   )
 
   return (

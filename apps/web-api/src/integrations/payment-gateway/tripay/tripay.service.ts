@@ -1,23 +1,24 @@
+import crypto from 'node:crypto'
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types'
-import crypto from 'crypto'
 import { ApiServiceException } from 'src/common/exceptions/api-service.exception'
-import { CreatePaymentGatewayRequest, CreatePaymentGatewayResponse } from '../payment-gateway.type'
-import { PaymentGateway } from '../payment.interface'
-import { TripayApiService } from './tripay.api.service'
-import { TripayPaymentMethodCode } from './tripay.type'
+import type { PaymentGateway } from '../payment.interface'
+import type {
+  CreatePaymentGatewayRequest,
+  CreatePaymentGatewayResponse,
+} from '../payment-gateway.type'
+import type { TripayApiService } from './tripay.api.service'
+import type { TripayPaymentMethodCode } from './tripay.type'
 
 @Injectable()
 export class TripayService implements PaymentGateway {
   private PRIVATE_KEY: string
-  private API_KEY: string
-  private MERCHANT_CODE: string
   private RETURN_URL: string
   private CALLBACK_URL: string
 
   constructor(
-    private readonly configService: ConfigService,
+    readonly configService: ConfigService,
     private readonly tripayApiService: TripayApiService,
   ) {
     this.PRIVATE_KEY = configService.get<string>('TRIPAY_PRIVATE_KEY')
@@ -34,7 +35,7 @@ export class TripayService implements PaymentGateway {
     let fee = 0
     let totalAmount = 0
 
-    if (data.fee_type == PaymentMethodFeeType.BUYER) {
+    if (data.fee_type === PaymentMethodFeeType.BUYER) {
       totalAmount = data.amount
     } else {
       fee = this.calculateFee(amount, data.fee_in_percent / 100, data.fee_static)
@@ -52,7 +53,7 @@ export class TripayService implements PaymentGateway {
         method: data.provider_code as TripayPaymentMethodCode,
         order_items: data.order_items,
         callback_url: data.callback_url ?? this.CALLBACK_URL ?? '',
-        return_url: data.return_url ?? (this.RETURN_URL ? this.RETURN_URL + '/' + data.id : ''),
+        return_url: data.return_url ?? (this.RETURN_URL ? `${this.RETURN_URL}/${data.id}` : ''),
         expired_time: expiredTime,
         customer_phone: data.customer_phone,
         signature,

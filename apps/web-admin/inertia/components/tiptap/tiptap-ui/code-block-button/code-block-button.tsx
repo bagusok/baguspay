@@ -1,22 +1,18 @@
 import * as React from 'react'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
 // --- Tiptap UI ---
 import type { UseCodeBlockConfig } from '~/components/tiptap/tiptap-ui/code-block-button'
 import {
   CODE_BLOCK_SHORTCUT_KEY,
   useCodeBlock,
 } from '~/components/tiptap/tiptap-ui/code-block-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface CodeBlockButtonProps extends Omit<ButtonProps, 'type'>, UseCodeBlockConfig {
   /**
@@ -55,7 +51,7 @@ export const CodeBlockButton = React.forwardRef<HTMLButtonElement, CodeBlockButt
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, canToggle, isActive, handleToggle, label, shortcutKeys, Icon } =
@@ -71,7 +67,7 @@ export const CodeBlockButton = React.forwardRef<HTMLButtonElement, CodeBlockButt
         if (event.defaultPrevented) return
         handleToggle()
       },
-      [handleToggle, onClick]
+      [handleToggle, onClick],
     )
 
     if (!isVisible) {
@@ -103,7 +99,7 @@ export const CodeBlockButton = React.forwardRef<HTMLButtonElement, CodeBlockButt
         )}
       </Button>
     )
-  }
+  },
 )
 
 CodeBlockButton.displayName = 'CodeBlockButton'

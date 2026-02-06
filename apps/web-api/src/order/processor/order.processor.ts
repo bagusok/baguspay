@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { OrderRepository } from '../order.repository'
-
 import { PaymentStatus, ProductProvider } from '@repo/db/types'
-import { DatabaseService } from 'src/database/database.service'
-import { OffersRepository } from 'src/offers/offers.repository'
-import { ProductRepository } from 'src/products/product.repository'
-import { DigiflazzOrderProcessor } from './digiflazz.processor'
+import type { DatabaseService } from 'src/database/database.service'
+import type { OffersRepository } from 'src/offers/offers.repository'
+import type { ProductRepository } from 'src/products/product.repository'
+import type { OrderRepository } from '../order.repository'
+import type { DigiflazzOrderProcessor } from './digiflazz.processor'
 
 @Injectable()
 export class OrderProcessor {

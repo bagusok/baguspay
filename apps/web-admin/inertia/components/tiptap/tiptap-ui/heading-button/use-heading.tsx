@@ -1,22 +1,9 @@
 'use client'
 
 import { NodeSelection, TextSelection } from '@tiptap/pm/state'
-import { type Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
-// --- Hooks ---
-import { useIsMobile } from '~/hooks/use-mobile'
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
-// --- Lib ---
-import {
-  findNodePosition,
-  isNodeInSchema,
-  isNodeTypeSelected,
-  isValidPosition,
-} from '~/utils/tiptap_utils'
-
 // --- Icons ---
 import { HeadingFiveIcon } from '~/components/tiptap/tiptap-icons/heading-five-icon'
 import { HeadingFourIcon } from '~/components/tiptap/tiptap-icons/heading-four-icon'
@@ -24,6 +11,16 @@ import { HeadingOneIcon } from '~/components/tiptap/tiptap-icons/heading-one-ico
 import { HeadingSixIcon } from '~/components/tiptap/tiptap-icons/heading-six-icon'
 import { HeadingThreeIcon } from '~/components/tiptap/tiptap-icons/heading-three-icon'
 import { HeadingTwoIcon } from '~/components/tiptap/tiptap-icons/heading-two-icon'
+// --- Hooks ---
+import { useIsMobile } from '~/hooks/use-mobile'
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import {
+  findNodePosition,
+  isNodeInSchema,
+  isNodeTypeSelected,
+  isValidPosition,
+} from '~/utils/tiptap_utils'
 
 export type Level = 1 | 2 | 3 | 4 | 5 | 6
 
@@ -285,7 +282,7 @@ export function useHeading(config: UseHeadingConfig) {
       enabled: isVisible && canToggleState,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

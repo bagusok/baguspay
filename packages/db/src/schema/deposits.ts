@@ -1,13 +1,8 @@
-import { varchar } from 'drizzle-orm/pg-core'
-import { uuid } from 'drizzle-orm/pg-core'
-import { pgTable } from 'drizzle-orm/pg-core'
-import { users } from './users'
-import { integer } from 'drizzle-orm/pg-core'
-import { timestamp } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
+import { index, integer, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { paymentMethods } from './payments'
 import { DepositStatus, depositStatusEnum } from './pg-enums'
-import { index } from 'drizzle-orm/pg-core'
+import { users } from './users'
 
 export const deposits = pgTable(
   'deposits',

@@ -75,7 +75,7 @@ export default class HomeController {
         total_orders: count(tb.orders.id),
         completed_orders:
           sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
-            'completed_orders'
+            'completed_orders',
           ),
       })
       .from(tb.orders)
@@ -84,8 +84,8 @@ export default class HomeController {
       .groupBy(tb.productSnapshots.name, tb.productSnapshots.category_name)
       .orderBy(
         desc(
-          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`
-        )
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`,
+        ),
       )
       .limit(10)
 
@@ -95,7 +95,7 @@ export default class HomeController {
         total_orders: count(tb.orders.id),
         completed_orders:
           sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
-            'completed_orders'
+            'completed_orders',
           ),
       })
       .from(tb.orders)
@@ -104,8 +104,8 @@ export default class HomeController {
       .groupBy(tb.productSnapshots.category_name)
       .orderBy(
         desc(
-          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`
-        )
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`,
+        ),
       )
       .limit(10)
 
@@ -117,7 +117,7 @@ export default class HomeController {
         total_orders: count(tb.orders.id),
         completed_orders:
           sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
-            'completed_orders'
+            'completed_orders',
           ),
       })
       .from(tb.orders)
@@ -126,8 +126,8 @@ export default class HomeController {
       .groupBy(tb.users.id, tb.users.name, tb.users.email)
       .orderBy(
         desc(
-          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`
-        )
+          sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`,
+        ),
       )
       .limit(10)
 
@@ -138,19 +138,19 @@ export default class HomeController {
         totalOrders: count(tb.orders.id),
         paymentSuccess:
           sql`sum(case when ${tb.orders.payment_status} = ${PaymentStatus.SUCCESS} then 1 else 0 end)`.as(
-            'payment_success'
+            'payment_success',
           ),
         paymentFailed:
           sql`sum(case when ${tb.orders.payment_status} = ${PaymentStatus.FAILED} then 1 else 0 end)`.as(
-            'payment_failed'
+            'payment_failed',
           ),
         orderSuccess:
           sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.COMPLETED} then 1 else 0 end)`.as(
-            'order_success'
+            'order_success',
           ),
         orderFailed:
           sql`sum(case when ${tb.orders.order_status} = ${OrderStatus.FAILED} then 1 else 0 end)`.as(
-            'order_failed'
+            'order_failed',
           ),
       })
       .from(tb.orders)

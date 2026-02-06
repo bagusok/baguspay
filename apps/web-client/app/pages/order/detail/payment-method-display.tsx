@@ -31,8 +31,8 @@ type Props = {
   orderStatus: string
 }
 
-export default function PaymentMethodDisplay({ paymentMethod, paymentStatus, orderStatus }: Props) {
-  const [copiedField, setCopiedField] = useState<string | null>(null)
+export default function PaymentMethodDisplay({ paymentMethod, paymentStatus }: Props) {
+  const [, setCopiedField] = useState<string | null>(null)
 
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text).then(() => {

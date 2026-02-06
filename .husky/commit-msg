@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Commit message hook
+# Validates commit message format
+
+commit_msg_file=$1
+commit_msg=$(cat "$commit_msg_file")
+
+# Check if commit message is not empty
+if [ -z "$commit_msg" ]; then
+  echo "Error: Commit message cannot be empty"
+  exit 1
+fi
+
+# Check minimum length
+if [ ${#commit_msg} -lt 10 ]; then
+  echo "Error: Commit message must be at least 10 characters"
+  exit 1
+fi
+
+exit 0

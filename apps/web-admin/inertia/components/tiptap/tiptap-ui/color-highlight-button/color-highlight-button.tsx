@@ -1,30 +1,27 @@
 'use client'
 
 import * as React from 'react'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Tiptap UI ---
 import type { UseColorHighlightConfig } from '~/components/tiptap/tiptap-ui/color-highlight-button'
 import {
   COLOR_HIGHLIGHT_SHORTCUT_KEY,
   useColorHighlight,
 } from '~/components/tiptap/tiptap-ui/color-highlight-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 // --- Styles ---
 import '~/components/tiptap/tiptap-ui/color-highlight-button/color-highlight-button.scss'
 
 export interface ColorHighlightButtonProps
-  extends Omit<ButtonProps, 'type'>, UseColorHighlightConfig {
+  extends Omit<ButtonProps, 'type'>,
+    UseColorHighlightConfig {
   /**
    * Optional text to display alongside the icon.
    */
@@ -63,7 +60,7 @@ export const ColorHighlightButton = React.forwardRef<HTMLButtonElement, ColorHig
       style,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, canColorHighlight, isActive, handleColorHighlight, label, shortcutKeys } =
@@ -81,7 +78,7 @@ export const ColorHighlightButton = React.forwardRef<HTMLButtonElement, ColorHig
         if (event.defaultPrevented) return
         handleColorHighlight()
       },
-      [handleColorHighlight, onClick]
+      [handleColorHighlight, onClick],
     )
 
     const buttonStyle = React.useMemo(
@@ -90,7 +87,7 @@ export const ColorHighlightButton = React.forwardRef<HTMLButtonElement, ColorHig
           ...style,
           '--highlight-color': highlightColor,
         }) as React.CSSProperties,
-      [highlightColor, style]
+      [highlightColor, style],
     )
 
     if (!isVisible) {
@@ -126,7 +123,7 @@ export const ColorHighlightButton = React.forwardRef<HTMLButtonElement, ColorHig
         )}
       </Button>
     )
-  }
+  },
 )
 
 ColorHighlightButton.displayName = 'ColorHighlightButton'

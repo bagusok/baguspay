@@ -1,6 +1,6 @@
 import { OfferType } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 export const insertOfferValidator = vine.object({
   name: vine.string().maxLength(100),
@@ -93,7 +93,7 @@ export const addOfferUserValidator = vine.object({
   users: vine.array(
     vine.object({
       user_id: vine.string().uuid(),
-    })
+    }),
   ),
 })
 
@@ -103,7 +103,7 @@ export const addOfferProductValidator = vine.object({
   products: vine.array(
     vine.object({
       product_id: vine.string().uuid(),
-    })
+    }),
   ),
 })
 
@@ -113,7 +113,7 @@ export const addOfferPaymentMethodValidator = vine.object({
   payments: vine.array(
     vine.object({
       payment_method_id: vine.string().uuid(),
-    })
+    }),
   ),
 })
 

@@ -1,21 +1,21 @@
 // import type { HttpContext } from '@adonisjs/core/http'
 
-import env from '#start/env'
-import {
-  deleteFileValidator,
-  deleteFilesValidator,
-  listFileQueryValidator,
-  uploadFileValidator,
-  uploadFilesValidator,
-} from '#validators/file_manager'
-import { HttpContext } from '@adonisjs/core/http'
+import crypto from 'node:crypto'
+import fs from 'node:fs/promises'
+import type { HttpContext } from '@adonisjs/core/http'
 import drive from '@adonisjs/drive/services/main'
 import { count, db, desc, eq } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import crypto from 'node:crypto'
-import fs from 'node:fs/promises'
 import sharp from 'sharp'
+import env from '#start/env'
+import {
+  deleteFilesValidator,
+  deleteFileValidator,
+  listFileQueryValidator,
+  uploadFilesValidator,
+  uploadFileValidator,
+} from '#validators/file_manager'
 
 export default class FileManagersController {
   public async upload(ctx: HttpContext) {
@@ -55,7 +55,7 @@ export default class FileManagersController {
           })
           .returning()
 
-        console.log('File saved to database:', save)
+        // console.log('File saved to database:', save)
 
         return ctx.response.json({
           message: 'File uploaded successfully',
@@ -73,8 +73,8 @@ export default class FileManagersController {
           error: 'Unsupported file type. Only images are allowed.',
         })
       }
-    } catch (error) {
-      console.error('File upload error:', error)
+    } catch (_) {
+      // console.error('File upload error:', error)
       return ctx.response.status(500).json({
         error: 'An error occurred while uploading the file. Please try again later.',
       })
@@ -125,8 +125,7 @@ export default class FileManagersController {
         uploaded.push({
           id: save[0].id,
           name: `${fileHash}.webp`,
-          url:
-            env.get('S3_ENDPOINT') + env.get('S3_BUCKET_NAME') + `/storage/images/${fileHash}.webp`,
+          url: `${env.get('S3_ENDPOINT') + env.get('S3_BUCKET_NAME')}/storage/images/${fileHash}.webp`,
         })
       }
 
@@ -135,8 +134,8 @@ export default class FileManagersController {
         files: uploaded,
         errors,
       })
-    } catch (error) {
-      console.error('File upload error:', error)
+    } catch (_) {
+      // console.error('File upload error:', error)
       return ctx.response.status(500).json({
         error: 'An error occurred while uploading the files. Please try again later.',
       })
@@ -176,8 +175,8 @@ export default class FileManagersController {
       return ctx.response.json({
         message: 'File deleted successfully',
       })
-    } catch (error) {
-      console.error('File deletion error:', error)
+    } catch (_) {
+      // console.error('File deletion error:', error)
       return ctx.response.status(500).json({
         error: 'An error occurred while deleting the file. Please try again later.',
       })
@@ -219,8 +218,8 @@ export default class FileManagersController {
         deleted,
         errors,
       })
-    } catch (error) {
-      console.error('File deletion error:', error)
+    } catch (_) {
+      // console.error('File deletion error:', error)
       return ctx.response.status(500).json({
         error: 'An error occurred while deleting the files. Please try again later.',
       })
@@ -230,7 +229,7 @@ export default class FileManagersController {
   public async list(ctx: HttpContext) {
     try {
       const { page = 1, limit = 20 } = await ctx.request.validateUsing(
-        vine.compile(listFileQueryValidator)
+        vine.compile(listFileQueryValidator),
       )
 
       const files = await db.query.fileManager.findMany({
@@ -254,8 +253,8 @@ export default class FileManagersController {
           totalPages: Math.ceil(Number(fCount.count) / limit),
         },
       })
-    } catch (error) {
-      console.error('File list error:', error)
+    } catch (_) {
+      // console.error('File list error:', error)
       return ctx.response.status(500).json({
         error: 'An error occurred while fetching the file list. Please try again later.',
       })
@@ -281,8 +280,7 @@ export default class FileManagersController {
       return ctx.response.json({
         data: file,
       })
-    } catch (error) {
-      console.error('Get file by ID error:', error)
+    } catch (_) {
       return ctx.response.status(500).json({
         error: 'An error occurred while fetching the file. Please try again later.',
       })

@@ -1,5 +1,6 @@
 'use client'
 
+import { Link, usePage } from '@inertiajs/react'
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,7 +18,6 @@ import {
   SidebarMenuSubItem,
 } from '@repo/ui/components/ui/sidebar'
 import { ChevronRight, type LucideIcon } from 'lucide-react'
-import { Link, usePage } from '@inertiajs/react'
 
 export function NavMain({
   items,

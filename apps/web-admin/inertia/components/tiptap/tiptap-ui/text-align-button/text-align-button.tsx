@@ -1,22 +1,18 @@
 import * as React from 'react'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Tiptap UI ---
 import type { TextAlign, UseTextAlignConfig } from '~/components/tiptap/tiptap-ui/text-align-button'
 import {
   TEXT_ALIGN_SHORTCUT_KEYS,
   useTextAlign,
 } from '~/components/tiptap/tiptap-ui/text-align-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface TextAlignButtonProps extends Omit<ButtonProps, 'type'>, UseTextAlignConfig {
   /**
@@ -58,7 +54,7 @@ export const TextAlignButton = React.forwardRef<HTMLButtonElement, TextAlignButt
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, handleTextAlign, label, canAlign, isActive, Icon, shortcutKeys } =
@@ -75,7 +71,7 @@ export const TextAlignButton = React.forwardRef<HTMLButtonElement, TextAlignButt
         if (event.defaultPrevented) return
         handleTextAlign()
       },
-      [handleTextAlign, onClick]
+      [handleTextAlign, onClick],
     )
 
     if (!isVisible) {
@@ -107,7 +103,7 @@ export const TextAlignButton = React.forwardRef<HTMLButtonElement, TextAlignButt
         )}
       </Button>
     )
-  }
+  },
 )
 
 TextAlignButton.displayName = 'TextAlignButton'

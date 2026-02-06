@@ -1,7 +1,7 @@
 import {
   HttpStatus,
   UnprocessableEntityException,
-  ValidationError,
+  type ValidationError,
   ValidationPipe,
 } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
@@ -61,7 +61,7 @@ async function bootstrap() {
         schema: {
           type: 'timestamp',
           format: 'timestamp',
-          example: new Date().getTime().toString(),
+          example: Date.now().toString(),
         },
       },
       {

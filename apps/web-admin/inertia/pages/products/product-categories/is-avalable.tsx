@@ -1,8 +1,8 @@
-import { UpdateProductCategoryValidator } from '#validators/product'
 import { router } from '@inertiajs/react'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { useState } from 'react'
 import { LoaderIcon } from 'react-hot-toast'
+import type { UpdateProductCategoryValidator } from '#validators/product'
 
 export default function IsAvailable({
   isAvailable,
@@ -25,7 +25,7 @@ export default function IsAvailable({
         preserveScroll: true,
         onStart: () => setIsLoading(true),
         onFinish: () => setIsLoading(false),
-      }
+      },
     )
   }
 

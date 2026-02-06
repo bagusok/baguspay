@@ -6,10 +6,13 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { and, asc, eq, gte, lte, ne, or } from '@repo/db'
 import { OfferType, tb } from '@repo/db/types'
 import { SendResponse } from 'src/common/utils/response'
-import { DatabaseService } from 'src/database/database.service'
-import { StorageService } from 'src/storage/storage.service'
-import { ProductCategoriesQueryDto } from './product-categories.dto'
-import { ProductCategoriesRepository } from './product-categories.repository'
+import type { DatabaseService } from 'src/database/database.service'
+import type { StorageService } from 'src/storage/storage.service'
+import type {
+  ProductCategoriesQueryDto,
+  ProductCategoryGetByTypeParamsDto,
+} from './product-categories.dto'
+import type { ProductCategoriesRepository } from './product-categories.repository'
 
 @Injectable()
 export class ProductCategoriesService {
@@ -77,7 +80,7 @@ export class ProductCategoriesService {
     }
   }
 
-  async getBySlug(slug: string): Promise<{ success: boolean; data: any }> {
+  async getBySlug(slug: string) {
     const category = await this.databaseService.db.query.productCategories.findFirst({
       where: and(
         eq(tb.productCategories.slug, slug),
@@ -371,6 +374,19 @@ export class ProductCategoriesService {
         flash_sales: buildProductFlashSale,
       },
       'Category retrieved successfully',
+    )
+  }
+
+  async getByType(data: ProductCategoryGetByTypeParamsDto) {
+    const categories = await this.productCategoriesRepository.findByType(data.type)
+
+    return SendResponse.success(
+      categories.map((category) => ({
+        ...category,
+        image_url: this.storageService.getFileUrl(category.image_url),
+        icon_url: this.storageService.getFileUrl(category.icon_url),
+      })),
+      'Categories retrieved successfully',
     )
   }
 

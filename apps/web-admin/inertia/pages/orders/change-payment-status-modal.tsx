@@ -1,4 +1,3 @@
-import { UpdateOrderPaymentStatusValidator } from '#validators/order'
 import { useForm } from '@inertiajs/react'
 import { PaymentStatus } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -20,6 +19,7 @@ import {
 import { PencilIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import type { UpdateOrderPaymentStatusValidator } from '#validators/order'
 
 export default function ChangePaymentStatusModal({
   orderId,
@@ -41,7 +41,7 @@ export default function ChangePaymentStatusModal({
         setOpen(false)
       },
       onError: (error) => {
-        toast.error('Error changing status: ' + error.error)
+        toast.error(`Error changing status: ${error.error}`)
         console.error('Error changing status:', error)
       },
     })
@@ -51,7 +51,7 @@ export default function ChangePaymentStatusModal({
     if (open) {
       form.setData('status', status)
     }
-  }, [open])
+  }, [open, form, status])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -89,15 +89,12 @@ export default function ChangePaymentStatusModal({
             )}
             <small className="text-xs text-red-500 italic">
               * Mengubah status pembayaran akan mempengaruhi proses order.
-              <br />
-              * Mengubah secara manual dapat menyebabkan ketidaksesuaian data.
-              <br />
-              * Pastikan untuk memeriksa dengan seksama baik di payment gateway maupun di sistem
-              internal.
-              <br />
-              * Sebaiknya kalo ada error seperti pending lama, atau user sudah bayar tapi status
-              masih pending, telanjur expired, atau user menekan tombol cancel. Sebaiknya di set ke
-              Failed. Dan dilakukan refund manual ke rekening user.
+              <br />* Mengubah secara manual dapat menyebabkan ketidaksesuaian data.
+              <br />* Pastikan untuk memeriksa dengan seksama baik di payment gateway maupun di
+              sistem internal.
+              <br />* Sebaiknya kalo ada error seperti pending lama, atau user sudah bayar tapi
+              status masih pending, telanjur expired, atau user menekan tombol cancel. Sebaiknya di
+              set ke Failed. Dan dilakukan refund manual ke rekening user.
               <br />* Apabila minta refund ke saldo, bisa di set paymentnya ke Success, dan order
               status ke Failed lalu di refund melalui tombol refund.
             </small>

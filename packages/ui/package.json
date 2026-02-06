@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "ui": "npx shadcn@latest",
-    "lint": "eslint .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
     "build": "tsup",
     "dev": "tsup --watch"
   },
@@ -52,7 +56,6 @@
     "./theme/*": "./src/theme/*.css"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@repo/tailwind-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/react": "^19.1.2",

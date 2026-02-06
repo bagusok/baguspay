@@ -1,20 +1,6 @@
 'use client'
 
-import {
-  ArrowLeftRight,
-  BanknoteArrowDown,
-  Command,
-  DollarSignIcon,
-  LayoutGrid,
-  PenIcon,
-  RefreshCcwIcon,
-  Settings2Icon,
-  ShoppingBagIcon,
-  TicketIcon,
-  UserIcon,
-} from 'lucide-react'
-import * as React from 'react'
-
+import { Link } from '@inertiajs/react'
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +10,22 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@repo/ui/components/ui/sidebar'
-import { Link } from '@inertiajs/react'
+import {
+  ArrowLeftRight,
+  BanknoteArrowDown,
+  Command,
+  DollarSignIcon,
+  FileTextIcon,
+  LayoutGrid,
+  NewspaperIcon,
+  PenIcon,
+  RefreshCcwIcon,
+  Settings2Icon,
+  ShoppingBagIcon,
+  TicketIcon,
+  UserIcon,
+} from 'lucide-react'
+import type * as React from 'react'
 import { NavMain } from './nav-main'
 import { NavUser } from './nav-user'
 
@@ -215,6 +216,21 @@ const data = {
       icon: UserIcon,
       items: [],
     },
+    {
+      title: 'Blog',
+      url: '#',
+      icon: NewspaperIcon,
+      items: [
+        {
+          title: 'Articles',
+          url: '/admin/blog/articles',
+        },
+        {
+          title: 'Categories',
+          url: '/admin/blog/categories',
+        },
+      ],
+    },
   ],
   config: [
     {
@@ -245,6 +261,17 @@ const data = {
         {
           title: 'General Settings',
           url: '/admin/config/settings/general',
+        },
+      ],
+    },
+    {
+      title: 'Pages',
+      url: '#',
+      icon: FileTextIcon,
+      items: [
+        {
+          title: 'Manage Pages',
+          url: '/admin/config/pages',
         },
       ],
     },

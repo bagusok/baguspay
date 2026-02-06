@@ -1,6 +1,4 @@
-import ConfigHomesController from '#controllers/configs/config_homes_controller'
-import { CreateHomeProductSectionValidator } from '#validators/config_home'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { Link, router, useForm } from '@inertiajs/react'
 import { AppPlatform, ProductGroupingMenuType, ProductGroupingType } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -27,9 +25,11 @@ import {
 } from '@repo/ui/components/ui/select'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { EyeIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
+import type ConfigHomesController from '#controllers/configs/config_homes_controller'
+import type { CreateHomeProductSectionValidator } from '#validators/config_home'
 import FileManager from '~/components/file-manager'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate } from '~/utils'
@@ -399,7 +399,7 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                     id="order"
                     type="number"
                     value={data.order}
-                    onChange={(e) => setData('order', parseInt(e.target.value) || 0)}
+                    onChange={(e) => setData('order', parseInt(e.target.value, 10) || 0)}
                   />
                   {errors.order && <p className="text-xs text-red-500 mt-1">{errors.order}</p>}
                 </div>

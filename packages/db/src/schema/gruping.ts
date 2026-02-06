@@ -4,8 +4,8 @@ import {
   AppPlatform,
   appPlatformEnum,
   ProductGroupingMenuType,
-  productGroupingMenuTypeEnum,
   ProductGroupingType,
+  productGroupingMenuTypeEnum,
   productGroupingTypeEnum,
 } from './pg-enums'
 import { productCategories } from './products'
@@ -27,6 +27,7 @@ export const productGroupings = pgTable('product_groupings', {
 
   is_featured: boolean('is_featured').default(false),
   label: varchar('label'),
+  category: varchar('category', { length: 255 }),
   order: integer('order').default(0),
 
   is_special_feature: boolean('is_special_feature').default(false),

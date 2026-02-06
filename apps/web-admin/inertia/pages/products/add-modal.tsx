@@ -1,4 +1,3 @@
-import { CreateProductValidator } from '#validators/product'
 import { useForm } from '@inertiajs/react'
 import { ProductBillingType, ProductFullfillmentType, ProductProvider } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -21,7 +20,8 @@ import {
 } from '@repo/ui/components/ui/select'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import { useQueryClient } from '@tanstack/react-query'
-import { FormEvent, useEffect, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
+import type { CreateProductValidator } from '#validators/product'
 import FileManager from '~/components/file-manager'
 
 type Props = {
@@ -63,7 +63,7 @@ export default function AddProductModal({ productSubCategoryId }: Props) {
       Number(data.provider_price) +
       Number(data.profit_static) +
       (Number(data.provider_price) * Number(data.profit_percentage)) / 100,
-    [data.provider_price, data.profit_static, data.profit_percentage]
+    [data.provider_price, data.profit_static, data.profit_percentage],
   )
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -81,7 +81,7 @@ export default function AddProductModal({ productSubCategoryId }: Props) {
     if (productSubCategoryId) {
       setData('product_sub_category_id', productSubCategoryId)
     }
-  }, [productSubCategoryId])
+  }, [productSubCategoryId, setData])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -174,6 +174,7 @@ export default function AddProductModal({ productSubCategoryId }: Props) {
                   id="is_available"
                   type="checkbox"
                   role="switch"
+                  aria-checked={data.is_available}
                   checked={data.is_available}
                   onChange={(e) => setData('is_available', e.target.checked)}
                   className="accent-primary h-5 w-10"
@@ -185,6 +186,7 @@ export default function AddProductModal({ productSubCategoryId }: Props) {
                   id="is_featured"
                   type="checkbox"
                   role="switch"
+                  aria-checked={data.is_featured}
                   checked={data.is_featured}
                   onChange={(e) => setData('is_featured', e.target.checked)}
                   className="accent-primary h-5 w-10"
@@ -327,7 +329,7 @@ export default function AddProductModal({ productSubCategoryId }: Props) {
               </Label>
               <Input
                 type="number"
-                value={isNaN(totalPrice) ? '' : totalPrice}
+                value={Number.isNaN(totalPrice) ? '' : totalPrice}
                 readOnly
                 className="bg-gray-100 cursor-not-allowed"
               />

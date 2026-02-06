@@ -1,4 +1,3 @@
-import { UpdateUserValidator } from '#validators/user'
 import { useForm } from '@inertiajs/react'
 import { UserRegisteredType, UserRole } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -24,6 +23,7 @@ import {
 import { Switch } from '@repo/ui/components/ui/switch'
 import { PencilIcon } from 'lucide-react'
 import { useState } from 'react'
+import type { UpdateUserValidator } from '#validators/user'
 
 type Props = {
   user: UpdateUserValidator & {

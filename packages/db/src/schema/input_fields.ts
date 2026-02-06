@@ -1,12 +1,7 @@
-import { varchar } from 'drizzle-orm/pg-core'
-import { jsonb } from 'drizzle-orm/pg-core'
-import { boolean } from 'drizzle-orm/pg-core'
-import { uuid } from 'drizzle-orm/pg-core'
-import { pgTable } from 'drizzle-orm/pg-core'
-import { productCategories } from './products'
 import { relations } from 'drizzle-orm'
-import { timestamp } from 'drizzle-orm/pg-core'
-import { InputFieldOption, InputFieldType, inputFieldTypeEnum } from './pg-enums'
+import { boolean, jsonb, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { type InputFieldOption, InputFieldType, inputFieldTypeEnum } from './pg-enums'
+import { productCategories } from './products'
 
 export const inputFields = pgTable('input_fields', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -12,7 +12,7 @@ import { Label } from '@repo/ui/components/ui/label'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { atom, useAtom, useAtomValue } from 'jotai'
 import { ChevronRightIcon, CircleCheckIcon, Clock, CreditCardIcon, XIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import toast from 'react-hot-toast'
 import { useNavigate } from 'react-router'
 import z from 'zod'
@@ -56,6 +56,8 @@ export default function CheckoutModal({ data }: Props) {
   const [selectedPayment, setSelectedPayment] = useState<PaymentItem | null>(null)
   const [paymentPhoneNumber, setPaymentPhoneNumber] = useState('')
   const [isPaymentSelectorOpen, setIsPaymentSelectorOpen] = useState(false)
+
+  const randId = useId()
 
   // Fetch payment methods based on inquiry_id
   const paymentMethods = useQuery({
@@ -137,8 +139,7 @@ export default function CheckoutModal({ data }: Props) {
 
     // Priority 2: If no preselected and balance is sufficient, auto-select balance
     if (
-      balanceData &&
-      balanceData.is_available &&
+      balanceData?.is_available &&
       data?.total_price &&
       balanceData.user_balance >= data.total_price
     ) {
@@ -321,9 +322,9 @@ export default function CheckoutModal({ data }: Props) {
                       Periode ({data.bills.lembar_tagihan} Lembar):
                     </p>
                     <div className="space-y-1">
-                      {data.bills.detail.map((bill, index) => (
+                      {data.bills.detail.map((bill) => (
                         <div
-                          key={index}
+                          key={randId}
                           className="bg-white dark:bg-slate-800 rounded px-2 py-1.5 text-xs"
                         >
                           <div className="flex justify-between items-center">

@@ -1,6 +1,6 @@
 import { UserRegisteredType, UserRole } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 // Custom rule untuk phone number harus diawali 62 dan hanya angka
 export const phoneNumberRule = vine.createRule((value: unknown, _, field) => {

@@ -2,8 +2,8 @@ import { Processor, WorkerHost } from '@nestjs/bullmq'
 import { Logger } from '@nestjs/common'
 import { and, eq } from '@repo/db'
 import { DepositStatus, tb } from '@repo/db/types'
-import { Job } from 'bullmq'
-import { DatabaseService } from 'src/database/database.service'
+import type { Job } from 'bullmq'
+import type { DatabaseService } from 'src/database/database.service'
 
 @Processor('deposits-queue')
 export class DepositQueueConsumer extends WorkerHost {

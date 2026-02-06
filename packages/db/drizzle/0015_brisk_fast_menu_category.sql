@@ -1,0 +1,1 @@
+ALTER TABLE "product_groupings" ADD COLUMN "category" varchar(255);

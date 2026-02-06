@@ -1,7 +1,7 @@
 // app/auth/session_prisma_user_provider.ts
 import { symbols } from '@adonisjs/auth'
 import type { SessionGuardUser, SessionUserProviderContract } from '@adonisjs/auth/types/session'
-import { db, eq, InferSelectModel } from '@repo/db'
+import { db, eq, type InferSelectModel } from '@repo/db'
 import { tb } from '@repo/db/types'
 
 type User = InferSelectModel<typeof tb.users>

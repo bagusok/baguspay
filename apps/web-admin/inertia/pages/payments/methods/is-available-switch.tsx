@@ -28,7 +28,7 @@ export default function IsAvailableSwicthPaymentMethods({ paymentMethodId, isAva
         onFinish: () => {
           setIsLoading(false)
         },
-      }
+      },
     )
   }
 

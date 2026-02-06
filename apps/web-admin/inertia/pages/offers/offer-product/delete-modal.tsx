@@ -41,7 +41,7 @@ export default function DeleteOfferProductModal({
           queryClient.invalidateQueries({ queryKey: ['offerProducts', offerId], exact: false })
         },
         preserveScroll: true,
-      }
+      },
     )
   }
 

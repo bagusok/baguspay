@@ -1,5 +1,5 @@
 import * as PopoverPrimitive from '@radix-ui/react-popover'
-import * as React from 'react'
+import type * as React from 'react'
 import '~/components/tiptap/tiptap-ui-primitive/popover/popover.scss'
 import { cn } from '~/utils/tiptap_utils'
 

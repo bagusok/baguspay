@@ -1,6 +1,4 @@
-import ConfigHomesController from '#controllers/configs/config_homes_controller'
-import { CreateHomeProductSectionValidator } from '#validators/config_home'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { Link, router, useForm } from '@inertiajs/react'
 import { AppPlatform, ProductGroupingMenuType, ProductGroupingType } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -27,9 +25,11 @@ import {
 } from '@repo/ui/components/ui/select'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { EyeIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
+import type ConfigHomesController from '#controllers/configs/config_homes_controller'
+import type { CreateHomeProductSectionValidator } from '#validators/config_home'
 import FileManager from '~/components/file-manager'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate } from '~/utils'
@@ -58,6 +58,11 @@ const columns: ColumnDef<Props['productSections'][number]>[] = [
   {
     accessorKey: 'name',
     header: 'Name',
+  },
+  {
+    accessorKey: 'category',
+    header: 'Category',
+    cell: ({ row }) => row.original.category || '-',
   },
   {
     accessorKey: 'platform',
@@ -163,6 +168,7 @@ export default function ProductSectionsIndex({ productSections }: Props) {
       is_available: false,
       is_featured: false,
       label: '',
+      category: '',
       order: 0,
       is_special_feature: false,
       special_feature_key: '',
@@ -234,6 +240,20 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                 {errors.description && (
                   <p className="text-xs text-red-500 mt-1">{errors.description}</p>
                 )}
+              </div>
+
+              {/* Category */}
+              <div>
+                <Label htmlFor="category" className="mb-2">
+                  Category
+                </Label>
+                <Input
+                  id="category"
+                  value={data.category || ''}
+                  onChange={(e) => setData('category', e.target.value)}
+                  placeholder="Contoh: Topup & Tagihan"
+                />
+                {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category}</p>}
               </div>
 
               {/* Redirect URL */}
@@ -399,7 +419,7 @@ export default function ProductSectionsIndex({ productSections }: Props) {
                     id="order"
                     type="number"
                     value={data.order}
-                    onChange={(e) => setData('order', parseInt(e.target.value) || 0)}
+                    onChange={(e) => setData('order', parseInt(e.target.value, 10) || 0)}
                   />
                   {errors.order && <p className="text-xs text-red-500 mt-1">{errors.order}</p>}
                 </div>

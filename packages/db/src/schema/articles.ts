@@ -1,12 +1,8 @@
-import { varchar } from 'drizzle-orm/pg-core'
-import { timestamp } from 'drizzle-orm/pg-core'
-import { text } from 'drizzle-orm/pg-core'
-import { boolean } from 'drizzle-orm/pg-core'
-import { uuid } from 'drizzle-orm/pg-core'
-import { pgTable } from 'drizzle-orm/pg-core'
-import { users } from './users'
-import { productCategories } from './products'
 import { relations } from 'drizzle-orm'
+import { boolean, integer, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import { ArticleType, articleTypeEnum } from './pg-enums'
+import { productCategories } from './products'
+import { users } from './users'
 
 export const articleCategories = pgTable('article_categories', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -14,7 +10,7 @@ export const articleCategories = pgTable('article_categories', {
   slug: varchar('slug').notNull().unique(),
   description: varchar('description', { length: 255 }),
 
-  created_at: timestamp('created_at', { withTimezone: true }),
+  created_at: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updated_at: timestamp('updated_at', { withTimezone: true }).$onUpdate(() => new Date()),
 })
 
@@ -23,23 +19,34 @@ export const articles = pgTable('articles', {
   title: varchar('title', { length: 255 }).notNull(),
   image_url: varchar('image_url', { length: 255 }),
   slug: varchar('slug').notNull().unique(),
+  excerpt: text('excerpt'),
   content: text('content').notNull(),
-  article_category_id: uuid('article_category_id')
-    .references(() => articleCategories.id)
-    .notNull(),
-  user_id: uuid('user_id')
-    .notNull()
-    .references(() => users.id),
+  type: articleTypeEnum('type').notNull().default(ArticleType.ARTICLE),
+  article_category_id: uuid('article_category_id').references(() => articleCategories.id),
+  user_id: uuid('user_id').references(() => users.id),
 
   is_published: boolean('is_published').notNull().default(false),
+  is_featured: boolean('is_featured').notNull().default(false),
+  order: integer('order').notNull().default(0),
   tags: text('tags').array().$type<string[]>(),
+  meta_title: varchar('meta_title', { length: 255 }),
+  meta_description: varchar('meta_description', { length: 500 }),
 
+  published_at: timestamp('published_at', { withTimezone: true }),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp('updated_at', { withTimezone: true }).$onUpdate(() => new Date()),
 })
 
-export const articleRelations = relations(articles, ({ many }) => ({
+export const articleRelations = relations(articles, ({ one, many }) => ({
+  category: one(articleCategories, {
+    fields: [articles.article_category_id],
+    references: [articleCategories.id],
+  }),
   products: many(productCategoryOnArticles),
+}))
+
+export const articleCategoryRelations = relations(articleCategories, ({ many }) => ({
+  articles: many(articles),
 }))
 
 export const productCategoryOnArticles = pgTable('product_category_on_articles', {

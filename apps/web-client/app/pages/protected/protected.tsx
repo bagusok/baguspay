@@ -20,7 +20,7 @@ export default function Protected() {
     if (!isAuthenticated || isExpiredAccessToken) {
       navigate(`/${locale}/auth/login`, { replace: true })
     }
-  }, [isAuthenticated, isExpiredAccessToken])
+  }, [isAuthenticated, isExpiredAccessToken, locale, navigate])
 
   if (isLoading) {
     return (

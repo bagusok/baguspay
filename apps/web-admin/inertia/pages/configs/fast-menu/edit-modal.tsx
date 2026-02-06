@@ -1,6 +1,4 @@
-import ConfigHomesController from '#controllers/configs/config_homes_controller'
-import { UpdateHomeProductSectionValidator } from '#validators/config_home'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
 import { AppPlatform, ProductGroupingMenuType, ProductGroupingType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -28,6 +26,8 @@ import { Textarea } from '@repo/ui/components/ui/textarea'
 import { PencilIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import type ConfigHomesController from '#controllers/configs/config_homes_controller'
+import type { UpdateHomeProductSectionValidator } from '#validators/config_home'
 import FileManager from '~/components/file-manager'
 
 type Props = {
@@ -39,7 +39,7 @@ export default function EditProductSectionModal({ productSection }: Props) {
   const { data, setData, errors, processing, patch } = useForm<UpdateHomeProductSectionValidator>({
     name: productSection?.name || '',
     description: productSection?.description || '',
-    // @ts-ignore
+    // @ts-expect-error
     image_id: productSection?.image_id || '',
     redirect_url: productSection?.redirect_url || '',
     app_key: productSection?.app_key || '',
@@ -49,6 +49,7 @@ export default function EditProductSectionModal({ productSection }: Props) {
     is_available: productSection?.is_available || false,
     is_featured: productSection?.is_featured || false,
     label: productSection?.label || '',
+    category: productSection?.category || '',
     order: productSection?.order || 0,
     is_special_feature: productSection?.is_special_feature || false,
     special_feature_key: productSection?.special_feature_key || '',
@@ -114,6 +115,20 @@ export default function EditProductSectionModal({ productSection }: Props) {
             {errors.description && (
               <p className="text-xs text-red-500 mt-1">{errors.description}</p>
             )}
+          </div>
+
+          {/* Category */}
+          <div>
+            <Label htmlFor="category" className="mb-2">
+              Category
+            </Label>
+            <Input
+              id="category"
+              value={data.category || ''}
+              onChange={(e) => setData('category', e.target.value)}
+              placeholder="Contoh: Topup & Tagihan"
+            />
+            {errors.category && <p className="text-xs text-red-500 mt-1">{errors.category}</p>}
           </div>
 
           {/* Redirect URL */}
@@ -273,7 +288,7 @@ export default function EditProductSectionModal({ productSection }: Props) {
                 id="order"
                 type="number"
                 value={data.order}
-                onChange={(e) => setData('order', parseInt(e.target.value) || 0)}
+                onChange={(e) => setData('order', parseInt(e.target.value, 10) || 0)}
               />
               {errors.order && <p className="text-xs text-red-500 mt-1">{errors.order}</p>}
             </div>

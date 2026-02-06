@@ -1,4 +1,3 @@
-import { UpdatePaymentMethodsValidator } from '#validators/payments'
 import { useForm } from '@inertiajs/react'
 import {
   PaymentMethodAllowAccess,
@@ -24,9 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { FormEvent, useEffect, useState } from 'react'
-
 import { useMutation } from '@tanstack/react-query'
+import { type FormEvent, useEffect, useState } from 'react'
+import type { UpdatePaymentMethodsValidator } from '#validators/payments'
 import FileManager from '~/components/file-manager'
 import { SimpleEditor } from '~/components/tiptap/tiptap-templates/simple/simple-editor'
 import { apiClient } from '~/utils/axios'
@@ -105,7 +104,7 @@ export function EditPaymentMethodModal({ paymentMethodId }: Props) {
     if (open) {
       getPaymentMethod.mutate()
     }
-  }, [open])
+  }, [open, getPaymentMethod])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -423,7 +422,7 @@ export function EditPaymentMethodModal({ paymentMethodId }: Props) {
                           } else {
                             form.setData(
                               'allow_access',
-                              (form.data.allow_access ?? []).filter((val) => val !== a)
+                              (form.data.allow_access ?? []).filter((val) => val !== a),
                             )
                           }
                         }}

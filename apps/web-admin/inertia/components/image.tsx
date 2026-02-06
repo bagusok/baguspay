@@ -1,4 +1,4 @@
-import React from 'react'
+import type React from 'react'
 
 type ImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
   baseUrl?: string
@@ -17,5 +17,5 @@ const _baseUrl = import.meta.env.VITE_S3_URL
 export default function Image({ src, baseUrl = _baseUrl, ...rest }: ImageProps) {
   const finalSrc =
     typeof src === 'string' && src.trim().length > 0 ? resolveSrc(src, baseUrl) : undefined
-  return <img src={finalSrc} {...rest} />
+  return <img src={finalSrc} {...rest} alt={rest.alt ?? ''} />
 }

@@ -7,9 +7,9 @@ import {
   IsUUID,
   Validate,
   ValidateNested,
-  ValidationArguments,
+  type ValidationArguments,
   ValidatorConstraint,
-  ValidatorConstraintInterface,
+  type ValidatorConstraintInterface,
 } from 'class-validator'
 import { InputFieldDto } from './input.fields.dto'
 

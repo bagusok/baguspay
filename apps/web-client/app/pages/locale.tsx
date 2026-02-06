@@ -1,8 +1,8 @@
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { Provider, useAtom, useSetAtom } from 'jotai'
-import { queryClientAtom } from 'jotai-tanstack-query'
 import { useHydrateAtoms } from 'jotai/utils'
+import { queryClientAtom } from 'jotai-tanstack-query'
 import { useEffect } from 'react'
 import { Outlet, redirect } from 'react-router'
 import UserLayout from '~/components/layout/user-layout'
@@ -32,14 +32,13 @@ import type { Route } from './+types'
 //   return null; // or return some data if required
 // };
 
-export default function Locale({ params, matches }: Route.ComponentProps) {
+export default function Locale(_args: Route.ComponentProps) {
   useHydrateAtoms([[queryClientAtom, queryClient]])
   const setAuthToken = useSetAtom(authTokenAtom)
   const [user] = useAtom(userAtom)
 
   useEffect(() => {
     if (user.isError) {
-      console.error('Error loading user data:', user.error)
       setAuthToken(null)
       redirect('/auth/login')
     }

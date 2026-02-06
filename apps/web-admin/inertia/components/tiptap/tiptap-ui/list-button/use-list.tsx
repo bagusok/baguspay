@@ -1,18 +1,16 @@
 'use client'
 
 import { NodeSelection, TextSelection } from '@tiptap/pm/state'
-import { type Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
-// --- Hooks ---
-import { useIsMobile } from '~/hooks/use-mobile'
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Icons ---
 import { ListIcon } from '~/components/tiptap/tiptap-icons/list-icon'
 import { ListOrderedIcon } from '~/components/tiptap/tiptap-icons/list-ordered-icon'
 import { ListTodoIcon } from '~/components/tiptap/tiptap-icons/list-todo-icon'
+// --- Hooks ---
+import { useIsMobile } from '~/hooks/use-mobile'
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
 
 // --- Lib ---
 import {
@@ -71,7 +69,7 @@ export const LIST_SHORTCUT_KEYS: Record<ListType, string> = {
 export function canToggleList(
   editor: Editor | null,
   type: ListType,
-  turnInto: boolean = true
+  turnInto: boolean = true,
 ): boolean {
   if (!editor || !editor.isEditable) return false
   if (!isNodeInSchema(type, editor) || isNodeTypeSelected(editor, ['image'])) return false
@@ -294,7 +292,7 @@ export function useList(config: UseListConfig) {
       enabled: isVisible && canToggle,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

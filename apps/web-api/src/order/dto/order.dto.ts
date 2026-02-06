@@ -13,9 +13,9 @@ import {
   Min,
   Validate,
   ValidateNested,
-  ValidationArguments,
+  type ValidationArguments,
   ValidatorConstraint,
-  ValidatorConstraintInterface,
+  type ValidatorConstraintInterface,
 } from 'class-validator'
 
 @ValidatorConstraint({ name: 'StartsWith62', async: false })

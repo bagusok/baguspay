@@ -1,11 +1,7 @@
-import { integer } from 'drizzle-orm/pg-core'
-import { uuid } from 'drizzle-orm/pg-core'
-import { pgTable } from 'drizzle-orm/pg-core'
-import { users } from './users'
-import { timestamp } from 'drizzle-orm/pg-core'
-import { varchar } from 'drizzle-orm/pg-core'
 import { relations } from 'drizzle-orm'
+import { integer, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { balanceMutationRefTypeEnum, balanceMutationTypeEnum } from './pg-enums'
+import { users } from './users'
 
 export const balanceMutations = pgTable('balance_mutations', {
   id: uuid('id').primaryKey().defaultRandom(),

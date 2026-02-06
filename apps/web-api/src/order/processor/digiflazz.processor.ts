@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { OrderStatus, ProductBillingType, UserRole } from '@repo/db/types'
-import { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
-import { OrderRepository } from '../order.repository'
-import { RefundService } from '../services/refund.service'
+import { OrderStatus, ProductBillingType, type UserRole } from '@repo/db/types'
+import type { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
+import type { OrderRepository } from '../order.repository'
+import type { RefundService } from '../services/refund.service'
 
 @Injectable()
 export class DigiflazzOrderProcessor {

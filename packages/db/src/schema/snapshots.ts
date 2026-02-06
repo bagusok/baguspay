@@ -15,16 +15,16 @@ import { paymentMethods } from './payments'
 import {
   PaymentMethodAllowAccess,
   PaymentMethodFeeType,
-  paymentMethodFeeTypeEnum,
   PaymentMethodProvider,
-  paymentMethodProviderEnum,
   PaymentMethodType,
-  paymentMethodTypeEnum,
   ProductBillingType,
-  productBillingTypeEnum,
   ProductFullfillmentType,
-  productFullfillmentTypeEnum,
   ProductProvider,
+  paymentMethodFeeTypeEnum,
+  paymentMethodProviderEnum,
+  paymentMethodTypeEnum,
+  productBillingTypeEnum,
+  productFullfillmentTypeEnum,
   productProviderEnum,
 } from './pg-enums'
 import { products } from './products'

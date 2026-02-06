@@ -1,22 +1,18 @@
 import * as React from 'react'
-
-// --- Lib ---
-import { parseShortcutKeys } from '~/utils/tiptap_utils'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Tiptap UI ---
 import type { UseImageUploadConfig } from '~/components/tiptap/tiptap-ui/image-upload-button'
 import {
   IMAGE_UPLOAD_SHORTCUT_KEY,
   useImageUpload,
 } from '~/components/tiptap/tiptap-ui/image-upload-button'
-
 // --- UI Primitives ---
 import { Badge } from '~/components/tiptap/tiptap-ui-primitive/badge'
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button } from '~/components/tiptap/tiptap-ui-primitive/button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { parseShortcutKeys } from '~/utils/tiptap_utils'
 
 export interface ImageUploadButtonProps extends Omit<ButtonProps, 'type'>, UseImageUploadConfig {
   /**
@@ -55,7 +51,7 @@ export const ImageUploadButton = React.forwardRef<HTMLButtonElement, ImageUpload
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const { isVisible, canInsert, handleImage, label, isActive, shortcutKeys, Icon } =
@@ -71,7 +67,7 @@ export const ImageUploadButton = React.forwardRef<HTMLButtonElement, ImageUpload
         if (event.defaultPrevented) return
         handleImage()
       },
-      [handleImage, onClick]
+      [handleImage, onClick],
     )
 
     if (!isVisible) {
@@ -103,7 +99,7 @@ export const ImageUploadButton = React.forwardRef<HTMLButtonElement, ImageUpload
         )}
       </Button>
     )
-  }
+  },
 )
 
 ImageUploadButton.displayName = 'ImageUploadButton'

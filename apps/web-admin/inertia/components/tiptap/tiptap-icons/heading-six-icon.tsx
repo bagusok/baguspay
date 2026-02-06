@@ -24,7 +24,7 @@ export const HeadingSixIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 HeadingSixIcon.displayName = 'HeadingSixIcon'

@@ -1,8 +1,8 @@
 import { router } from '@inertiajs/react'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
 import { LoaderCircleIcon } from 'lucide-react'
+import { useState } from 'react'
 
 type Props = {
   isAvailable: boolean
@@ -29,7 +29,7 @@ export default function IsAvailableSwitchProduct({ isAvailable, productId }: Pro
         preserveScroll: true,
         onStart: () => setIsLoading(true),
         onFinish: () => setIsLoading(false),
-      }
+      },
     )
   }
 

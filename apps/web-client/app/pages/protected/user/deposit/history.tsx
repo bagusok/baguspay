@@ -129,7 +129,7 @@ export default function DepositHistory() {
     if (filter.deposit_id || filter.start_date || filter.end_date) {
       setPage(1)
     }
-  }, [page, limit, filter])
+  }, [filter])
 
   return (
     <>

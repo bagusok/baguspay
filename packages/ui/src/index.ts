@@ -29,6 +29,3 @@ export * from './hooks/use-mobile'
 
 // lib
 export * from './lib/utils'
-
-// styles (consumers can import directly as needed)
-export {}

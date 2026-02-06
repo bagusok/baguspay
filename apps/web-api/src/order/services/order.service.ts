@@ -1,11 +1,12 @@
+import * as crypto from 'node:crypto'
 import {
   BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-
+import type { ConfigService } from '@nestjs/config'
+import { arrayContains, eq, gte, lte, ne, type SQL } from '@repo/db'
 import {
   InquiryStatus,
   OfferType,
@@ -18,23 +19,20 @@ import {
   tb,
   UserRole,
 } from '@repo/db/types'
-
-import { arrayContains, eq, gte, lte, ne, SQL } from '@repo/db'
-import * as crypto from 'crypto'
-import { TUser } from 'src/common/types/meta.type'
+import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
 import { SignatureUtils } from 'src/common/utils/signature'
-import { DatabaseService } from 'src/database/database.service'
-import { DigiflazzCekTagihanResponse } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
-import { OffersRepository } from 'src/offers/offers.repository'
-import { OffersService } from 'src/offers/offers.service'
-import { ProductRepository } from 'src/products/product.repository'
-import { QueueService } from 'src/queue/queue.service'
-import { InquiryUniversalDto } from '../dto/inquiry.universal.dto'
-import { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from '../dto/order.dto'
-import { OrderRepository } from '../order.repository'
-import { InquiryService } from './inquiry.service'
+import type { DatabaseService } from 'src/database/database.service'
+import type { DigiflazzCekTagihanResponse } from 'src/integrations/h2h/digiflazz/digiflazz.type'
+import type { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
+import type { OffersRepository } from 'src/offers/offers.repository'
+import type { OffersService } from 'src/offers/offers.service'
+import type { ProductRepository } from 'src/products/product.repository'
+import type { QueueService } from 'src/queue/queue.service'
+import type { InquiryUniversalDto } from '../dto/inquiry.universal.dto'
+import type { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from '../dto/order.dto'
+import type { OrderRepository } from '../order.repository'
+import type { InquiryService } from './inquiry.service'
 
 @Injectable()
 export class OrderService {
@@ -50,7 +48,7 @@ export class OrderService {
     private readonly productRepository: ProductRepository,
   ) {}
 
-  async getPricePerPaymentMethod(productId: string, user: TUser) {
+  async getPricePerPaymentMethod(productId: string, _user: TUser) {
     const product = await this.orderRepository.findProductByProductIdForInquiry(productId)
 
     if (!product) {
@@ -87,7 +85,7 @@ export class OrderService {
       return acc
     }, new Map<string, PaymentMethodResult[]>())
 
-    let groupedList = Array.from(groupedPaymentMethods.entries()).map(([name, items]) => ({
+    const groupedList = Array.from(groupedPaymentMethods.entries()).map(([name, items]) => ({
       name,
       items: items.map(({ payment_method_category, ...rest }) => {
         const fee = this.calculateFee(product.price, rest.fee_percentage / 100, rest.fee_static)
@@ -265,7 +263,7 @@ export class OrderService {
       total_price: finalTotal,
     }
 
-    const inquiryExpired = new Date().getTime() + 15 * 60 * 1000
+    const inquiryExpired = Date.now() + 15 * 60 * 1000
 
     const inquiry = await this.orderRepository.createInquiry({
       status: InquiryStatus.CONFIRMED,
@@ -357,7 +355,7 @@ export class OrderService {
       return acc
     }, new Map<string, PaymentMethodResult[]>())
 
-    let groupedList = Array.from(groupedPaymentMethods.entries()).map(([name, items]) => ({
+    const groupedList = Array.from(groupedPaymentMethods.entries()).map(([name, items]) => ({
       name,
       items: items.map(({ payment_method_category, ...rest }) => {
         const fee = this.calculateFee(
@@ -409,8 +407,8 @@ export class OrderService {
 
     if (
       user.role === UserRole.GUEST &&
-      (paymentMethod.type == PaymentMethodType.BALANCE ||
-        paymentMethod.provider_name == PaymentMethodProvider.BALANCE)
+      (paymentMethod.type === PaymentMethodType.BALANCE ||
+        paymentMethod.provider_name === PaymentMethodProvider.BALANCE)
     ) {
       throw new BadRequestException('Guests are not allowed to use balance as a payment method.')
     }
@@ -452,126 +450,122 @@ export class OrderService {
       paymentMethod.fee_static,
     )
 
-    const { createPayment, voucherAplied } = await this.databaseService.db.transaction(
-      async (tx) => {
-        // Validate Voucher
-        const voucherAplied = inquiryData.offer_applied.find(
-          (offer) => offer.type === OfferType.VOUCHER,
-        )
+    const { createPayment } = await this.databaseService.db.transaction(async (tx) => {
+      // Validate Voucher
+      const voucherAplied = inquiryData.offer_applied.find(
+        (offer) => offer.type === OfferType.VOUCHER,
+      )
 
-        if (inquiryData.offer_applied.length > 0 && voucherAplied) {
-          const validateVoucher = await this.offerService.validateVoucher(
-            voucherAplied.id,
-            inquiryData.product_snapshot.product_id,
-            user,
-          )
-        }
-
-        // Validate Voucher
-
-        const createPayment = await this.pgService.createPayment({
-          user_id: user.id,
-          amount: inquiryData.total_price,
-          customer_email: user.email,
-          customer_phone: inquiryData.customer_phone,
-          customer_name: user.name,
-          expired_in: paymentMethod.expired_in,
-          provider_code: paymentMethod.provider_code,
-          fee_in_percent: paymentMethod.fee_percentage,
-          fee_static: paymentMethod.fee_static,
-          fee_type: paymentMethod.fee_type,
-          provider_name: paymentMethod.provider_name,
-          id: orderId,
-          order_items: [
-            {
-              name: `${inquiryData.product_snapshot.category_name} - ${inquiryData.product_snapshot.name}`,
-              price: inquiryData.total_price + calculateFee,
-              quantity: 1,
-              product_id: inquiryData.product_snapshot.product_id,
-              customer_input: inquiryData.customer_input_merged,
-            },
-          ],
-        })
-
-        const paymentSnapshot = await this.orderRepository.createPaymentSnapshot(
-          {
-            name: paymentMethod.name,
-            payment_method_id: paymentMethod.id,
-            type: paymentMethod.type,
-            fee_static: paymentMethod.fee_static,
-            fee_percentage: paymentMethod.fee_percentage,
-            fee_type: paymentMethod.fee_type,
-            provider_code: paymentMethod.provider_code,
-            provider_name: paymentMethod.provider_name,
-            allow_access: paymentMethod.allow_access,
-            email: user.email,
-
-            expired_in: paymentMethod.expired_in,
-            expired_at: createPayment.expired_at,
-
-            is_need_email: paymentMethod.is_need_email,
-            is_need_phone_number: paymentMethod.is_need_phone_number,
-            phone_number: data.payment_phone_number,
-
-            provider_ref_id: createPayment.ref_id,
-            qr_code: createPayment.qr_code,
-            pay_code: createPayment.pay_code,
-            pay_url: createPayment.pay_url,
-          },
-          tx,
-        )
-
-        const createOrder = await this.orderRepository.createOrder(
-          {
-            inquiry_id: inquiryData.id,
-            payment_snapshot_id: paymentSnapshot.id,
-            product_snapshot_id: inquiryData.product_snapshot_id,
-            user_id: user.id,
-            price: inquiryData.price,
-            total_price: createPayment.amount_total,
-            discount_price: inquiryData.discount_price,
-            cost_price: inquiryData.product_snapshot.provider_price,
-            fee: createPayment.total_fee,
-            profit: inquiryData.profit,
-            sn_number: '',
-            order_id: orderId,
-            payment_status: createPayment.status,
-            order_status:
-              createPayment.status == PaymentStatus.SUCCESS
-                ? OrderStatus.PENDING
-                : OrderStatus.NONE,
-            customer_input: inquiryData.customer_input_merged,
-            customer_phone: inquiryData.customer_phone,
-            customer_email: inquiryData.customer_email,
-            customer_ip: ip,
-            customer_ua: userAgent,
-          },
-          tx,
-        )
-
-        if (voucherAplied) {
-          await this.offerRepository.aplyOfferToOrder(voucherAplied.id, createOrder.id, user.id, tx)
-          await this.offerRepository.incrementOfferUsageCount(voucherAplied.id, tx)
-        }
-
-        await this.productRepository.decreaseProductStockByProductId(
+      if (inquiryData.offer_applied.length > 0 && voucherAplied) {
+        await this.offerService.validateVoucher(
+          voucherAplied.id,
           inquiryData.product_snapshot.product_id,
-          1,
-          tx,
+          user,
         )
+      }
 
-        await this.orderRepository.setInquiryStatus(InquiryStatus.USED, inquiryData.id, tx)
+      // Validate Voucher
 
-        return { createPayment, voucherAplied }
-      },
-    )
+      const createPayment = await this.pgService.createPayment({
+        user_id: user.id,
+        amount: inquiryData.total_price,
+        customer_email: user.email,
+        customer_phone: inquiryData.customer_phone,
+        customer_name: user.name,
+        expired_in: paymentMethod.expired_in,
+        provider_code: paymentMethod.provider_code,
+        fee_in_percent: paymentMethod.fee_percentage,
+        fee_static: paymentMethod.fee_static,
+        fee_type: paymentMethod.fee_type,
+        provider_name: paymentMethod.provider_name,
+        id: orderId,
+        order_items: [
+          {
+            name: `${inquiryData.product_snapshot.category_name} - ${inquiryData.product_snapshot.name}`,
+            price: inquiryData.total_price + calculateFee,
+            quantity: 1,
+            product_id: inquiryData.product_snapshot.product_id,
+            customer_input: inquiryData.customer_input_merged,
+          },
+        ],
+      })
+
+      const paymentSnapshot = await this.orderRepository.createPaymentSnapshot(
+        {
+          name: paymentMethod.name,
+          payment_method_id: paymentMethod.id,
+          type: paymentMethod.type,
+          fee_static: paymentMethod.fee_static,
+          fee_percentage: paymentMethod.fee_percentage,
+          fee_type: paymentMethod.fee_type,
+          provider_code: paymentMethod.provider_code,
+          provider_name: paymentMethod.provider_name,
+          allow_access: paymentMethod.allow_access,
+          email: user.email,
+
+          expired_in: paymentMethod.expired_in,
+          expired_at: createPayment.expired_at,
+
+          is_need_email: paymentMethod.is_need_email,
+          is_need_phone_number: paymentMethod.is_need_phone_number,
+          phone_number: data.payment_phone_number,
+
+          provider_ref_id: createPayment.ref_id,
+          qr_code: createPayment.qr_code,
+          pay_code: createPayment.pay_code,
+          pay_url: createPayment.pay_url,
+        },
+        tx,
+      )
+
+      const createOrder = await this.orderRepository.createOrder(
+        {
+          inquiry_id: inquiryData.id,
+          payment_snapshot_id: paymentSnapshot.id,
+          product_snapshot_id: inquiryData.product_snapshot_id,
+          user_id: user.id,
+          price: inquiryData.price,
+          total_price: createPayment.amount_total,
+          discount_price: inquiryData.discount_price,
+          cost_price: inquiryData.product_snapshot.provider_price,
+          fee: createPayment.total_fee,
+          profit: inquiryData.profit,
+          sn_number: '',
+          order_id: orderId,
+          payment_status: createPayment.status,
+          order_status:
+            createPayment.status === PaymentStatus.SUCCESS ? OrderStatus.PENDING : OrderStatus.NONE,
+          customer_input: inquiryData.customer_input_merged,
+          customer_phone: inquiryData.customer_phone,
+          customer_email: inquiryData.customer_email,
+          customer_ip: ip,
+          customer_ua: userAgent,
+        },
+        tx,
+      )
+
+      if (voucherAplied) {
+        await this.offerRepository.aplyOfferToOrder(voucherAplied.id, createOrder.id, user.id, tx)
+        await this.offerRepository.incrementOfferUsageCount(voucherAplied.id, tx)
+      }
+
+      await this.productRepository.decreaseProductStockByProductId(
+        inquiryData.product_snapshot.product_id,
+        1,
+        tx,
+      )
+
+      await this.orderRepository.setInquiryStatus(InquiryStatus.USED, inquiryData.id, tx)
+
+      return { createPayment, voucherAplied }
+    })
 
     // Add queue jobs AFTER transaction commits to ensure order exists in database
-    if (createPayment.status == PaymentStatus.SUCCESS) {
+    if (createPayment.status === PaymentStatus.SUCCESS) {
       await this.queueService.addOrderJob(orderId)
     }
 
-    if (createPayment.status == PaymentStatus.PENDING) {
+    if (createPayment.status === PaymentStatus.PENDING) {
       const delay = new Date(createPayment.expired_at).getTime() - Date.now()
       await this.queueService.addExpiredOrderJob(orderId, delay)
     }
@@ -743,7 +737,7 @@ export class OrderService {
       throw new NotFoundException(`Order with ID ${data.id} not found.`)
     }
 
-    if (user.role == UserRole.GUEST) {
+    if (user.role === UserRole.GUEST) {
       throw new BadRequestException('Guest users cannot cancel orders.')
     }
 

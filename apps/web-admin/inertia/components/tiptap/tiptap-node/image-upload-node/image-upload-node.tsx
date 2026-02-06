@@ -63,7 +63,7 @@ export interface UploadOptions {
   upload: (
     file: File,
     onProgress: (event: { progress: number }) => void,
-    signal: AbortSignal
+    signal: AbortSignal,
   ) => Promise<string>
   /**
    * Callback triggered when a file is uploaded successfully
@@ -88,7 +88,7 @@ function useFileUpload(options: UploadOptions) {
   const uploadFile = async (file: File): Promise<string | null> => {
     if (file.size > options.maxSize) {
       const error = new Error(
-        `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
+        `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`,
       )
       options.onError?.(error)
       return null
@@ -116,10 +116,10 @@ function useFileUpload(options: UploadOptions) {
         file,
         (event: { progress: number }) => {
           setFileItems((prev) =>
-            prev.map((item) => (item.id === fileId ? { ...item, progress: event.progress } : item))
+            prev.map((item) => (item.id === fileId ? { ...item, progress: event.progress } : item)),
           )
         },
-        abortController.signal
+        abortController.signal,
       )
 
       if (!url) throw new Error('Upload failed: No URL returned')
@@ -127,8 +127,8 @@ function useFileUpload(options: UploadOptions) {
       if (!abortController.signal.aborted) {
         setFileItems((prev) =>
           prev.map((item) =>
-            item.id === fileId ? { ...item, status: 'success', url, progress: 100 } : item
-          )
+            item.id === fileId ? { ...item, status: 'success', url, progress: 100 } : item,
+          ),
         )
         options.onSuccess?.(url)
         return url
@@ -139,8 +139,8 @@ function useFileUpload(options: UploadOptions) {
       if (!abortController.signal.aborted) {
         setFileItems((prev) =>
           prev.map((item) =>
-            item.id === fileId ? { ...item, status: 'error', progress: 0 } : item
-          )
+            item.id === fileId ? { ...item, status: 'error', progress: 0 } : item,
+          ),
         )
         options.onError?.(error instanceof Error ? error : new Error('Upload failed'))
       }
@@ -156,7 +156,7 @@ function useFileUpload(options: UploadOptions) {
 
     if (options.limit && files.length > options.limit) {
       options.onError?.(
-        new Error(`Maximum ${options.limit} file${options.limit === 1 ? '' : 's'} allowed`)
+        new Error(`Maximum ${options.limit} file${options.limit === 1 ? '' : 's'} allowed`),
       )
       return []
     }
@@ -344,7 +344,7 @@ const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({ fileItem, onRem
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+    return `${parseFloat((bytes / k ** i).toFixed(2))} ${sizes[i]}`
   }
 
   return (

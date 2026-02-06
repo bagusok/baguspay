@@ -16,13 +16,15 @@
     "build": "tsup",
     "build:watch": "tsup --watch",
     "dev": "tsup --watch",
-    "lint": "eslint . --ext .ts,.tsx --fix"
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.8.4",
-    "eslint-plugin-unused-imports": "^4.3.0",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },

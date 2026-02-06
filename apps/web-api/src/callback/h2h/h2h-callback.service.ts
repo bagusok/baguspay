@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { ProductBillingType } from '@repo/db/types'
-import {
+import type {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
 } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import { OrderRepository } from 'src/order/order.repository'
-import { DigiflazzH2HCallbackService } from './digiflazz-h2h-callback.service'
+import type { OrderRepository } from 'src/order/order.repository'
+import type { DigiflazzH2HCallbackService } from './digiflazz-h2h-callback.service'
 
 @Injectable()
 export class H2HCallbackService {
@@ -40,7 +40,7 @@ export class H2HCallbackService {
     }
 
     // Get order to check billing type
-    console.log('Payload Ref ID:', payload.data)
+    // console.log('Payload Ref ID:', payload.data)
     const order = await this.orderRepository.findOrderByIdWithRelation(orderId)
 
     if (!order) {

@@ -1,6 +1,6 @@
 import { BannerLocation } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 export const createBannerValidator = vine.object({
   title: vine.string().trim().minLength(1),

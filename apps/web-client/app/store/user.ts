@@ -2,10 +2,10 @@ import type { UserRole } from '@repo/db/types'
 import { atomWithQuery } from 'jotai-tanstack-query'
 import { apiClient } from '~/utils/axios'
 
-export const userAtom = atomWithQuery<UserMe>((get) => {
+export const userAtom = atomWithQuery<UserMe>((_) => {
   return {
     queryKey: ['userAtom'],
-    queryFn: async ({}) =>
+    queryFn: async () =>
       apiClient
         .get('/user/me')
         .then((res) => res.data.data)

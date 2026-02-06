@@ -1,17 +1,17 @@
 import {
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   Injectable,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { JwtService } from '@nestjs/jwt'
+import type { ConfigService } from '@nestjs/config'
+import type { JwtService } from '@nestjs/jwt'
 import { eq } from '@repo/db'
 import { tb } from '@repo/db/types'
-import { Request } from 'express'
+import type { Request } from 'express'
 import { GUEST_USER } from 'src/common/constants/guest-user'
-import { DatabaseService } from 'src/database/database.service'
+import type { DatabaseService } from 'src/database/database.service'
 
 @Injectable()
 export class TransactionGuard implements CanActivate {

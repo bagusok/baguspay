@@ -1,0 +1,38 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "root": false,
+  "extends": ["../../biome.json"],
+  "linter": {
+    "rules": {
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "useHookAtTopLevel": "error",
+        "noUnusedVariables": "warn",
+        "noUnusedFunctionParameters": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
+      },
+      "complexity": {
+        "noUselessFragments": "warn"
+      },
+      "style": {
+        "useImportType": "off"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off"
+      },
+      "security": {
+        "noDangerouslySetInnerHtml": "warn"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "files": {
+    "includes": ["!build", "!node_modules", "!.react-router"]
+  }
+}

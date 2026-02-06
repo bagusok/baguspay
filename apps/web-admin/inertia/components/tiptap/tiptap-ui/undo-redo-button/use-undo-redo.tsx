@@ -1,19 +1,16 @@
 'use client'
 
-import { type Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
-// --- Hooks ---
-import { useIsMobile } from '~/hooks/use-mobile'
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
-// --- Lib ---
-import { isNodeTypeSelected } from '~/utils/tiptap_utils'
-
 // --- Icons ---
 import { Redo2Icon } from '~/components/tiptap/tiptap-icons/redo2-icon'
 import { Undo2Icon } from '~/components/tiptap/tiptap-icons/undo2-icon'
+// --- Hooks ---
+import { useIsMobile } from '~/hooks/use-mobile'
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { isNodeTypeSelected } from '~/utils/tiptap_utils'
 
 export type UndoRedoAction = 'undo' | 'redo'
 
@@ -175,7 +172,7 @@ export function useUndoRedo(config: UseUndoRedoConfig) {
       enabled: isVisible && canExecute,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

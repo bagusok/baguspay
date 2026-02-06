@@ -2,12 +2,10 @@
 
 import type { Editor } from '@tiptap/react'
 import * as React from 'react'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Icons ---
 import { LinkIcon } from '~/components/tiptap/tiptap-icons/link-icon'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
 
 // --- Lib ---
 import { isMarkInSchema, sanitizeUrl } from '~/utils/tiptap_utils'
@@ -157,7 +155,7 @@ export function useLinkHandler(props: LinkHandlerProps) {
         window.open(safeUrl, target, features)
       }
     },
-    [url]
+    [url],
   )
 
   return {
@@ -188,7 +186,7 @@ export function useLinkState(props: { editor: Editor | null; hideWhenUnavailable
         shouldShowLinkButton({
           editor,
           hideWhenUnavailable,
-        })
+        }),
       )
     }
 

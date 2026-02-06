@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { AuthModule } from './auth/auth.module'
+import { BlogModule } from './blog/blog.module'
 import { CallbackModule } from './callback/callback.module'
 import { DatabaseModule } from './database/database.module'
 import { DepositModule } from './deposit/deposit.module'
@@ -19,9 +20,9 @@ import { PaymentsModule } from './payments/payments.module'
 import { ProductCategoriesModule } from './product-categories/product-categories.module'
 import { ProductsModule } from './products/products.module'
 import { QueueModule } from './queue/queue.module'
+import { SettingsModule } from './settings/settings.module'
 import { StorageModule } from './storage/storage.module'
 import { UserModule } from './user/user.module'
-import { SettingsModule } from './settings/settings.module'
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { SettingsModule } from './settings/settings.module'
     OffersModule,
     StorageModule,
     SettingsModule,
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [AppService],

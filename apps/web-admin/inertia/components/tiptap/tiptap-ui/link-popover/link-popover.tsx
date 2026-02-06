@@ -1,20 +1,13 @@
 import type { Editor } from '@tiptap/react'
 import * as React from 'react'
-
-// --- Hooks ---
-import { useIsMobile } from '~/hooks/use-mobile'
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Icons ---
 import { CornerDownLeftIcon } from '~/components/tiptap/tiptap-icons/corner-down-left-icon'
 import { ExternalLinkIcon } from '~/components/tiptap/tiptap-icons/external-link-icon'
 import { LinkIcon } from '~/components/tiptap/tiptap-icons/link-icon'
 import { TrashIcon } from '~/components/tiptap/tiptap-icons/trash-icon'
-
 // --- Tiptap UI ---
 import type { UseLinkPopoverConfig } from '~/components/tiptap/tiptap-ui/link-popover'
 import { useLinkPopover } from '~/components/tiptap/tiptap-ui/link-popover'
-
 // --- UI Primitives ---
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button, ButtonGroup } from '~/components/tiptap/tiptap-ui-primitive/button'
@@ -26,6 +19,9 @@ import {
   PopoverTrigger,
 } from '~/components/tiptap/tiptap-ui-primitive/popover'
 import { Separator } from '~/components/tiptap/tiptap-ui-primitive/separator'
+// --- Hooks ---
+import { useIsMobile } from '~/hooks/use-mobile'
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
 
 export interface LinkMainProps {
   /**
@@ -86,7 +82,7 @@ export const LinkButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {children || <LinkIcon className="tiptap-button-icon" />}
       </Button>
     )
-  }
+  },
 )
 
 LinkButton.displayName = 'LinkButton'
@@ -208,7 +204,7 @@ export const LinkPopover = React.forwardRef<HTMLButtonElement, LinkPopoverProps>
       children,
       ...buttonProps
     },
-    ref
+    ref,
   ) => {
     const { editor } = useTiptapEditor(providedEditor)
     const [isOpen, setIsOpen] = React.useState(false)
@@ -225,7 +221,7 @@ export const LinkPopover = React.forwardRef<HTMLButtonElement, LinkPopoverProps>
         setIsOpen(nextIsOpen)
         onOpenChange?.(nextIsOpen)
       },
-      [onOpenChange]
+      [onOpenChange],
     )
 
     const handleSetLink = React.useCallback(() => {
@@ -239,7 +235,7 @@ export const LinkPopover = React.forwardRef<HTMLButtonElement, LinkPopoverProps>
         if (event.defaultPrevented) return
         setIsOpen(!isOpen)
       },
-      [onClick, isOpen]
+      [onClick, isOpen],
     )
 
     React.useEffect(() => {
@@ -281,7 +277,7 @@ export const LinkPopover = React.forwardRef<HTMLButtonElement, LinkPopoverProps>
         </PopoverContent>
       </Popover>
     )
-  }
+  },
 )
 
 LinkPopover.displayName = 'LinkPopover'

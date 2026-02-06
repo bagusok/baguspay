@@ -38,7 +38,7 @@ export const BlockquoteIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 BlockquoteIcon.displayName = 'BlockquoteIcon'

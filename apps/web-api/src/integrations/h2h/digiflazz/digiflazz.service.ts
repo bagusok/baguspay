@@ -1,9 +1,9 @@
+import crypto from 'node:crypto'
 import { BadRequestException, GatewayTimeoutException, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { OrderStatus } from '@repo/db/types'
-import axios, { AxiosInstance } from 'axios'
-import crypto from 'crypto'
-import {
+import axios, { type AxiosInstance } from 'axios'
+import type {
   DigiflazzApiTopupResponse,
   DigiflazzBayarTagihanData,
   DigiflazzBayarTagihanResponse,
@@ -158,8 +158,6 @@ export class DigiflazzService {
         sign: sign,
       })
 
-      console.log('Digiflazz Cek Tagihan Response:', response.data)
-
       switch (response.data.data.rc) {
         case '00':
           return {
@@ -226,7 +224,7 @@ export class DigiflazzService {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log('Digiflazz Cek Tagihan Error Response:', error.response?.data)
+        // console.log('Digiflazz Cek Tagihan Error Response:', error.response?.data)
         throw new BadRequestException(
           `DF: ${error.response?.data?.message || error.response?.data?.data?.message}`,
         )
@@ -400,7 +398,7 @@ export class DigiflazzService {
       .update(JSON.stringify(payload))
       .digest('hex')
 
-    console.log('Generated Sign:', sign, signFromPost)
+    // console.log('Generated Sign:', sign, signFromPost)
 
     return {
       isValid: `sha1=${sign}` === signFromPost,

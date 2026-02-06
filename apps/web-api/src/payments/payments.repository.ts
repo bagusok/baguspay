@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { and, eq } from '@repo/db'
 import { PaymentMethodProvider, PaymentMethodType, tb } from '@repo/db/types'
-import { DatabaseService } from 'src/database/database.service'
+import type { DatabaseService } from 'src/database/database.service'
 
 @Injectable()
 export class PaymentsRepository {

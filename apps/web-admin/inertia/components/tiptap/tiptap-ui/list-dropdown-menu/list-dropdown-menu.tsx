@@ -1,17 +1,9 @@
-import { type Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import * as React from 'react'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Icons ---
 import { ChevronDownIcon } from '~/components/tiptap/tiptap-icons/chevron-down-icon'
-
 // --- Tiptap UI ---
 import { ListButton, type ListType } from '~/components/tiptap/tiptap-ui/list-button'
-
-import { useListDropdownMenu } from './use-list-dropdown-menu'
-
 // --- UI Primitives ---
 import type { ButtonProps } from '~/components/tiptap/tiptap-ui-primitive/button'
 import { Button, ButtonGroup } from '~/components/tiptap/tiptap-ui-primitive/button'
@@ -22,6 +14,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/tiptap/tiptap-ui-primitive/dropdown-menu'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+import { useListDropdownMenu } from './use-list-dropdown-menu'
 
 export interface ListDropdownMenuProps extends Omit<ButtonProps, 'type'> {
   /**
@@ -70,7 +65,7 @@ export function ListDropdownMenu({
       setIsOpen(open)
       onOpenChange?.(open)
     },
-    [onOpenChange]
+    [onOpenChange],
   )
 
   if (!isVisible || !editor || !editor.isEditable) {

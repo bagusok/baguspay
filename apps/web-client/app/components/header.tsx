@@ -140,7 +140,7 @@ export default function Header() {
               variant="secondary"
               onClick={() => setTheme((prev) => (prev === Theme.LIGHT ? Theme.DARK : Theme.LIGHT))}
             >
-              {theme == Theme.LIGHT ? (
+              {theme === Theme.LIGHT ? (
                 <SunIcon className="h-6 w-6 text-foreground" />
               ) : (
                 <MoonIcon className="h-6 w-6 text-foreground" />

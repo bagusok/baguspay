@@ -5,7 +5,7 @@ import { Link } from 'react-router'
 export default function NotFound() {
   return (
     <div className="md:max-w-7xl mx-auto">
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent p-8 md:p-12 border border-border text-center">
+      <section className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-8 md:p-12 border border-border text-center">
         <div className="relative z-10 flex flex-col items-center">
           <div className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             <TriangleAlert className="size-4" />
@@ -37,16 +37,5 @@ export default function NotFound() {
         <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
       </section>
     </div>
-  )
-}
-
-function QuickLink({ to, label }: { to: string; label: string }) {
-  return (
-    <Link
-      to={to}
-      className="rounded-lg border border-border bg-card px-3 py-2 hover:bg-secondary transition"
-    >
-      {label}
-    </Link>
   )
 }

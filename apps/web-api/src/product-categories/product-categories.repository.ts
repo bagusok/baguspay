@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { and, asc, eq, ilike } from '@repo/db'
-import { tb } from '@repo/db/types'
-import { DatabaseService } from 'src/database/database.service'
-import { ProductCategoriesQueryDto } from './product-categories.dto'
+import { type ProductCategoryType, tb } from '@repo/db/types'
+import type { DatabaseService } from 'src/database/database.service'
+import type { ProductCategoriesQueryDto } from './product-categories.dto'
 
 @Injectable()
 export class ProductCategoriesRepository {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async findAll(query: ProductCategoriesQueryDto, isSpecialFeature = false) {
-    return this.databaseService.db.query.productCategories.findMany({
+    return await this.databaseService.db.query.productCategories.findMany({
       where: and(
         ...(query.type ? [eq(tb.productCategories.type, query.type)] : []),
         ...(query.billing_type
@@ -36,5 +36,28 @@ export class ProductCategoriesRepository {
         sub_name: true,
       },
     })
+  }
+
+  async findByType(type: ProductCategoryType) {
+    const categories = await this.databaseService.db.query.productCategories.findMany({
+      where: eq(tb.productCategories.type, type),
+      orderBy: asc(tb.productCategories.name),
+      columns: {
+        id: true,
+        name: true,
+        slug: true,
+        image_url: true,
+        icon_url: true,
+        is_available: true,
+        is_featured: true,
+        label: true,
+        publisher: true,
+        is_special_feature: true,
+        special_feature_key: true,
+        sub_name: true,
+      },
+    })
+
+    return categories
   }
 }

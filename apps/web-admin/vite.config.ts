@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite'
 import { getDirname } from '@adonisjs/core/helpers'
 import inertia from '@adonisjs/inertia/client'
-import react from '@vitejs/plugin-react'
 import adonisjs from '@adonisjs/vite/client'
 import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [
@@ -24,5 +24,12 @@ export default defineConfig({
   },
   server: {
     allowedHosts: ['.adonisjs.dev', 'localhost', '.ngrok-free.app', 'tunnel.bagusok.dev'],
+    hmr: {
+      port: 24679, // Unique port for web-admin HMR to avoid conflicts
+    },
+    watch: {
+      // Prevent watch from crashing on Windows
+      usePolling: false,
+    },
   },
 })

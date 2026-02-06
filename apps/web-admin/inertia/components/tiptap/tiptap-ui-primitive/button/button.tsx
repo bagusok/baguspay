@@ -27,6 +27,7 @@ export const ShortcutDisplay: React.FC<{ shortcuts: string[] }> = ({ shortcuts }
   return (
     <div>
       {shortcuts.map((key, index) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: aaa
         <React.Fragment key={index}>
           {index > 0 && <kbd>+</kbd>}
           <kbd>{key}</kbd>
@@ -47,7 +48,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'aria-label': ariaLabel,
       ...props
     },
-    ref
+    ref,
   ) => {
     const shortcuts = React.useMemo(() => parseShortcutKeys({ shortcutKeys }), [shortcutKeys])
 
@@ -80,7 +81,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </TooltipContent>
       </Tooltip>
     )
-  }
+  },
 )
 
 Button.displayName = 'Button'
@@ -92,6 +93,7 @@ export const ButtonGroup = React.forwardRef<
   }
 >(({ className, children, orientation = 'vertical', ...props }, ref) => {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: aa
     <div
       ref={ref}
       className={cn('tiptap-button-group', className)}

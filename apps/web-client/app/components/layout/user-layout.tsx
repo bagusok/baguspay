@@ -1,6 +1,6 @@
 import { useAtom, useAtomValue } from 'jotai'
-import { queryClientAtom } from 'jotai-tanstack-query'
 import { useHydrateAtoms } from 'jotai/utils'
+import { queryClientAtom } from 'jotai-tanstack-query'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { deviceIdAtom } from '~/store/device-id'

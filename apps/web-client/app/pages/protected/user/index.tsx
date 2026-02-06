@@ -120,25 +120,25 @@ export default function UserDashboard() {
     // If it looks like a phone number (starts with 0 or +)
     if (input.startsWith('0') || input.startsWith('+')) {
       if (input.length > 6) {
-        return input.slice(0, 4) + '****' + input.slice(-3)
+        return `${input.slice(0, 4)}****${input.slice(-3)}`
       }
-      return input.slice(0, 3) + '****'
+      return `${input.slice(0, 3)}****`
     }
 
     // If it contains underscore (game ID format)
     if (input.includes('_')) {
       const parts = input.split('_')
       if (parts[0].length > 4) {
-        parts[0] = parts[0].slice(0, 3) + '****' + parts[0].slice(-2)
+        parts[0] = `${parts[0].slice(0, 3)}****${parts[0].slice(-2)}`
       }
       return parts.join('_')
     }
 
     // For other formats
     if (input.length > 6) {
-      return input.slice(0, 3) + '****' + input.slice(-2)
+      return `${input.slice(0, 3)}****${input.slice(-2)}`
     } else if (input.length > 3) {
-      return input.slice(0, 2) + '****'
+      return `${input.slice(0, 2)}****`
     }
 
     return input
@@ -281,26 +281,24 @@ export default function UserDashboard() {
           </CardHeader>
           <CardContent className="space-y-4">
             {isLoading ? (
-              <>
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-muted rounded-lg animate-pulse"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-muted rounded animate-pulse w-32"></div>
-                        <div className="h-3 bg-muted rounded animate-pulse w-24"></div>
-                      </div>
-                    </div>
+              [1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-muted rounded-lg animate-pulse"></div>
                     <div className="space-y-2">
-                      <div className="h-6 bg-muted rounded animate-pulse w-16"></div>
-                      <div className="h-3 bg-muted rounded animate-pulse w-20"></div>
+                      <div className="h-4 bg-muted rounded animate-pulse w-32"></div>
+                      <div className="h-3 bg-muted rounded animate-pulse w-24"></div>
                     </div>
                   </div>
-                ))}
-              </>
+                  <div className="space-y-2">
+                    <div className="h-6 bg-muted rounded animate-pulse w-16"></div>
+                    <div className="h-3 bg-muted rounded animate-pulse w-20"></div>
+                  </div>
+                </div>
+              ))
             ) : data?.recentOrders?.length === 0 ? (
               <div className="text-center text-muted-foreground py-4">Belum ada orderan</div>
             ) : (

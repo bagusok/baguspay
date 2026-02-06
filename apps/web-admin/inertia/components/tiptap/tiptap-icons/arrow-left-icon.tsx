@@ -18,7 +18,7 @@ export const ArrowLeftIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 ArrowLeftIcon.displayName = 'ArrowLeftIcon'

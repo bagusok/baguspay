@@ -1,3 +1,7 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, count, db, desc, eq, ilike, type SQL } from '@repo/db'
+import { tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
 import {
   createPayementMethodCategoryValidator,
   createPaymentMethodsValidator,
@@ -6,10 +10,6 @@ import {
   updatePayementMethodCategoryValidator,
   updatePaymentMethodsValidator,
 } from '#validators/payments'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, desc, eq, ilike, SQL } from '@repo/db'
-import { tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 
 export default class PaymentsController {
   public async indexCategory(ctx: HttpContext) {
@@ -85,7 +85,7 @@ export default class PaymentsController {
       vine.compile(createPayementMethodCategoryValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     await db.insert(tb.paymentMethodCategories).values(data)
@@ -103,7 +103,7 @@ export default class PaymentsController {
       vine.compile(updatePayementMethodCategoryValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const category = await db.query.paymentMethodCategories.findFirst({
@@ -153,7 +153,7 @@ export default class PaymentsController {
       vine.compile(createPaymentMethodsValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const image = await db.query.fileManager.findFirst({
@@ -185,7 +185,7 @@ export default class PaymentsController {
       vine.compile(updatePaymentMethodsValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const paymentMethod = await db.query.paymentMethods.findFirst({

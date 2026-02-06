@@ -93,7 +93,7 @@ export default function PaymentMethodSelector({
 }: Props) {
   // Convert balance data to PaymentItem format for selection
   const handleBalanceSelect = () => {
-    if (balanceData && balanceData.is_available && balanceData.user_balance >= productPrice) {
+    if (balanceData?.is_available && balanceData.user_balance >= productPrice) {
       const balanceItem: PaymentItem = {
         id: balanceData.id,
         name: balanceData.name,

@@ -1,3 +1,8 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, count, db, desc, eq, ilike, or } from '@repo/db'
+import { BalanceMutationRefType, BalanceMutationType, tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
+import { hash } from 'bcrypt-ts'
 import {
   addBalanceValidator,
   createUserValidator,
@@ -6,16 +11,9 @@ import {
   updateUserValidator,
   userQueryValidator,
 } from '#validators/user'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, count, db, desc, eq, ilike, or } from '@repo/db'
-import { BalanceMutationRefType, BalanceMutationType, tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
-import { hash } from 'bcrypt-ts'
 
 export default class UsersController {
   public async index({ inertia, request }: HttpContext) {
-    console.log('UsersController.index called', request.qs())
-
     const {
       limit = 10,
       page = 1,
@@ -107,8 +105,6 @@ export default class UsersController {
   }
 
   public async postDelete({ request, response, session }: HttpContext) {
-    console.log('postUpdate called', request.params())
-
     const data = await request.validateUsing(vine.compile(deleteUserParamsValidator), {
       data: request.params(),
     })
@@ -191,7 +187,7 @@ export default class UsersController {
         where.push(eq(tb.users.id, searchQuery))
       } else {
         where.push(
-          or(ilike(tb.users.name, `%${searchQuery}%`), ilike(tb.users.email, `%${searchQuery}%`))
+          or(ilike(tb.users.name, `%${searchQuery}%`), ilike(tb.users.email, `%${searchQuery}%`)),
         )
       }
     }
@@ -286,7 +282,7 @@ export default class UsersController {
       vine.compile(deductBalanceValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const { id } = await ctx.request.validateUsing(vine.compile(deleteUserParamsValidator), {

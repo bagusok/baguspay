@@ -1,16 +1,16 @@
+import type { ClassConstructor } from 'class-transformer'
 import {
-  ValidatorConstraint,
-  ValidatorConstraintInterface,
-  ValidationOptions,
   registerDecorator,
-  ValidationArguments,
+  type ValidationArguments,
+  type ValidationOptions,
+  ValidatorConstraint,
+  type ValidatorConstraintInterface,
 } from 'class-validator'
-import { ClassConstructor } from 'class-transformer'
 
 type Tfn<T> = (o: T) => any
 
 export const Match = <T>(
-  type: ClassConstructor<T>,
+  _type: ClassConstructor<T>,
   property: Tfn<T>,
   validationOptions?: ValidationOptions,
 ) => {

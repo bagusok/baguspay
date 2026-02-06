@@ -5,7 +5,7 @@ import {
   PaymentMethodType,
 } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 export const createPayementMethodCategoryValidator = vine.object({
   name: vine.string().maxLength(100),

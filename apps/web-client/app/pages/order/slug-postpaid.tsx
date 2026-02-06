@@ -24,9 +24,9 @@ import Image from '~/components/image'
 import { useInquiry } from '../../hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
 import {
-  inquirySchema,
   type InputField,
   type InquiryForm,
+  inquirySchema,
   type OrderProducts,
   type ProductCategoryData,
 } from './slug'
@@ -68,7 +68,7 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
     mutationKey: ['inquiry-postpaid', selectedProduct?.id || 'unknown'],
   })
 
-  const { fields, replace, update } = useFieldArray({
+  const { update } = useFieldArray({
     control: form.control,
     name: 'input_fields',
   })

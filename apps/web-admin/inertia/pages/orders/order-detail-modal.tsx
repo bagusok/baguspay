@@ -1,5 +1,5 @@
-import { InferSelectModel } from '@repo/db'
-import { OrderStatus, PaymentStatus, RefundStatus, tb } from '@repo/db/types'
+import type { InferSelectModel } from '@repo/db'
+import { OrderStatus, PaymentStatus, RefundStatus, type tb } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
@@ -52,7 +52,7 @@ export default function OrderDetailModal({ orderId }: Props) {
     if (open) {
       detailOrder.mutate()
     }
-  }, [open])
+  }, [open, detailOrder])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

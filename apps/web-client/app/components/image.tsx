@@ -14,8 +14,8 @@ function resolveSrc(src: string, baseUrl: string) {
 
 const _baseUrl = import.meta.env.VITE_S3_URL
 
-export default function Image({ src, baseUrl = _baseUrl, ...rest }: ImageProps) {
+export default function Image({ src, baseUrl = _baseUrl, alt = '', ...rest }: ImageProps) {
   const finalSrc =
     typeof src === 'string' && src.trim().length > 0 ? resolveSrc(src, baseUrl) : undefined
-  return <img src={finalSrc} {...rest} />
+  return <img src={finalSrc} alt={alt} {...rest} />
 }

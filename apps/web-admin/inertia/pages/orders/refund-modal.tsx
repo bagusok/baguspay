@@ -24,7 +24,7 @@ export default function RefundOrderModal({ orderId }: { orderId: string }) {
         setOpen(false)
       },
       onError: (error) => {
-        toast.error('Error changing status: ' + error.error)
+        toast.error(`Error changing status: ${error.error}`)
         console.error('Error changing status:', error)
       },
     })
@@ -34,7 +34,7 @@ export default function RefundOrderModal({ orderId }: { orderId: string }) {
     if (open) {
       form.setData('status', status)
     }
-  }, [open])
+  }, [open, form])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

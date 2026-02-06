@@ -1,6 +1,4 @@
-import PaymentsController from '#controllers/payments_controller'
-import { CreatePaymentMethodsValidator } from '#validators/payments'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
 import {
   PaymentMethodAllowAccess,
@@ -26,7 +24,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { FormEvent, useState } from 'react'
+import { type FormEvent, useState } from 'react'
+import type PaymentsController from '#controllers/payments_controller'
+import type { CreatePaymentMethodsValidator } from '#validators/payments'
 import FileManager from '~/components/file-manager'
 import { SimpleEditor } from '~/components/tiptap/tiptap-templates/simple/simple-editor'
 
@@ -369,7 +369,7 @@ export function AddPaymentMethodModal({ categories }: Props) {
                       } else {
                         form.setData(
                           'allow_access',
-                          form.data.allow_access.filter((val) => val !== a)
+                          form.data.allow_access.filter((val) => val !== a),
                         )
                       }
                     }}

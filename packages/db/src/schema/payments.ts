@@ -14,10 +14,10 @@ import { deposits } from './deposits'
 import {
   PaymentMethodAllowAccess,
   PaymentMethodFeeType,
-  paymentMethodFeeTypeEnum,
   PaymentMethodProvider,
-  paymentMethodProviderEnum,
   PaymentMethodType,
+  paymentMethodFeeTypeEnum,
+  paymentMethodProviderEnum,
   paymentMethodTypeEnum,
 } from './pg-enums'
 import { paymentSnapshots } from './snapshots'

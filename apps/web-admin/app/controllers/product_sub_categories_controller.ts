@@ -1,12 +1,12 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { db, eq } from '@repo/db'
+import { tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
 import {
   createProductSubCategoryValidator,
   productIdValidator,
   updateProductSubCategoryValidator,
 } from '#validators/product'
-import type { HttpContext } from '@adonisjs/core/http'
-import { db, eq } from '@repo/db'
-import { tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 
 export default class ProductSubCategoriesController {
   public async postCreate(ctx: HttpContext) {
@@ -14,7 +14,7 @@ export default class ProductSubCategoriesController {
       vine.compile(createProductSubCategoryValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const image = await db.query.fileManager.findFirst({

@@ -4,7 +4,7 @@ import { orders } from './orders'
 import {
   InquiryStatus,
   inquiryStatusEnum,
-  OfferAppliedOnInquiry,
+  type OfferAppliedOnInquiry,
   ProductProvider,
   productProviderEnum,
 } from './pg-enums'

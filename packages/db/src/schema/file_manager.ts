@@ -1,8 +1,4 @@
-import { varchar } from 'drizzle-orm/pg-core'
-import { timestamp } from 'drizzle-orm/pg-core'
-import { integer } from 'drizzle-orm/pg-core'
-import { uuid } from 'drizzle-orm/pg-core'
-import { pgTable } from 'drizzle-orm/pg-core'
+import { integer, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 
 export const fileManager = pgTable('file_manager', {
   id: uuid('id').primaryKey().defaultRandom(),

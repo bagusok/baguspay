@@ -1,5 +1,5 @@
-import { InferSelectModel } from '@repo/db'
-import { tb } from '@repo/db/types'
+import type { InferSelectModel } from '@repo/db'
+import type { tb } from '@repo/db/types'
 import { atomWithQuery } from 'jotai-tanstack-query'
 import { apiClient } from '~/utils/axios'
 

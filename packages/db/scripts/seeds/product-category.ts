@@ -1,7 +1,7 @@
 // Anda mungkin perlu mengimpor tipe ProductCategoryTypeEnum jika belum global
 // import { ProductCategoryType } from './schema';
 
-import { db } from '@/database'
+import type { db } from '@/database'
 import { ProductCategoryType } from '@/schema'
 import { tb } from '@/table'
 

@@ -21,7 +21,7 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     return (
       <div
@@ -36,7 +36,7 @@ export const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
         {children}
       </div>
     )
-  }
+  },
 )
 
 Badge.displayName = 'Badge'

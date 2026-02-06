@@ -2,25 +2,21 @@
 
 import type { Editor } from '@tiptap/react'
 import * as React from 'react'
-
-// --- Hooks ---
-import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Icons ---
 import { ListIcon } from '~/components/tiptap/tiptap-icons/list-icon'
 import { ListOrderedIcon } from '~/components/tiptap/tiptap-icons/list-ordered-icon'
 import { ListTodoIcon } from '~/components/tiptap/tiptap-icons/list-todo-icon'
-
-// --- Lib ---
-import { isNodeInSchema } from '~/utils/tiptap_utils'
-
 // --- Tiptap UI ---
 import {
   canToggleList,
   isListActive,
-  listIcons,
   type ListType,
+  listIcons,
 } from '~/components/tiptap/tiptap-ui/list-button'
+// --- Hooks ---
+import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
+// --- Lib ---
+import { isNodeInSchema } from '~/utils/tiptap_utils'
 
 /**
  * Configuration for the list dropdown menu functionality
@@ -105,7 +101,7 @@ export function shouldShowListDropdown(params: {
  */
 export function getActiveListType(
   editor: Editor | null,
-  availableTypes: ListType[]
+  availableTypes: ListType[],
 ): ListType | undefined {
   if (!editor || !editor.isEditable) return undefined
   return availableTypes.find((type) => isListActive(editor, type))
@@ -180,7 +176,7 @@ export function useListDropdownMenu(config?: UseListDropdownMenuConfig) {
           hideWhenUnavailable,
           listInSchema,
           canToggleAny,
-        })
+        }),
       )
     }
 

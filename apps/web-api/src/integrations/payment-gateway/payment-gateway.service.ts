@@ -1,15 +1,13 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { PaymentMethodProvider } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
-import { BalanceService } from './balance/balance.service'
-import { DuitkuService } from './duitku/duitku.service'
-import { CreatePaymentGatewayRequest } from './payment-gateway.type'
-import { TripayService } from './tripay/tripay.service'
+import type { DBInstance } from 'src/common/types/db-instance'
+import type { BalanceService } from './balance/balance.service'
+import type { DuitkuService } from './duitku/duitku.service'
+import type { CreatePaymentGatewayRequest } from './payment-gateway.type'
+import type { TripayService } from './tripay/tripay.service'
 
 @Injectable()
 export class PaymentGatewayService {
-  private readonly logger = new Logger(PaymentGatewayService.name)
-
   constructor(
     private readonly tripayService: TripayService,
     private readonly duitkuService: DuitkuService,

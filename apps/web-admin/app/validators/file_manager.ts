@@ -12,7 +12,7 @@ export const uploadFilesValidator = vine.object({
     vine.file({
       size: '5mb',
       extnames: ['jpg', 'jpeg', 'heic', 'heif', 'png', 'webp', 'avif'],
-    })
+    }),
   ),
 })
 

@@ -6,7 +6,12 @@
     "build": "react-router build",
     "dev": "react-router dev --host",
     "start": "set PORT=9992 && react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

@@ -41,7 +41,7 @@ export default function DeleteOfferUserModal({
           queryClient.invalidateQueries({ queryKey: ['offerUsers', offerId], exact: false })
         },
         preserveScroll: true,
-      }
+      },
     )
   }
 

@@ -1,8 +1,8 @@
 import { Body, Controller, Headers, Post } from '@nestjs/common'
 import { ApiTags } from '@nestjs/swagger'
-import { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type'
-import { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type'
-import { PaymentGatewayCallbackService } from './payment-gateway-callback.service'
+import type { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type'
+import type { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type'
+import type { PaymentGatewayCallbackService } from './payment-gateway-callback.service'
 
 @ApiTags('Callback')
 @Controller('callback/payment')

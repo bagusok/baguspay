@@ -4,12 +4,12 @@
     "module": "es2022", // Output ES modules (Node 16+ friendly, supports bundler resolution)
     "moduleResolution": "bundler", // Support package.json exports (subpath imports)
     "outDir": "dist", // Hasil build ada di dist/
-    "rootDir": "src", // Source code di src/
+    "rootDir": ".", // Source code di src/ and example/
     "esModuleInterop": true, // Supaya bisa import default (axios, dotenv, dll)
     "strict": true, // Type checking ketat
     "skipLibCheck": true, // Biar build cepat
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx", "example/test.ts"],
   "exclude": ["node_modules", "dist"]
 }

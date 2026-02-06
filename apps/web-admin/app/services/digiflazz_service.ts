@@ -1,7 +1,7 @@
-import env from '#start/env'
+import crypto from 'node:crypto'
 import { inject } from '@adonisjs/core'
-import { isAxiosError, type AxiosInstance } from 'axios'
-import crypto from 'crypto'
+import { type AxiosInstance, isAxiosError } from 'axios'
+import env from '#start/env'
 
 @inject()
 export class DigiflazzService {
@@ -43,7 +43,7 @@ export class DigiflazzService {
       category?: string
       brand?: string
       type?: string
-    }
+    },
   ): Promise<DigiflazzGetProductResponse> {
     try {
       const response = await this.apiClient.post('/price-list', {
@@ -53,11 +53,25 @@ export class DigiflazzService {
         ...data,
       })
 
+      console.log(response.data)
+
+      // If data.rc exists and is not '00', it's an error. If data.rc does not exist, data is the array (success)
+      if (
+        response.data?.data &&
+        typeof response.data.data === 'object' &&
+        'rc' in response.data.data &&
+        response.data.data.rc !== '00'
+      ) {
+        throw new Error(`Digiflazz API Error: ${response.data.data.message}`)
+      }
+
       return response.data
     } catch (error) {
       if (isAxiosError(error)) {
-        throw new Error(`Digiflazz API Error: ${error.response?.data?.message || error.message}`)
+        throw new Error(`Digiflazz API Error: ${error.response?.data?.message || error?.message}`)
       }
+
+      console.error(error)
 
       throw error
     }

@@ -7,7 +7,7 @@ import { XIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { isOpenSidebarAtom } from '~/store/sidebar'
 import { userAtom } from '~/store/user'
-import { navData, type LocalLabel } from './header'
+import { type LocalLabel, navData } from './header'
 import LinkWithLocale from './link'
 import NavLinkWithLocale from './navlink'
 
@@ -23,7 +23,7 @@ export default function Sidebar() {
       }`}
       onClick={() => isOpenSidebar && setIsOpenSidebar(false)}
     >
-      <div
+      <button
         className={`flex flex-col absolute top-0 left-0 h-full bg-background transition-transform duration-300 w-3/4 shadow-lg ${
           isOpenSidebar ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -45,7 +45,7 @@ export default function Sidebar() {
           <div className="px-4 pb-4">
             <div className="rounded-xl p-2 bg-secondary/50">
               <div className="flex items-center gap-2">
-                <Avatar className="flex-shrink-0">
+                <Avatar className="shrink-0">
                   {user.data?.image_url && <AvatarImage src={user.data.image_url}></AvatarImage>}
                   <AvatarFallback>
                     {user.data?.name
@@ -153,7 +153,7 @@ export default function Sidebar() {
             </Button>
           </div>
         )}
-      </div>
+      </button>
     </aside>
   )
 }

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "root": false,
+  "extends": ["../../biome.json"],
+  "linter": {
+    "rules": {
+      "correctness": {
+        "noUnusedVariables": "warn",
+        "useHookAtTopLevel": "warn"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noImplicitAnyLet": "off",
+        "noControlCharactersInRegex": "off"
+      },
+      "style": {
+        "useImportType": "warn"
+      },
+      "a11y": {
+        "useAriaPropsForRole": "warn",
+        "noStaticElementInteractions": "off"
+      }
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "files": {
+    "includes": ["!build", "!node_modules", "!tests", "!*.edge"]
+  }
+}

@@ -1,7 +1,5 @@
 'use client'
 
-import { SidebarIcon } from 'lucide-react'
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,6 +11,7 @@ import {
 import { Button } from '@repo/ui/components/ui/button'
 import { Separator } from '@repo/ui/components/ui/separator'
 import { useSidebar } from '@repo/ui/components/ui/sidebar'
+import { SidebarIcon } from 'lucide-react'
 import { SearchForm } from './search-form'
 
 export function SiteHeader() {

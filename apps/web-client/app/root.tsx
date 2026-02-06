@@ -1,10 +1,17 @@
-import { data, isRouteErrorResponse, Links, Meta, Outlet, redirect, Scripts } from 'react-router'
-
 import { cn } from '@repo/ui/lib/utils'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
-import { ScrollRestoration } from 'react-router'
+import {
+  data,
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  redirect,
+  Scripts,
+  ScrollRestoration,
+} from 'react-router'
 import { useChangeLanguage } from 'remix-i18next/react'
 import type { Route } from './+types/root'
 import './app.css'
@@ -15,15 +22,15 @@ import { getSession } from './session.server'
 export const middleware = [i18nextMiddleware]
 
 export async function loader({ context, request, params }: Route.LoaderArgs) {
-  let i18next = getInstance(context)
+  const i18next = getInstance(context)
   const url = new URL(request.url)
   const supportedLangs = ['en', 'id', 'ms']
 
   // Ambil param locale dari path
-  let pathParts = url.pathname.split('/').filter(Boolean)
-  let localeParam = pathParts[0]
+  const pathParts = url.pathname.split('/').filter(Boolean)
+  const localeParam = pathParts[0]
   // Ambil locale dari cookie
-  let cookieLocale = (await localeCookie.parse(request.headers.get('Cookie'))) || null
+  const cookieLocale = (await localeCookie.parse(request.headers.get('Cookie'))) || null
 
   // Urutan: param > cookie > default
   let redirectLang = 'id'
@@ -77,7 +84,7 @@ export const links: Route.LinksFunction = () => [
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  let { i18n } = useTranslation('common')
+  const { i18n } = useTranslation('common')
 
   return (
     <html lang={i18n.language}>
@@ -108,7 +115,6 @@ export default function App({ loaderData }: Route.ComponentProps) {
     if (loaderData?.flash.error) {
       toast.error(loaderData.flash?.error ?? '')
     }
-    console.log('Flash messages:', loaderData?.flash)
   }, [loaderData?.flash])
 
   return <Outlet />

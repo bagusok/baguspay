@@ -1,3 +1,7 @@
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, asc, count, db, desc, eq, gte, ilike, inArray, lte, type SQL } from '@repo/db'
+import { OfferType, tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
 import {
   addOfferPaymentMethodValidator,
   addOfferProductValidator,
@@ -12,10 +16,6 @@ import {
   offerUserQueryValidator,
   updateOfferValidator,
 } from '#validators/offer'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, asc, count, db, desc, eq, gte, ilike, inArray, lte, SQL } from '@repo/db'
-import { OfferType, tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 
 export default class OfferController {
   async indexVoucher(ctx: HttpContext) {
@@ -347,7 +347,7 @@ export default class OfferController {
       vine.compile(insertOfferValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const image = await db.query.fileManager.findFirst({
@@ -383,7 +383,7 @@ export default class OfferController {
       vine.compile(updateOfferValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     console.log('offerData', offerData)
@@ -471,6 +471,9 @@ export default class OfferController {
     })
 
     if (!offer) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response.status(404).json({ error: 'Offer not found' })
+      }
       ctx.session.flashErrors({
         error: 'Offer not found',
       })
@@ -490,6 +493,11 @@ export default class OfferController {
     const newUserIds = userIds.filter((userId) => !existingUserIds.includes(userId))
 
     if (newUserIds.length === 0) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response
+          .status(422)
+          .json({ error: 'All users are already connected to this offer' })
+      }
       ctx.session.flashErrors({
         error: 'All users are already connected to this offer',
       })
@@ -502,6 +510,10 @@ export default class OfferController {
     }))
 
     await db.insert(tb.offerUsers).values(newOfferUsers).onConflictDoNothing()
+
+    if (ctx.request.accepts(['json']) === 'json') {
+      return ctx.response.json({ success: true })
+    }
 
     ctx.session.flash('success', 'User connected to offer successfully')
     return ctx.response.redirect().back()
@@ -516,7 +528,7 @@ export default class OfferController {
       vine.compile(deleteOfferUserValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const offerUser = await db.query.offerUsers.findFirst({
@@ -549,6 +561,9 @@ export default class OfferController {
       where: eq(tb.offers.id, id),
     })
     if (!offer) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response.status(404).json({ error: 'Offer not found' })
+      }
       ctx.session.flashErrors({
         error: 'Offer not found',
       })
@@ -559,7 +574,7 @@ export default class OfferController {
     const existingOfferProducts = await db.query.offer_products.findMany({
       where: and(
         eq(tb.offer_products.offer_id, id),
-        inArray(tb.offer_products.product_id, productIds)
+        inArray(tb.offer_products.product_id, productIds),
       ),
       columns: {
         product_id: true,
@@ -569,6 +584,11 @@ export default class OfferController {
     const existingProductIds = existingOfferProducts.map((op) => op.product_id)
     const newProductIds = productIds.filter((productId) => !existingProductIds.includes(productId))
     if (newProductIds.length === 0) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response
+          .status(422)
+          .json({ error: 'All products are already connected to this offer' })
+      }
       ctx.session.flashErrors({
         error: 'All products are already connected to this offer',
       })
@@ -581,6 +601,10 @@ export default class OfferController {
     }))
 
     await db.insert(tb.offer_products).values(newOfferProducts).onConflictDoNothing()
+
+    if (ctx.request.accepts(['json']) === 'json') {
+      return ctx.response.json({ success: true })
+    }
 
     ctx.session.flash('success', 'Product connected to offer successfully')
     return ctx.response.redirect().back()
@@ -595,13 +619,13 @@ export default class OfferController {
       vine.compile(deleteOfferProductValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const offerProduct = await db.query.offer_products.findFirst({
       where: and(
         eq(tb.offer_products.offer_id, id),
-        inArray(tb.offer_products.product_id, productIds)
+        inArray(tb.offer_products.product_id, productIds),
       ),
     })
 
@@ -627,13 +651,16 @@ export default class OfferController {
       vine.compile(addOfferPaymentMethodValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const offer = await db.query.offers.findFirst({
       where: eq(tb.offers.id, id),
     })
     if (!offer) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response.status(404).json({ error: 'Offer not found' })
+      }
       ctx.session.flashErrors({
         error: 'Offer not found',
       })
@@ -644,7 +671,7 @@ export default class OfferController {
     const existingOfferPaymentMethods = await db.query.offerPaymentMethods.findMany({
       where: and(
         eq(tb.offerPaymentMethods.offer_id, id),
-        inArray(tb.offerPaymentMethods.payment_method_id, paymentMethodIds)
+        inArray(tb.offerPaymentMethods.payment_method_id, paymentMethodIds),
       ),
       columns: {
         payment_method_id: true,
@@ -654,10 +681,15 @@ export default class OfferController {
     const existingPaymentMethodIds = existingOfferPaymentMethods.map((opm) => opm.payment_method_id)
 
     const newPaymentMethodIds = paymentMethodIds.filter(
-      (paymentMethodId) => !existingPaymentMethodIds.includes(paymentMethodId)
+      (paymentMethodId) => !existingPaymentMethodIds.includes(paymentMethodId),
     )
 
     if (newPaymentMethodIds.length === 0) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response
+          .status(422)
+          .json({ error: 'All payment methods are already connected to this offer' })
+      }
       ctx.session.flashErrors({
         error: 'All payment methods are already connected to this offer',
       })
@@ -669,6 +701,10 @@ export default class OfferController {
       payment_method_id: paymentMethodId,
     }))
     await db.insert(tb.offerPaymentMethods).values(newOfferPaymentMethods).onConflictDoNothing()
+
+    if (ctx.request.accepts(['json']) === 'json') {
+      return ctx.response.json({ success: true })
+    }
 
     ctx.session.flash('success', 'Payment method connected to offer successfully')
     return ctx.response.redirect().back()
@@ -683,13 +719,13 @@ export default class OfferController {
       vine.compile(deleteOfferPaymentMethodValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const offerPaymentMethod = await db.query.offerPaymentMethods.findFirst({
       where: and(
         eq(tb.offerPaymentMethods.offer_id, id),
-        inArray(tb.offerPaymentMethods.payment_method_id, paymentIds)
+        inArray(tb.offerPaymentMethods.payment_method_id, paymentIds),
       ),
     })
 

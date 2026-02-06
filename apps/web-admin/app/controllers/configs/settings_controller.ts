@@ -1,14 +1,16 @@
-import { updateSettingsValidator } from '#validators/config_settings'
 import type { HttpContext } from '@adonisjs/core/http'
 import { db, eq, inArray } from '@repo/db'
 import { tb } from '@repo/db/types'
 import vine from '@vinejs/vine'
+import { updateSettingsValidator } from '#validators/config_settings'
 
 const SETTINGS_KEYS = {
   maintenance_enabled: 'maintenance.enabled',
   app_name: 'app.name',
   app_description: 'app.description',
   app_icon_url: 'app.icon_url',
+  app_android_url: 'app.android_url',
+  app_ios_url: 'app.ios_url',
   maintenance_banner_image_url: 'MAINTENANCE_BANNER_IMAGE_URL',
   app_version: 'app.version',
   api_version: 'api.version',
@@ -67,6 +69,8 @@ export default class SettingsController {
         app_description: map.get(SETTINGS_KEYS.app_description) || '',
         app_icon_url: appIconUrl,
         app_icon_file_id: appIconFile?.id || '',
+        app_android_url: map.get(SETTINGS_KEYS.app_android_url) || '',
+        app_ios_url: map.get(SETTINGS_KEYS.app_ios_url) || '',
         maintenance_banner_image_url: maintenanceBannerUrl,
         maintenance_banner_file_id: maintenanceBannerFile?.id || '',
         app_version: map.get(SETTINGS_KEYS.app_version) || '',
@@ -111,6 +115,8 @@ export default class SettingsController {
       { key: SETTINGS_KEYS.app_name, value: data.app_name ?? '' },
       { key: SETTINGS_KEYS.app_description, value: data.app_description ?? '' },
       { key: SETTINGS_KEYS.app_icon_url, value: data.app_icon_url ?? '' },
+      { key: SETTINGS_KEYS.app_android_url, value: data.app_android_url ?? '' },
+      { key: SETTINGS_KEYS.app_ios_url, value: data.app_ios_url ?? '' },
       {
         key: SETTINGS_KEYS.maintenance_banner_image_url,
         value: data.maintenance_banner_image_url ?? '',

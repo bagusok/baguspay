@@ -1,8 +1,5 @@
 import { router, useForm } from '@inertiajs/react'
-import { useState, FormEvent } from 'react'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -11,6 +8,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
+import { Input } from '@repo/ui/components/ui/input'
+import { Label } from '@repo/ui/components/ui/label'
+import { type FormEvent, useState } from 'react'
 
 export function AddPaymentCategoryModal() {
   const [open, setOpen] = useState(false)

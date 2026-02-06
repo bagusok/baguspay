@@ -1,4 +1,3 @@
-import { CreateProductSubCategoryValidator } from '#validators/product'
 import { useForm } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import {
@@ -15,6 +14,7 @@ import { Label } from '@repo/ui/components/ui/label'
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import { useState } from 'react'
+import type { CreateProductSubCategoryValidator } from '#validators/product'
 import FileManager from '~/components/file-manager'
 
 type Props = {

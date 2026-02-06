@@ -1,25 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import type { ConfigService } from '@nestjs/config'
 import { OrderStatus, ProductProvider } from '@repo/db/types'
-import { DatabaseService } from 'src/database/database.service'
-import { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
-import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
-import { OffersService } from 'src/offers/offers.service'
-import { PaymentsService } from 'src/payments/payments.service'
-import { QueueService } from 'src/queue/queue.service'
-import { StorageService } from 'src/storage/storage.service'
-import { GetInquiryFromProviderInput } from '../types/inquiry.types'
+import type { DatabaseService } from 'src/database/database.service'
+import type { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
+import type { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
+import type { OffersService } from 'src/offers/offers.service'
+import type { PaymentsService } from 'src/payments/payments.service'
+import type { QueueService } from 'src/queue/queue.service'
+import type { StorageService } from 'src/storage/storage.service'
+import type { GetInquiryFromProviderInput } from '../types/inquiry.types'
 
 @Injectable()
 export class InquiryService {
   constructor(
-    private readonly databaseService: DatabaseService,
-    private readonly configService: ConfigService,
-    private readonly pgService: PaymentGatewayService,
-    private readonly queueService: QueueService,
-    private readonly offerService: OffersService,
-    private readonly paymentService: PaymentsService,
-    private readonly storageService: StorageService,
+    readonly _databaseService: DatabaseService,
+    readonly _configService: ConfigService,
+    readonly _pgService: PaymentGatewayService,
+    readonly _queueService: QueueService,
+    readonly _offerService: OffersService,
+    readonly _paymentService: PaymentsService,
+    readonly _storageService: StorageService,
     private readonly digiflazzService: DigiflazzService,
   ) {}
 

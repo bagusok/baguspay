@@ -1,5 +1,4 @@
-import ProductsCategoriesController from '#controllers/product_categories_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { useForm } from '@inertiajs/react'
 import { ProductFullfillmentType } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -15,11 +14,12 @@ import {
 import { Switch } from '@repo/ui/components/ui/switch'
 import { Textarea } from '@repo/ui/components/ui/textarea'
 import toast from 'react-hot-toast'
+import type ProductsCategoriesController from '#controllers/product_categories_controller'
 import FileManager from '~/components/file-manager'
 import AdminLayout from '~/components/layout/admin-layout'
 
 export default function EditProductCategory(
-  props: InferPageProps<ProductsCategoriesController, 'editPulsa'>
+  props: InferPageProps<ProductsCategoriesController, 'editPulsa'>,
 ) {
   const { data, errors, setData, patch, processing } = useForm('editpulsas', {
     file_image_id: props.image.file_image_id || '',

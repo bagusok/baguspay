@@ -20,7 +20,7 @@ export const HighlighterIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 HighlighterIcon.displayName = 'HighlighterIcon'

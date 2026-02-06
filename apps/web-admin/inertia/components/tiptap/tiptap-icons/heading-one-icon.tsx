@@ -22,7 +22,7 @@ export const HeadingOneIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 HeadingOneIcon.displayName = 'HeadingOneIcon'

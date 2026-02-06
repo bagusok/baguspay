@@ -5,7 +5,7 @@ import {
   ProductProvider,
 } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 export const createProductCategoryValidator = vine.object({
   file_image_id: vine.string().uuid(),
@@ -75,6 +75,8 @@ export const productCategoriesQueryValidator = vine.object({
   limit: vine.number().min(10).optional(),
   searchQuery: vine.string().optional(),
   searchBy: vine.enum(['name', 'id']).optional(),
+  categoryId: vine.string().uuid().optional(),
+  subCategoryId: vine.string().uuid().optional(),
 })
 
 export type ProductCategoriesQueryValidator = Infer<typeof productCategoriesQueryValidator>
@@ -170,6 +172,13 @@ export const updateProductValidator = vine.object({
 })
 
 export type UpdateProductValidator = Infer<typeof updateProductValidator>
+
+export const updateProviderPriceValidator = vine.object({
+  provider_price: vine.number().min(0),
+  provider_max_price: vine.number().min(0),
+})
+
+export type UpdateProviderPriceValidator = Infer<typeof updateProviderPriceValidator>
 
 export const getAllProductsQueryValidator = vine.object({
   page: vine.number().min(1).optional(),

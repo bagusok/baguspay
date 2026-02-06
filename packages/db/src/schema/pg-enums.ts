@@ -1,5 +1,5 @@
-import { enumToPgEnum } from '@/utils'
 import { pgEnum } from 'drizzle-orm/pg-core'
+import { enumToPgEnum } from '@/utils'
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -331,6 +331,13 @@ export enum BannerLocation {
 }
 
 export const bannerLocationEnum = pgEnum('banner_location', enumToPgEnum(BannerLocation))
+
+export enum ArticleType {
+  ARTICLE = 'article',
+  PAGE = 'page',
+}
+
+export const articleTypeEnum = pgEnum('article_type', enumToPgEnum(ArticleType))
 
 export type OfferAppliedOnInquiry = {
   id: string

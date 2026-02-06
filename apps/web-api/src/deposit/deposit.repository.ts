@@ -1,15 +1,26 @@
 import { Injectable } from '@nestjs/common'
-import { and, arrayContains, count, desc, eq, gte, InferInsertModel, lte, ne, SQL } from '@repo/db'
 import {
-  DepositStatus,
+  and,
+  arrayContains,
+  count,
+  desc,
+  eq,
+  gte,
+  type InferInsertModel,
+  lte,
+  ne,
+  type SQL,
+} from '@repo/db'
+import {
+  type DepositStatus,
   PaymentMethodAllowAccess,
   PaymentMethodProvider,
   PaymentMethodType,
   tb,
 } from '@repo/db/types'
-import { DBInstance } from 'src/common/types/db-instance'
-import { DatabaseService } from 'src/database/database.service'
-import { DepositHistoryQuery } from './deposit.dto'
+import type { DBInstance } from 'src/common/types/db-instance'
+import type { DatabaseService } from 'src/database/database.service'
+import type { DepositHistoryQuery } from './deposit.dto'
 
 @Injectable()
 export class DepositRepository {

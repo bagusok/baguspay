@@ -1,5 +1,4 @@
-import HomeController from '#controllers/home_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
 import { OrderStatus, PaymentStatus } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -13,8 +12,9 @@ import {
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
 import { cn } from '@repo/ui/lib/utils'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useEffect, useState } from 'react'
+import type HomeController from '#controllers/home_controller'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate, formatPrice } from '~/utils'
 

@@ -1,3 +1,4 @@
+import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -7,11 +8,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
-import { Button } from '@repo/ui/components/ui/button'
-import { Trash2Icon } from 'lucide-react'
-import { router } from '@inertiajs/react'
 import { useQueryClient } from '@tanstack/react-query'
+import { Trash2Icon } from 'lucide-react'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { apiClient } from '~/utils/axios'
 
 export default function DeleteProductModal({ productId }: { productId: string }) {
   const [open, setOpen] = useState(false)
@@ -36,16 +37,19 @@ export default function DeleteProductModal({ productId }: { productId: string })
           <Button
             variant="destructive"
             onClick={() => {
-              router.delete(`/admin/products/${productId}`, {
-                preserveScroll: true,
-                onSuccess: () => {
+              apiClient
+                .delete(`/admin/products/${productId}`)
+                .then(() => {
+                  toast.success('Product deleted successfully')
                   setOpen(false)
                   queryClient.invalidateQueries({
                     queryKey: ['products'],
                     exact: false,
                   })
-                },
-              })
+                })
+                .catch((error) => {
+                  toast.error(error.response?.data?.error || 'Failed to delete product')
+                })
             }}
           >
             Yes, delete account

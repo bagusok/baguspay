@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react'
 import { Button } from '@repo/ui/components/ui/button'
 import {
   Dialog,
@@ -7,11 +8,10 @@ import {
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { apiClient } from '~/utils/axios'
 import { LoaderCircleIcon, PlusIcon } from 'lucide-react'
-import { router } from '@inertiajs/react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { apiClient } from '~/utils/axios'
 
 export default function AddInputFields({ productCategoryId }: { productCategoryId: string }) {
   const [open, setOpen] = useState(false)
@@ -35,7 +35,7 @@ export default function AddInputFields({ productCategoryId }: { productCategoryI
     if (open) {
       getInputFields.refetch()
     }
-  }, [open])
+  }, [open, getInputFields])
 
   const handleAdd = (inputId: string) => {
     router.post(
@@ -60,7 +60,7 @@ export default function AddInputFields({ productCategoryId }: { productCategoryI
             toast.error(error[key])
           })
         },
-      }
+      },
     )
   }
 

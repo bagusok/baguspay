@@ -1,11 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
-import { JwtService } from '@nestjs/jwt'
+import type { ConfigService } from '@nestjs/config'
+import type { JwtService } from '@nestjs/jwt'
 import { LoginIsFrom, UserRegisteredType, UserRole } from '@repo/db/types'
 import { compare, hash } from 'bcrypt'
-import { LoginDto, RegisterDto } from './auth.dto'
-import { AuthRepository } from './auth.repository'
-import { DeviceInfo, getDeviceInfo, isSameDevice } from './utils/device-fingerprint'
+import type { LoginDto, RegisterDto } from './auth.dto'
+import type { AuthRepository } from './auth.repository'
+import { type DeviceInfo, getDeviceInfo, isSameDevice } from './utils/device-fingerprint'
 
 interface LoginHeaders {
   deviceId: string
@@ -45,7 +45,7 @@ export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    readonly _configService: ConfigService,
   ) {}
 
   private generateTokens(payload: TokenPayload) {

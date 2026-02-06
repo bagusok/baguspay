@@ -1,13 +1,11 @@
 import { relations } from 'drizzle-orm'
-import { timestamp } from 'drizzle-orm/pg-core'
-import { boolean } from 'drizzle-orm/pg-core'
-import { varchar, integer, uuid, pgTable } from 'drizzle-orm/pg-core'
-import { sessions } from './sessions'
-import { deposits } from './deposits'
+import { boolean, integer, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 import { balanceMutations } from './balance_mutations'
-import { orders } from './orders'
+import { deposits } from './deposits'
 import { offerOnOrders, offerUsers } from './offers'
-import { UserRegisteredType, userRegisteredTypeEnum, UserRole, userRoleEnum } from './pg-enums'
+import { orders } from './orders'
+import { UserRegisteredType, UserRole, userRegisteredTypeEnum, userRoleEnum } from './pg-enums'
+import { sessions } from './sessions'
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),

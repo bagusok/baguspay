@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common'
-import { AtlanticService } from './atlantic.service'
+import type { AtlanticService } from './atlantic.service'
 
 @Controller('atlantic')
 export class AtlanticController {
-  constructor(private readonly atlanticService: AtlanticService) {}
+  constructor(readonly _atlanticService: AtlanticService) {}
 }

@@ -1,16 +1,13 @@
-import { type Editor } from '@tiptap/react'
+import type { Editor } from '@tiptap/react'
 import * as React from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
-
+// --- Icons ---
+import { HighlighterIcon } from '~/components/tiptap/tiptap-icons/highlighter-icon'
 // --- Hooks ---
 import { useIsMobile } from '~/hooks/use-mobile'
 import { useTiptapEditor } from '~/hooks/use-tiptap-editor'
-
 // --- Lib ---
 import { isMarkInSchema, isNodeTypeSelected } from '~/utils/tiptap_utils'
-
-// --- Icons ---
-import { HighlighterIcon } from '~/components/tiptap/tiptap-icons/highlighter-icon'
 
 export const COLOR_HIGHLIGHT_SHORTCUT_KEY = 'mod+shift+h'
 export const HIGHLIGHT_COLORS = [
@@ -197,7 +194,7 @@ export function useColorHighlight(config: UseColorHighlightConfig) {
       enabled: isVisible && canColorHighlightState,
       enableOnContentEditable: !isMobile,
       enableOnFormTags: true,
-    }
+    },
   )
 
   return {

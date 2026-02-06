@@ -35,8 +35,11 @@ export default function NavUser({ user }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="hidden md:flex gap-2 overflow-hidden max-w-48 hover:bg-accent hover:text-accent-foreground rounded-md p-2 transition-colors">
-          <Avatar className="flex-shrink-0">
+        <button
+          type="button"
+          className="hidden md:flex gap-2 overflow-hidden max-w-48 hover:bg-accent hover:text-accent-foreground rounded-md p-2 transition-colors"
+        >
+          <Avatar className="shrink-0">
             {user.image_url && <AvatarImage src={user.image_url} />}
             <AvatarFallback>
               {user.name

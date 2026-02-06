@@ -40,7 +40,7 @@ export default function DetailDepositModal(props: Props) {
     if (open) {
       detailDeposit.mutate()
     }
-  }, [open])
+  }, [open, detailDeposit])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

@@ -1,6 +1,6 @@
-import ProductsCategoriesController from '#controllers/product_categories_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { useState } from 'react'
+import type ProductsCategoriesController from '#controllers/product_categories_controller'
 import Image from '~/components/image'
 import AdminLayout from '~/components/layout/admin-layout'
 import SectionProductSubCategory from '../product-sub-categories'
@@ -55,7 +55,12 @@ export default function ProductCategoryDetail({ productCategory }: Props) {
         selectedSubId={selectedSubId}
         setSelectedSubId={setSelectedSubId}
       />
-      <SectionProducts productSubCategoryId={selectedSubId} />
+      <SectionProducts
+        productSubCategoryId={selectedSubId}
+        selectedSubCategory={productCategory.product_sub_categories?.find(
+          (sub) => sub.id === selectedSubId,
+        )}
+      />
     </AdminLayout>
   )
 }

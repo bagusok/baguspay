@@ -26,12 +26,10 @@ createInertiaApp({
   setup({ el, App, props }) {
     hydrateRoot(
       el,
-      <>
-        <QueryClientProvider client={query}>
-          <App {...props} />,
-          <Toaster position="top-right" />
-        </QueryClientProvider>
-      </>
+      <QueryClientProvider client={query}>
+        <App {...props} />,
+        <Toaster position="top-right" />
+      </QueryClientProvider>,
     )
   },
 })

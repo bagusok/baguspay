@@ -4,12 +4,12 @@ import { useFormMutation } from '~/hooks/use-form-mutation'
 import { apiClient } from '~/utils/axios'
 import {
   checkoutTokenAtom,
+  type InquiryResponse,
   inquiryIdAtom,
   inquiryRequestDataAtom,
   inquiryTimeAtom,
   isOpenModalCheckout,
   preselectedPaymentMethodIdAtom,
-  type InquiryResponse,
 } from '../pages/order/checkout-modal'
 import type { InquiryForm } from '../pages/order/slug'
 

@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+
+import type { HttpContext } from '@adonisjs/core/http'
+import { and, db, eq, inArray } from '@repo/db'
+import { AppPlatform, ProductGroupingMenuType, ProductGroupingType, tb } from '@repo/db/types'
+import vine from '@vinejs/vine'
 import {
+  bulkConnectProductToSectionValidator,
   configHomeIdValidator,
   connectProductToSectionValidator,
   createHomeProductSectionValidator,
   updateHomeProductSectionValidator,
 } from '#validators/config_home'
-import type { HttpContext } from '@adonisjs/core/http'
-import { and, db, eq } from '@repo/db'
-import { AppPlatform, ProductGroupingMenuType, ProductGroupingType, tb } from '@repo/db/types'
-import vine from '@vinejs/vine'
 
 export default class ConfigHomesController {
   async index(ctx: HttpContext) {
@@ -96,7 +98,7 @@ export default class ConfigHomesController {
       data: ctx.request.body(),
     })
 
-    let image = await db.query.fileManager.findFirst({
+    const image = await db.query.fileManager.findFirst({
       where: eq(tb.fileManager.id, image_id),
     })
 
@@ -130,7 +132,7 @@ export default class ConfigHomesController {
   }
 
   async updateProductSection(ctx: HttpContext) {
-    console.log('Update Product Section', ctx.request.body())
+    // console.log('Update Product Section', ctx.request.body())
 
     const {
       name,
@@ -232,16 +234,16 @@ export default class ConfigHomesController {
       vine.compile(connectProductToSectionValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
-    console.log('Connecting product category to section', product_category_id, ctx.request.params())
+    // console.log('Connecting product category to section', product_category_id, ctx.request.params())
 
     const { id: product_grouping_id } = await ctx.request.validateUsing(
       vine.compile(configHomeIdValidator),
       {
         data: ctx.request.params(),
-      }
+      },
     )
 
     const productCategory = await db.query.productCategories.findFirst({
@@ -258,7 +260,7 @@ export default class ConfigHomesController {
     const check = await db.query.productGroupingToProductCategories.findFirst({
       where: and(
         eq(tb.productGroupingToProductCategories.product_category_id, product_category_id),
-        eq(tb.productGroupingToProductCategories.product_grouping_id, product_grouping_id)
+        eq(tb.productGroupingToProductCategories.product_grouping_id, product_grouping_id),
       ),
     })
 
@@ -279,25 +281,89 @@ export default class ConfigHomesController {
     return ctx.response.redirect().back()
   }
 
-  async disconnectProductFromSection(ctx: HttpContext) {
-    const { product_category_id } = await ctx.request.validateUsing(
-      vine.compile(connectProductToSectionValidator),
+  async bulkConnectProductToSection(ctx: HttpContext) {
+    const { product_category_ids } = await ctx.request.validateUsing(
+      vine.compile(bulkConnectProductToSectionValidator),
       {
         data: ctx.request.body(),
-      }
+      },
     )
 
     const { id: product_grouping_id } = await ctx.request.validateUsing(
       vine.compile(configHomeIdValidator),
       {
         data: ctx.request.params(),
+      },
+    )
+
+    const productSection = await db.query.productGroupings.findFirst({
+      where: eq(tb.productGroupings.id, product_grouping_id),
+    })
+
+    if (!productSection) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response.status(404).json({ error: 'Product section not found' })
       }
+      ctx.session.flashErrors({ error: 'Product section not found' })
+      return ctx.response.redirect().back()
+    }
+
+    const existingMappings = await db.query.productGroupingToProductCategories.findMany({
+      where: and(
+        eq(tb.productGroupingToProductCategories.product_grouping_id, product_grouping_id),
+        inArray(tb.productGroupingToProductCategories.product_category_id, product_category_ids),
+      ),
+      columns: { product_category_id: true },
+    })
+
+    const existingIds = existingMappings.map((m) => m.product_category_id)
+    const newIds = product_category_ids.filter((id) => !existingIds.includes(id))
+
+    if (newIds.length === 0) {
+      if (ctx.request.accepts(['json']) === 'json') {
+        return ctx.response
+          .status(422)
+          .json({ error: 'All product categories are already connected' })
+      }
+      ctx.session.flashErrors({ error: 'All product categories are already connected' })
+      return ctx.response.redirect().back()
+    }
+
+    const newMappings = newIds.map((product_category_id) => ({
+      id: crypto.randomUUID(),
+      product_category_id,
+      product_grouping_id,
+    }))
+
+    await db.insert(tb.productGroupingToProductCategories).values(newMappings).onConflictDoNothing()
+
+    if (ctx.request.accepts(['json']) === 'json') {
+      return ctx.response.json({ success: true, added: newIds.length })
+    }
+
+    ctx.session.flash('success', `${newIds.length} product categories connected successfully`)
+    return ctx.response.redirect().back()
+  }
+
+  async disconnectProductFromSection(ctx: HttpContext) {
+    const { product_category_id } = await ctx.request.validateUsing(
+      vine.compile(connectProductToSectionValidator),
+      {
+        data: ctx.request.body(),
+      },
+    )
+
+    const { id: product_grouping_id } = await ctx.request.validateUsing(
+      vine.compile(configHomeIdValidator),
+      {
+        data: ctx.request.params(),
+      },
     )
 
     const check = await db.query.productGroupingToProductCategories.findFirst({
       where: and(
         eq(tb.productGroupingToProductCategories.product_category_id, product_category_id),
-        eq(tb.productGroupingToProductCategories.product_grouping_id, product_grouping_id)
+        eq(tb.productGroupingToProductCategories.product_grouping_id, product_grouping_id),
       ),
     })
 

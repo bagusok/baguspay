@@ -41,7 +41,7 @@ export default function DeleteOfferPaymentModal({
           queryClient.invalidateQueries({ queryKey: ['offerPayments', offerId], exact: false })
         },
         preserveScroll: true,
-      }
+      },
     )
   }
 

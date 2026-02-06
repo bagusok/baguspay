@@ -1,17 +1,22 @@
+import { Trash2 as RemoveIcon } from 'lucide-react'
 import {
-  Dispatch,
-  SetStateAction,
   createContext,
+  type Dispatch,
   forwardRef,
+  type SetStateAction,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
 } from 'react'
-import { useDropzone, DropzoneState, FileRejection, DropzoneOptions } from 'react-dropzone'
+import {
+  type DropzoneOptions,
+  type DropzoneState,
+  type FileRejection,
+  useDropzone,
+} from 'react-dropzone'
 import { toast } from 'sonner'
-import { Trash2 as RemoveIcon } from 'lucide-react'
 import { cn } from '../lib/utils'
 import { buttonVariants } from './ui/button'
 import { Input } from './ui/input'
@@ -146,7 +151,14 @@ export const FileUploader = forwardRef<
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [value, activeIndex, removeFileFromSet],
+      [
+        value,
+        activeIndex,
+        removeFileFromSet,
+        direction,
+        dropzoneState.inputRef.current,
+        orientation,
+      ],
     )
 
     const onDrop = useCallback(
@@ -186,7 +198,7 @@ export const FileUploader = forwardRef<
         }
       },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-      [reSelectAll, value],
+      [reSelectAll, value, maxFiles, maxSize, onValueChange],
     )
 
     useEffect(() => {
@@ -222,7 +234,6 @@ export const FileUploader = forwardRef<
       >
         <div
           ref={ref}
-          tabIndex={0}
           onKeyDownCapture={handleKeyDown}
           className={cn('grid w-full focus:outline-none overflow-hidden ', className, {
             'gap-2': value && value.length > 0,

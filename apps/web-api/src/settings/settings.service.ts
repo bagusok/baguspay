@@ -1,19 +1,19 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 
 import bcrypt from 'bcrypt'
-import { TUser } from 'src/common/types/meta.type'
+import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import { DatabaseService } from 'src/database/database.service'
-import { UserRepository } from 'src/user/user.repository'
-import { ChangeEmailDto } from './dtos/change-email.dto'
-import { ChangePasswordDto } from './dtos/change-password.dto'
-import { changePhoneNumberDto } from './dtos/change-phone.dto'
-import { ChangeProfileDto } from './dtos/change-profile.dto'
+import type { DatabaseService } from 'src/database/database.service'
+import type { UserRepository } from 'src/user/user.repository'
+import type { ChangeEmailDto } from './dtos/change-email.dto'
+import type { ChangePasswordDto } from './dtos/change-password.dto'
+import type { changePhoneNumberDto } from './dtos/change-phone.dto'
+import type { ChangeProfileDto } from './dtos/change-profile.dto'
 
 @Injectable()
 export class SettingsService {
   constructor(
-    private readonly databaseService: DatabaseService,
+    readonly _databaseService: DatabaseService,
     private readonly userRepository: UserRepository,
   ) {}
 

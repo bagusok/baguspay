@@ -1,5 +1,4 @@
-import DepositsController from '#controllers/deposits_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/react'
 import { DepositStatus } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
@@ -22,8 +21,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
+import type DepositsController from '#controllers/deposits_controller'
 import AdminLayout from '~/components/layout/admin-layout'
 import { formatDate, formatPrice } from '~/utils'
 import ChangeStatusModal from './change-status-modal'
@@ -168,7 +168,7 @@ export default function DepositIndex(props: Props) {
       },
       {
         onSuccess: () => setOpen(false),
-      }
+      },
     )
   }
 
@@ -182,7 +182,7 @@ export default function DepositIndex(props: Props) {
     router.get(
       '/admin/deposits',
       { limit: 10, page: 1, sortBy, sortColumn },
-      { onSuccess: () => setOpen(false) }
+      { onSuccess: () => setOpen(false) },
     )
   }
 

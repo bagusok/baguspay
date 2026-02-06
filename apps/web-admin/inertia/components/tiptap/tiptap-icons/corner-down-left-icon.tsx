@@ -20,7 +20,7 @@ export const CornerDownLeftIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 CornerDownLeftIcon.displayName = 'CornerDownLeftIcon'

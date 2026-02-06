@@ -1,7 +1,7 @@
 'use client'
 
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
-import * as React from 'react'
+import type * as React from 'react'
 
 type CollapsibleProps = React.ComponentProps<typeof CollapsiblePrimitive.Root>
 type CollapsibleTriggerProps = React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleTrigger>

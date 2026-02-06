@@ -9,7 +9,7 @@ import {
   SheetTrigger,
 } from '@repo/ui/components/ui/sheet'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { useWindowSize } from 'usehooks-ts'
 import { apiClient } from '~/utils/axios'
@@ -19,6 +19,7 @@ export default function FastMenu() {
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<FastMenuData | null>(null)
+  const id = useId()
 
   const fastmenus = useQuery({
     queryKey: ['fastmenus'],
@@ -45,9 +46,9 @@ export default function FastMenu() {
       <section className="mt-4 space-y-3">
         <div className="h-5 w-28 rounded bg-muted animate-pulse" />
         <div className="flex flex-wrap gap-3">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_) => (
             <div
-              key={i}
+              key={id}
               className="mt-1.5 rounded-xl border border-border/70 bg-card/70 p-2 flex items-center gap-2 w-28 md:w-32 shadow-sm animate-pulse"
             >
               <div className="h-10 w-10 md:h-12 md:w-12 rounded-lg bg-muted" />
@@ -96,11 +97,7 @@ export default function FastMenu() {
               />
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground line-clamp-1 flex items-center gap-1">
-                  {menu.is_featured ? (
-                    <span aria-label="featured" className="text-amber-500 text-xs">
-                      ★
-                    </span>
-                  ) : null}
+                  {menu.is_featured ? <span className="text-amber-500 text-xs">★</span> : null}
                   {menu.name}
                 </p>
                 {menu.label ? (
@@ -134,15 +131,14 @@ export default function FastMenu() {
           }
 
           return (
-            <div
+            <button
               key={menu.id}
+              type="button"
               onClick={() => handleClick(menu)}
-              role="button"
-              tabIndex={0}
-              className="outline-none"
+              className="appearance-none p-0 bg-transparent border-0 outline-none"
             >
               {card}
-            </div>
+            </button>
           )
         })}
       </div>

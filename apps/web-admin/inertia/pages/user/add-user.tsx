@@ -1,4 +1,3 @@
-import { CreateUserValidator } from '#validators/user'
 import { useForm } from '@inertiajs/react'
 import { UserRegisteredType, UserRole } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
@@ -21,9 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { useState } from 'react'
 import { Switch } from '@repo/ui/components/ui/switch'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
+import type { CreateUserValidator } from '#validators/user'
 
 export default function AddUserModal() {
   const [open, setOpen] = useState(false)
@@ -42,7 +42,7 @@ export default function AddUserModal() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     post('/admin/users', {
-      onSuccess: (data) => {
+      onSuccess: (_data) => {
         toast.success('User created successfully')
         setOpen(false)
       },

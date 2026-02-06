@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import { Link } from 'react-router'
 import { apiClient } from '~/utils/axios'
 
 export default function HomeProductSections() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
+
+  const id = useId()
 
   const productSections = useQuery({
     queryKey: ['product-sections'],
@@ -22,9 +24,9 @@ export default function HomeProductSections() {
       <section className="mt-10 space-y-6">
         <div className="h-6 w-32 rounded bg-muted animate-pulse" />
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 lg:gap-8">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_) => (
             <div
-              key={i}
+              key={id}
               className="rounded-xl border border-border/60 bg-card/60 shadow-sm p-3 space-y-3 animate-pulse"
             >
               <div className="aspect-square w-full rounded-lg bg-muted" />

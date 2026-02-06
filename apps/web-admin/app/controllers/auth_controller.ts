@@ -1,9 +1,9 @@
-import { loginValidator, registerValidator } from '#validators/auth'
 import type { HttpContext } from '@adonisjs/core/http'
+import hash from '@adonisjs/core/services/hash'
 import { db, eq, or } from '@repo/db'
 import { tb, UserRegisteredType, UserRole } from '@repo/db/types'
 import vine from '@vinejs/vine'
-import hash from '@adonisjs/core/services/hash'
+import { loginValidator, registerValidator } from '#validators/auth'
 
 export default class AuthController {
   public async register({ inertia }: HttpContext) {
@@ -85,8 +85,8 @@ export default class AuthController {
 
     await ctx.auth.use('web').login(user)
 
-    const a = await ctx.auth.use('web').authenticate()
-    console.log('Authenticated User:', a)
+    await ctx.auth.use('web').authenticate()
+    // console.log('Authenticated User:', a)
 
     ctx.session.flashMessages.set('success', 'You have been logged in successfully.')
     return ctx.response.redirect().toRoute('home.index')

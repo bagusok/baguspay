@@ -1,8 +1,5 @@
-import ProductsCategoriesController from '#controllers/product_categories_controller'
-import { InferPageProps } from '@adonisjs/inertia/types'
+import type { InferPageProps } from '@adonisjs/inertia/types'
 import { Link, router } from '@inertiajs/react'
-import AdminLayout from '~/components/layout/admin-layout'
-
 import { DataTable } from '@repo/ui/components/data-table'
 import { Button } from '@repo/ui/components/ui/button'
 import {
@@ -22,11 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@repo/ui/components/ui/select'
-import { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useState } from 'react'
-import { formatDate } from '~/utils'
-
+import type ProductsCategoriesController from '#controllers/product_categories_controller'
 import Image from '~/components/image'
+import AdminLayout from '~/components/layout/admin-layout'
+import { formatDate } from '~/utils'
 import IsAvailable from './product-categories/is-avalable'
 
 type Props = InferPageProps<ProductsCategoriesController, 'index'>

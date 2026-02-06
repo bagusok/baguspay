@@ -1,4 +1,4 @@
-import { ValidationError } from 'class-validator'
+import type { ValidationError } from 'class-validator'
 
 type FormattedErrors = Record<string, any>
 
@@ -7,7 +7,7 @@ export function formatValidationErrors(
 ): FormattedErrors | FormattedErrors[] {
   // Cek apakah semua error dalam level ini adalah untuk indeks array
   // (misal, propertinya adalah "0", "1", "2", dst.)
-  const isArray = errors.every((err) => !isNaN(parseInt(err.property, 10)))
+  const isArray = errors.every((err) => !Number.isNaN(parseInt(err.property, 10)))
 
   // JIKA INI ARRAY:
   if (isArray && errors.length > 0) {

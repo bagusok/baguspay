@@ -13,11 +13,11 @@ import {
   tb,
   UserRole,
 } from '@repo/db/types'
-import { TUser } from 'src/common/types/meta.type'
+import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import { DatabaseService } from 'src/database/database.service'
-import { StorageService } from 'src/storage/storage.service'
-import { PaymentsRepository } from './payments.repository'
+import type { DatabaseService } from 'src/database/database.service'
+import type { StorageService } from 'src/storage/storage.service'
+import type { PaymentsRepository } from './payments.repository'
 
 @Injectable()
 export class PaymentsService {
@@ -169,7 +169,7 @@ export class PaymentsService {
   }
 
   async getPaymentMethodBalance(user: TUser) {
-    if (user.role == UserRole.GUEST) {
+    if (user.role === UserRole.GUEST) {
       return SendResponse.success(null, 'Please login to use balance payment method')
     }
 

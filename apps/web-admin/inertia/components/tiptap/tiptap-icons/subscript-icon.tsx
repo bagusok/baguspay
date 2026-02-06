@@ -32,7 +32,7 @@ export const SubscriptIcon = React.memo(
         />
       </svg>
     )
-  }
+  },
 )
 
 SubscriptIcon.displayName = 'SubscriptIcon'
