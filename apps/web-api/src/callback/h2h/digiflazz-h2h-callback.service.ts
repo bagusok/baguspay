@@ -1,13 +1,13 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { OrderStatus } from '@repo/db/types'
-import type { DepositService } from 'src/deposit/deposit.service'
-import type { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
+import { DepositService } from 'src/deposit/deposit.service'
+import { DigiflazzService } from 'src/integrations/h2h/digiflazz/digiflazz.service'
 import type {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
 } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import type { OrderRepository } from 'src/order/order.repository'
-import type { RefundService } from 'src/order/services/refund.service'
+import { OrderRepository } from 'src/order/order.repository'
+import { RefundService } from 'src/order/services/refund.service'
 
 @Injectable()
 export class DigiflazzH2HCallbackService {

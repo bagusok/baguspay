@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { BalanceMutationRefType, BalanceMutationType, RefundStatus, UserRole } from '@repo/db/types'
-import type { DatabaseService } from 'src/database/database.service'
-import type { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
-import type { OffersRepository } from 'src/offers/offers.repository'
-import type { ProductRepository } from 'src/products/product.repository'
-import type { OrderRepository } from '../order.repository'
+import { DatabaseService } from 'src/database/database.service'
+import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
+import { OffersRepository } from 'src/offers/offers.repository'
+import { ProductRepository } from 'src/products/product.repository'
+import { OrderRepository } from '../order.repository'
 
 @Injectable()
 export class RefundService {

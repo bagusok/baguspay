@@ -21,6 +21,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import Image from '~/components/image'
+import VoucherInput from '~/components/voucher-input'
 import { useInquiry } from '../../hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
 import {
@@ -278,69 +279,77 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
             </div>
           </div>
 
-          {/* Contact Information Section */}
-          <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
-            <h3 className="text-base font-semibold mb-4">Informasi Kontak</h3>
+          {/* Right Column: Voucher & Contact */}
+          <div className="space-y-4">
+            <VoucherInput
+              form={form}
+              productId={selectedProduct?.id || ''}
+              productPrice={selectedProduct?.total_price}
+            />
 
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="email"
-                  id="email"
-                  className="w-full mt-2 rounded-lg dark:border-none"
-                  placeholder="user@example.com"
-                  {...form.register('email')}
-                />
-                {form.formState.errors.email && (
-                  <p className="text-xs text-red-500 mt-1">{form.formState.errors.email.message}</p>
-                )}
+            <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
+              <h3 className="text-base font-semibold mb-4">Informasi Kontak</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="email"
+                    id="email"
+                    className="w-full mt-2 rounded-lg dark:border-none"
+                    placeholder="user@example.com"
+                    {...form.register('email')}
+                  />
+                  {form.formState.errors.email && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {form.formState.errors.email.message}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <Label htmlFor="phone_number" className="text-sm font-medium">
+                    Nomor Telepon (Opsional)
+                  </Label>
+                  <Input
+                    type="text"
+                    id="phone_number"
+                    className="w-full mt-2 rounded-lg dark:border-none"
+                    placeholder="08123456789"
+                    {...form.register('phone_number')}
+                  />
+                  {form.formState.errors.phone_number && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {form.formState.errors.phone_number.message}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-12 text-base font-semibold"
+                  disabled={isInquiryLoading || !form.formState.isValid}
+                >
+                  {isInquiryLoading ? (
+                    <>
+                      <LoaderCircleIcon className="w-5 h-5 mr-2 animate-spin" />
+                      Mengecek Tagihan...
+                    </>
+                  ) : (
+                    <>
+                      <ZapIcon className="w-5 h-5 mr-2" />
+                      Cek Tagihan
+                    </>
+                  )}
+                </Button>
               </div>
-
-              <div>
-                <Label htmlFor="phone_number" className="text-sm font-medium">
-                  Nomor Telepon (Opsional)
-                </Label>
-                <Input
-                  type="text"
-                  id="phone_number"
-                  className="w-full mt-2 rounded-lg dark:border-none"
-                  placeholder="08123456789"
-                  {...form.register('phone_number')}
-                />
-                {form.formState.errors.phone_number && (
-                  <p className="text-xs text-red-500 mt-1">
-                    {form.formState.errors.phone_number.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full h-12 text-base font-semibold"
-                disabled={isInquiryLoading || !form.formState.isValid}
-              >
-                {isInquiryLoading ? (
-                  <>
-                    <LoaderCircleIcon className="w-5 h-5 mr-2 animate-spin" />
-                    Mengecek Tagihan...
-                  </>
-                ) : (
-                  <>
-                    <ZapIcon className="w-5 h-5 mr-2" />
-                    Cek Tagihan
-                  </>
-                )}
-              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Checkout Modal */}
       {inquiry.isSuccess && inquiryData && <CheckoutModal data={inquiryData} />}
     </form>
   )

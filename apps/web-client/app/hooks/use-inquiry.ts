@@ -52,23 +52,19 @@ export function useInquiry({ form, mutationKey = ['inquiry'] }: UseInquiryOption
   })
 
   const handleInquiry = (formData: InquiryForm) => {
-    const { voucher_id, payment_method_id, ...rest } = formData
+    const { payment_method_id, ...rest } = formData
 
-    // Store payment_method_id for preselection in checkout modal
     if (payment_method_id) {
       setPreselectedPaymentId(payment_method_id)
     }
 
-    // Store inquiry request data untuk checkout modal
     setInquiryRequestData(formData)
 
-    // Generate random inquiry time untuk tracking
     if (!inquiryTime) {
       const randomTime = Date.now()
       setInquiryTime(randomTime)
     }
 
-    // Submit inquiry tanpa payment_method_id (karena optional dan bisa diubah di checkout modal)
     inquiry.mutate(rest)
   }
 

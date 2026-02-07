@@ -3,7 +3,7 @@ import type {
   ProductCategoriesQueryDto,
   ProductCategoryGetByTypeParamsDto,
 } from './product-categories.dto'
-import type { ProductCategoriesService } from './product-categories.service'
+import { ProductCategoriesService } from './product-categories.service'
 
 // @ApiSecurity('access-token')
 // @UseGuards(JwtAuthGuard)

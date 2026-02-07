@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { and, asc, eq, ilike } from '@repo/db'
 import { type ProductCategoryType, tb } from '@repo/db/types'
-import type { DatabaseService } from 'src/database/database.service'
-import type { ProductCategoriesQueryDto } from './product-categories.dto'
+import { DatabaseService } from 'src/database/database.service'
+import { ProductCategoriesQueryDto } from './product-categories.dto'
 
 @Injectable()
 export class ProductCategoriesRepository {

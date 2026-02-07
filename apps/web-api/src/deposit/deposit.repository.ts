@@ -19,7 +19,7 @@ import {
   tb,
 } from '@repo/db/types'
 import type { DBInstance } from 'src/common/types/db-instance'
-import type { DatabaseService } from 'src/database/database.service'
+import { DatabaseService } from 'src/database/database.service'
 import type { DepositHistoryQuery } from './deposit.dto'
 
 @Injectable()

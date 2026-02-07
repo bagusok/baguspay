@@ -11,13 +11,13 @@ import {
 } from '@repo/db/types'
 import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import type { DatabaseService } from 'src/database/database.service'
-import type { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
-import type { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
-import type { QueueService } from 'src/queue/queue.service'
-import type { StorageService } from 'src/storage/storage.service'
+import { DatabaseService } from 'src/database/database.service'
+import { BalanceService } from 'src/integrations/payment-gateway/balance/balance.service'
+import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
+import { QueueService } from 'src/queue/queue.service'
+import { StorageService } from 'src/storage/storage.service'
 import type { CreateDeposit, DepositHistoryQuery } from './deposit.dto'
-import type { DepositRepository } from './deposit.repository'
+import { DepositRepository } from './deposit.repository'
 
 @Injectable()
 export class DepositService {

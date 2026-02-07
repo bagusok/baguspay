@@ -55,7 +55,8 @@ export default function PaymentSection({ products, form }: Props) {
       setSelectedPayment(null)
       form.setValue('payment_method_id', '')
     }
-  }, [products, form, balancePaymentMethod, paymentMethods])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products?.id])
 
   // Memoized calculations for payment options
   const _isGuest = !user.data?.role || user.data.role === 'guest'

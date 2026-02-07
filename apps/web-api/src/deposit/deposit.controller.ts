@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
 import { User } from 'src/common/decorators/user.decorator'
 import type { TUser } from 'src/common/types/meta.type'
 import type { CreateDeposit, DepositHistoryQuery, DepositParams } from './deposit.dto'
-import type { DepositService } from './deposit.service'
+import { DepositService } from './deposit.service'
 
 @ApiSecurity('access-token')
 @UseGuards(JwtAuthGuard)

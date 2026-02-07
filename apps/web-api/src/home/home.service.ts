@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { and, eq, inArray } from '@repo/db'
 import { BannerLocation, ProductGroupingMenuType, tb } from '@repo/db/types'
 import { SendResponse } from 'src/common/utils/response'
-import type { DatabaseService } from 'src/database/database.service'
-import type { StorageService } from 'src/storage/storage.service'
+import { DatabaseService } from 'src/database/database.service'
+import { StorageService } from 'src/storage/storage.service'
 
 @Injectable()
 export class HomeService {

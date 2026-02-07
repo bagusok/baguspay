@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { PaymentMethodProvider, PaymentStatus } from '@repo/db/types'
 import { SendResponse } from 'src/common/utils/response'
-import type { DepositService } from 'src/deposit/deposit.service'
-import type { DuitkuService } from 'src/integrations/payment-gateway/duitku/duitku.service'
+import { DepositService } from 'src/deposit/deposit.service'
+import { DuitkuService } from 'src/integrations/payment-gateway/duitku/duitku.service'
 import type { DuitkuCallbackPayload } from 'src/integrations/payment-gateway/duitku/duitku.type'
-import type { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service'
+import { TripayService } from 'src/integrations/payment-gateway/tripay/tripay.service'
 import type { TripayCallbackData } from 'src/integrations/payment-gateway/tripay/tripay.type'
-import type { OrderService } from 'src/order/services/order.service'
+import { OrderService } from 'src/order/services/order.service'
 
 @Injectable()
 export class PaymentGatewayCallbackService {

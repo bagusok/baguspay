@@ -5,7 +5,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { arrayContains, eq, gte, lte, ne, type SQL } from '@repo/db'
 import {
   InquiryStatus,
@@ -22,17 +22,17 @@ import {
 import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
 import { SignatureUtils } from 'src/common/utils/signature'
-import type { DatabaseService } from 'src/database/database.service'
+import { DatabaseService } from 'src/database/database.service'
 import type { DigiflazzCekTagihanResponse } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import type { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
-import type { OffersRepository } from 'src/offers/offers.repository'
-import type { OffersService } from 'src/offers/offers.service'
-import type { ProductRepository } from 'src/products/product.repository'
-import type { QueueService } from 'src/queue/queue.service'
-import type { InquiryUniversalDto } from '../dto/inquiry.universal.dto'
-import type { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from '../dto/order.dto'
-import type { OrderRepository } from '../order.repository'
-import type { InquiryService } from './inquiry.service'
+import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
+import { OffersRepository } from 'src/offers/offers.repository'
+import { OffersService } from 'src/offers/offers.service'
+import { ProductRepository } from 'src/products/product.repository'
+import { QueueService } from 'src/queue/queue.service'
+import { InquiryUniversalDto } from '../dto/inquiry.universal.dto'
+import { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from '../dto/order.dto'
+import { OrderRepository } from '../order.repository'
+import { InquiryService } from './inquiry.service'
 
 @Injectable()
 export class OrderService {

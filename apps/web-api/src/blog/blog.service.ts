@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { ArticleType } from '@repo/db/types'
 import { SendResponse } from 'src/common/utils/response'
-import type { StorageService } from 'src/storage/storage.service'
-import type { GetBlogPostsDto } from './blog.dto'
-import type { BlogRepository } from './blog.repository'
+import { StorageService } from 'src/storage/storage.service'
+import { GetBlogPostsDto } from './blog.dto'
+import { BlogRepository } from './blog.repository'
 
 @Injectable()
 export class BlogService {

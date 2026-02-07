@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { HttpException, Injectable } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types'
 import { ApiServiceException } from 'src/common/exceptions/api-service.exception'
 import type { PaymentGateway } from '../payment.interface'
@@ -8,7 +8,7 @@ import type {
   CreatePaymentGatewayRequest,
   CreatePaymentGatewayResponse,
 } from '../payment-gateway.type'
-import type { DuitkuAPiService } from './duitku.api.service'
+import { DuitkuAPiService } from './duitku.api.service'
 
 @Injectable()
 export class DuitkuService implements PaymentGateway {

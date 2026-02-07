@@ -15,9 +15,9 @@ import {
 } from '@repo/db/types'
 import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import type { DatabaseService } from 'src/database/database.service'
-import type { StorageService } from 'src/storage/storage.service'
-import type { PaymentsRepository } from './payments.repository'
+import { DatabaseService } from 'src/database/database.service'
+import { StorageService } from 'src/storage/storage.service'
+import { PaymentsRepository } from './payments.repository'
 
 @Injectable()
 export class PaymentsService {

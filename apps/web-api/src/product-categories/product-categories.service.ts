@@ -6,13 +6,13 @@ import { Injectable, NotFoundException } from '@nestjs/common'
 import { and, asc, eq, gte, lte, ne, or } from '@repo/db'
 import { OfferType, tb } from '@repo/db/types'
 import { SendResponse } from 'src/common/utils/response'
-import type { DatabaseService } from 'src/database/database.service'
-import type { StorageService } from 'src/storage/storage.service'
+import { DatabaseService } from 'src/database/database.service'
+import { StorageService } from 'src/storage/storage.service'
 import type {
   ProductCategoriesQueryDto,
   ProductCategoryGetByTypeParamsDto,
 } from './product-categories.dto'
-import type { ProductCategoriesRepository } from './product-categories.repository'
+import { ProductCategoriesRepository } from './product-categories.repository'
 
 @Injectable()
 export class ProductCategoriesService {

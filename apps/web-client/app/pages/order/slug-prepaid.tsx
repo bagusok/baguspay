@@ -24,6 +24,7 @@ import {
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import Image from '~/components/image'
+import VoucherInput from '~/components/voucher-input'
 import { formatPrice } from '~/utils/format'
 import { useInquiry } from '../../hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
@@ -376,6 +377,13 @@ export default function OrderSlugPrepaidPage({
                   * Pastikan email aktif untuk menerima notifikasi
                 </span>
               </div>
+
+              <VoucherInput
+                form={form}
+                productId={selectedItem?.id || ''}
+                productPrice={selectedItem?.total_price}
+              />
+
               <PaymentSection products={selectedItem} form={form} />
 
               <Button

@@ -20,8 +20,8 @@ import {
   tb,
 } from '@repo/db/types'
 import type { DBInstance } from 'src/common/types/db-instance'
-import type { DatabaseService } from 'src/database/database.service'
-import type { GetOrderHistoryQueryDto } from './dto/order.dto'
+import { DatabaseService } from 'src/database/database.service'
+import { GetOrderHistoryQueryDto } from './dto/order.dto'
 
 @Injectable()
 export class OrderRepository {

@@ -15,7 +15,7 @@
         "noStaticOnlyClass": "off"
       },
       "style": {
-        "useImportType": "warn"
+        "useImportType": "off"
       }
     }
   },

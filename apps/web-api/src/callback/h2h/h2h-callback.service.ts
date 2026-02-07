@@ -4,8 +4,8 @@ import type {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
 } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import type { OrderRepository } from 'src/order/order.repository'
-import type { DigiflazzH2HCallbackService } from './digiflazz-h2h-callback.service'
+import { OrderRepository } from 'src/order/order.repository'
+import { DigiflazzH2HCallbackService } from './digiflazz-h2h-callback.service'
 
 @Injectable()
 export class H2HCallbackService {

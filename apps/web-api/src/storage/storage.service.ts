@@ -1,5 +1,5 @@
 import { Injectable, type OnModuleInit } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { Disk } from 'flydrive'
 import { S3Driver } from 'flydrive/drivers/s3'
 

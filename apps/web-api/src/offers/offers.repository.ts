@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { and, eq, gte, lt, lte, or, sql } from '@repo/db'
 import { OfferType, OrderStatus, PaymentStatus, tb } from '@repo/db/types'
 import type { DBInstance } from 'src/common/types/db-instance'
-import type { DatabaseService } from 'src/database/database.service'
+import { DatabaseService } from 'src/database/database.service'
 
 @Injectable()
 export class OffersRepository {
@@ -70,7 +70,7 @@ export class OffersRepository {
     const db = tx ?? this.databaseService.db
     const now = new Date()
 
-    const [offer] = await db
+    const q = db
       .select({
         id: tb.offers.id,
         name: tb.offers.name,
@@ -113,6 +113,14 @@ export class OffersRepository {
         ),
       )
       .limit(1)
+
+    if (tx) {
+      q.for('update', {
+        of: [tb.offers],
+      })
+    }
+
+    const [offer] = await q
 
     return offer
   }

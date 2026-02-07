@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Query } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import type { GetBlogPostsDto } from './blog.dto'
-import type { BlogService } from './blog.service'
+import { GetBlogPostsDto } from './blog.dto'
+import { BlogService } from './blog.service'
 
 @ApiTags('Blog')
 @Controller('blog')

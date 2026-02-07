@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { BadRequestException, GatewayTimeoutException, Injectable } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { OrderStatus } from '@repo/db/types'
 import axios, { type AxiosInstance } from 'axios'
 import type {

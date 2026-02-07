@@ -4,9 +4,9 @@ import { BalanceMutationType, LoginIsFrom, tb } from '@repo/db/types'
 import { getDeviceInfo, isBagusPayMobileApp } from 'src/auth/utils/device-fingerprint'
 import type { MetaPaginated, TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import type { StorageService } from 'src/storage/storage.service'
+import { StorageService } from 'src/storage/storage.service'
 import type { GetBalanceMutationHistoryQuery } from './user.dto'
-import type { DateRange, UserRepository } from './user.repository'
+import { DateRange, UserRepository } from './user.repository'
 
 /**
  * Get human-readable client type label

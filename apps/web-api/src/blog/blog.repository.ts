@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common'
 import { and, asc, count, desc, eq, ilike, type SQL } from '@repo/db'
 import { type ArticleType, tb } from '@repo/db/types'
-import type { DatabaseService } from 'src/database/database.service'
-import type { GetBlogPostsDto } from './blog.dto'
+import { DatabaseService } from 'src/database/database.service'
+import { GetBlogPostsDto } from './blog.dto'
 
 @Injectable()
 export class BlogRepository {

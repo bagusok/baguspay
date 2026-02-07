@@ -7,9 +7,9 @@ import { and, asc, count, eq, gte, lte, ne, or, type SQL } from '@repo/db'
 import { OfferType, tb } from '@repo/db/types'
 import type { MetaPaginated } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import type { DatabaseService } from 'src/database/database.service'
-import type { StorageService } from 'src/storage/storage.service'
-import type { GetAllProductsDto } from './products.dto'
+import { DatabaseService } from 'src/database/database.service'
+import { StorageService } from 'src/storage/storage.service'
+import { GetAllProductsDto } from './products.dto'
 
 @Injectable()
 export class ProductsService {

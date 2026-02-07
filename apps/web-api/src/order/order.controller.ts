@@ -18,9 +18,9 @@ import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
 import { TransactionGuard } from 'src/auth/guards/transaction.guard'
 import type { TUser } from 'src/common/types/meta.type'
-import type { InquiryUniversalDto } from './dto/inquiry.universal.dto'
-import type { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from './dto/order.dto'
-import type { OrderService } from './services/order.service'
+import { InquiryUniversalDto } from './dto/inquiry.universal.dto'
+import { CheckoutDto, GetOrderHistoryQueryDto, OrderIdDto } from './dto/order.dto'
+import { OrderService } from './services/order.service'
 
 @ApiSecurity('access-token')
 @Controller('order')

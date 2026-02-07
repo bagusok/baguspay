@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { HttpStatus, Injectable } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import axios, { type AxiosInstance, isAxiosError } from 'axios'
 import { ApiServiceException } from 'src/common/exceptions/api-service.exception'
 import type {

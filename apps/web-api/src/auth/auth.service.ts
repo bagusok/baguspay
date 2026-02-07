@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
-import type { JwtService } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { JwtService } from '@nestjs/jwt'
 import { LoginIsFrom, UserRegisteredType, UserRole } from '@repo/db/types'
 import { compare, hash } from 'bcrypt'
-import type { LoginDto, RegisterDto } from './auth.dto'
-import type { AuthRepository } from './auth.repository'
+import { LoginDto, RegisterDto } from './auth.dto'
+import { AuthRepository } from './auth.repository'
 import { type DeviceInfo, getDeviceInfo, isSameDevice } from './utils/device-fingerprint'
 
 interface LoginHeaders {

@@ -15,7 +15,7 @@ import { TransactionGuard } from 'src/auth/guards/transaction.guard'
 import { User } from 'src/common/decorators/user.decorator'
 import type { TUser } from 'src/common/types/meta.type'
 import type { GetBalanceMutationHistoryQuery } from './user.dto'
-import type { UserService } from './user.service'
+import { UserService } from './user.service'
 
 @ApiSecurity('access-token')
 @Controller('user')

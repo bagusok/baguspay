@@ -8,9 +8,9 @@ import { and, eq, or } from '@repo/db'
 import { OfferType, tb, UserRole } from '@repo/db/types'
 import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
-import type { DatabaseService } from 'src/database/database.service'
-import type { RedeemVoucherDto } from './offers.dto'
-import type { OffersRepository } from './offers.repository'
+import { DatabaseService } from 'src/database/database.service'
+import { RedeemVoucherDto } from './offers.dto'
+import { OffersRepository } from './offers.repository'
 
 @Injectable()
 export class OffersService {

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto'
 import { HttpException, Injectable, InternalServerErrorException } from '@nestjs/common'
-import type { ConfigService } from '@nestjs/config'
+import { ConfigService } from '@nestjs/config'
 import { PaymentMethodFeeType, PaymentStatus } from '@repo/db/types'
 import { ApiServiceException } from 'src/common/exceptions/api-service.exception'
 import type { PaymentGateway } from '../payment.interface'
@@ -8,7 +8,7 @@ import type {
   CreatePaymentGatewayRequest,
   CreatePaymentGatewayResponse,
 } from '../payment-gateway.type'
-import type { TripayApiService } from './tripay.api.service'
+import { TripayApiService } from './tripay.api.service'
 import type { TripayPaymentMethodCode } from './tripay.type'
 
 @Injectable()
@@ -22,8 +22,6 @@ export class TripayService implements PaymentGateway {
     private readonly tripayApiService: TripayApiService,
   ) {
     this.PRIVATE_KEY = configService.get<string>('TRIPAY_PRIVATE_KEY')
-    this.API_KEY = configService.get<string>('TRIPAY_APIKEY')
-    this.MERCHANT_CODE = configService.get<string>('TRIPAY_MERCHANT_CODE')
   }
 
   async createTransaction(

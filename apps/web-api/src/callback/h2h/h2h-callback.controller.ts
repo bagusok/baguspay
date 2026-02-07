@@ -4,7 +4,7 @@ import type {
   DigiflazzPostpaidCallbackData,
   DigiflazzPrepaidCallbackData,
 } from 'src/integrations/h2h/digiflazz/digiflazz.type'
-import type { H2HCallbackService } from './h2h-callback.service'
+import { H2HCallbackService } from './h2h-callback.service'
 
 @ApiTags('Callback')
 @Controller('callback/h2h')
