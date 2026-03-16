@@ -106,57 +106,60 @@ export default function Header() {
   return (
     <header className="w-full md:max-w-7xl mx-auto sticky top-0 backdrop-blur-sm z-40">
       <div className="flex gap-4 p-4 justify-between items-center">
-        <div className="flex gap-6">
-          <h1 className="font-bold text-xl text-foreground">Baguspay</h1>
-          <div className="items-end hidden md:flex ml-10 gap-6">
-            {navData.navMain.items.map((item) => (
-              <NavLinkWithLocale
-                key={item.label}
-                to={item.href}
-                className={({ isActive }) =>
-                  cn(`flex items-center gap-2  font-medium text-sm text-foreground`, {
-                    'font-bold': isActive,
-                    'hover:opacity-75': !isActive,
-                  })
-                }
-              >
-                {t(item.local_label as LocalLabel)}
-              </NavLinkWithLocale>
-            ))}
-          </div>
+        <h1 className="font-bold text-xl text-foreground">Baguspay</h1>
+
+        <div className="items-end hidden md:flex ml-10 gap-6">
+          {navData.navMain.items.map((item) => (
+            <NavLinkWithLocale
+              key={item.label}
+              to={item.href}
+              end={item.href === '/'}
+              className={({ isActive }) =>
+                cn(`flex items-center gap-2  font-medium text-sm text-foreground`, {
+                  'font-bold border-b-2 border-primary': isActive,
+                  'hover:opacity-75': !isActive,
+                })
+              }
+            >
+              {t(item.local_label as LocalLabel)}
+            </NavLinkWithLocale>
+          ))}
         </div>
 
-        {user.isSuccess && user?.data?.role !== UserRole.GUEST ? (
-          <NavUser user={user.data} />
-        ) : (
-          <div className="hidden md:flex gap-2 items-center">
-            <Button variant="secondary" asChild>
-              <LinkWithLocale to="/auth/register">{t('navbar.register')}</LinkWithLocale>
-            </Button>
-            <Button asChild>
-              <LinkWithLocale to="/auth/login">{t('navbar.login')}</LinkWithLocale>
-            </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            className="hover:opacity-70"
+            variant="secondary"
+            onClick={() => setTheme((prev) => (prev === Theme.LIGHT ? Theme.DARK : Theme.LIGHT))}
+          >
+            {theme === Theme.LIGHT ? (
+              <SunIcon className="h-6 w-6 text-foreground" />
+            ) : (
+              <MoonIcon className="h-6 w-6 text-foreground" />
+            )}
+          </Button>
+          {user.isSuccess && user?.data?.role !== UserRole.GUEST ? (
+            <NavUser user={user.data} />
+          ) : (
+            <div className="hidden md:flex gap-2 items-center">
+              <Button variant="secondary" asChild>
+                <LinkWithLocale to="/auth/register">{t('navbar.register')}</LinkWithLocale>
+              </Button>
+              <Button asChild>
+                <LinkWithLocale to="/auth/login">{t('navbar.login')}</LinkWithLocale>
+              </Button>
+            </div>
+          )}
+          <div className="flex md:hidden gap-2 items-center">
             <Button
-              variant="secondary"
-              onClick={() => setTheme((prev) => (prev === Theme.LIGHT ? Theme.DARK : Theme.LIGHT))}
+              variant="ghost"
+              className="rounded-full"
+              size="icon"
+              onClick={() => setOpenSidebar(true)}
             >
-              {theme === Theme.LIGHT ? (
-                <SunIcon className="h-6 w-6 text-foreground" />
-              ) : (
-                <MoonIcon className="h-6 w-6 text-foreground" />
-              )}
+              <MenuIcon className="h-6 w-6 text-foreground" />
             </Button>
           </div>
-        )}
-        <div className="flex md:hidden gap-2 items-center">
-          <Button
-            variant="ghost"
-            className="rounded-full"
-            size="icon"
-            onClick={() => setOpenSidebar(true)}
-          >
-            <MenuIcon className="h-6 w-6 text-foreground" />
-          </Button>
         </div>
       </div>
     </header>

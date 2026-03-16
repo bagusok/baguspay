@@ -1,11 +1,10 @@
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import { useMutation } from '@tanstack/react-query'
 import { isAxiosError } from 'axios'
 import { ClockIcon, Loader2Icon, SearchIcon, TicketCheckIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { UnderlinedInput } from '~/components/form-fields'
 import LinkWithLocale from '~/components/link'
 import { apiClient } from '~/utils/axios'
 import { formatDate, formatPrice } from '~/utils/format'
@@ -16,7 +15,7 @@ export default function CheckOrderPage() {
   const checkOrder = useMutation({
     mutationKey: ['check-order'],
     mutationFn: async (orderId: string) =>
-      apiClient.post(`/order/check/${orderId}`).then((res) => res.data),
+      apiClient.get(`/order/check/${orderId}`).then((res) => res.data),
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,7 +30,7 @@ export default function CheckOrderPage() {
   return (
     <div className="md:max-w-7xl mx-auto">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
+      <section className="text-center relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
         <div className="relative z-10">
           <p className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             Cek Status Order
@@ -39,7 +38,7 @@ export default function CheckOrderPage() {
           <h1 className="mt-4 text-2xl md:text-4xl font-bold tracking-tight text-foreground">
             Lacak Pesanan Anda
           </h1>
-          <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground max-w-2xl">
+          <p className="mt-3 md:mt-8 text-sm md:text-base text-muted-foreground">
             Masukkan Order ID untuk melihat status terbaru dari pesanan Anda.
           </p>
         </div>
@@ -50,35 +49,42 @@ export default function CheckOrderPage() {
       <section className="mt-8 rounded-xl border border-border bg-card p-4 md:p-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="orderId">Order ID</Label>
-              <div className="flex gap-2">
-                <Input
-                  value={orderId}
-                  onChange={(e) => setOrderId(e.target.value)}
-                  id="orderId"
-                  placeholder="Contoh: T1234XXXXXX"
-                  name="orderId"
-                  autoComplete="off"
-                />
-                <Button type="submit" disabled={checkOrder.isPending} className="shrink-0">
-                  {checkOrder.isPending ? (
-                    <>
-                      <Loader2Icon className="size-4 animate-spin" />
-                      <span className="ml-2">Memeriksa...</span>
-                    </>
-                  ) : (
-                    <>
-                      <SearchIcon className="size-4" />
-                      <span className="ml-2">Cek Status</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Hanya masukkan Order ID tanpa spasi. Contoh bisa ditemukan pada email/riwayat
+            <div className="space-y-2 text-center">
+              <UnderlinedInput
+                label="Order ID"
+                value={orderId}
+                onChange={(e) => setOrderId(e.target.value)}
+                id="orderId"
+                placeholder="Contoh: T1234XXXXXX"
+                name="orderId"
+                autoComplete="off"
+                className="text-center"
+              />
+
+              <p className="text-xs text-muted-foreground italic">
+                * Hanya masukkan Order ID tanpa spasi. Contoh bisa ditemukan pada email/riwayat
                 pesanan Anda.
               </p>
+
+              <Button
+                type="submit"
+                disabled={checkOrder.isPending}
+                className="shrink-0 mt-6"
+                variant="default"
+                size="lg"
+              >
+                {checkOrder.isPending ? (
+                  <>
+                    <Loader2Icon className="size-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <SearchIcon className="size-4" />
+                    Cek Transaksi
+                  </>
+                )}
+              </Button>
             </div>
           </div>
         </form>
@@ -86,21 +92,15 @@ export default function CheckOrderPage() {
 
       {/* Result */}
       <section className="mt-6">
-        {checkOrder.isIdle && (
-          <div className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            Masukkan Order ID kemudian klik "Cek Status" untuk melihat hasil.
-          </div>
-        )}
-
         {checkOrder.isPending && (
-          <div className="rounded-xl border border-border p-6 flex items-center gap-3">
+          <div className="text-center justify-center rounded-xl border border-border p-6 flex items-center gap-3">
             <Loader2Icon className="size-5 animate-spin" />
             <span className="text-sm text-muted-foreground">Mengambil data pesanan...</span>
           </div>
         )}
 
         {checkOrder.isError && (
-          <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-destructive text-sm">
+          <div className="text-center rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-destructive text-sm">
             {isAxiosError(checkOrder.error) && checkOrder.error.response?.status === 404
               ? 'Order ID tidak ditemukan. Periksa kembali dan coba lagi.'
               : 'Terjadi kesalahan saat memeriksa pesanan. Silakan coba lagi.'}

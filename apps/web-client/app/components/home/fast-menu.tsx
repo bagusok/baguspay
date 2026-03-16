@@ -66,7 +66,7 @@ export default function FastMenu() {
   if (fastmenus.isError) {
     return (
       <section className="mt-4 space-y-2">
-        <h2 className="text-lg font-bold">Fast Menu</h2>
+        <h2 className="text-lg font-bold">Menu Cepat</h2>
         <div className="rounded-lg border border-destructive/40 bg-destructive/5 px-3 py-2 text-sm text-destructive">
           Error loading fast menu
         </div>
@@ -76,7 +76,7 @@ export default function FastMenu() {
 
   return (
     <div className="mt-4 space-y-3">
-      <h2 className="text-lg font-bold">Fast Menu</h2>
+      <h2 className="text-lg font-bold">Menu Cepat</h2>
       <div className="flex flex-wrap gap-3">
         {fastmenus.data?.map((menu) => {
           const firstCategory = menu.product_categories?.[0]
@@ -88,7 +88,7 @@ export default function FastMenu() {
                 : undefined
 
           const card = (
-            <div className="mt-1.5 rounded-xl border p-2 border-secondary flex flex-col md:flex-row items-center gap-2 w-16 md:w-32 cursor-pointer hover:border-primary transition-colors">
+            <div className="mt-1.5 dark:bg-secondary dark:border-0 hover:-translate-y-0.5 hover:scale-105 ease-in-out duration-100 rounded-2xl border p-2 border-border flex flex-col md:flex-row items-center gap-2 w-16 md:w-32 cursor-pointer hover:border-primary transition-colors">
               <Image
                 src={menu.image_url}
                 alt={menu.name}
@@ -157,7 +157,7 @@ export default function FastMenu() {
                   <Link
                     key={cat.id}
                     to={`/order/${cat.slug}`}
-                    className="rounded-lg border border-border/70 p-3 flex items-center gap-2 hover:border-primary transition-colors"
+                    className="rounded-lg hover:border hover:border-border/70 p-3 flex items-center gap-2 transition-colors bg-secondary"
                   >
                     <Image
                       src={cat.image_url}
@@ -187,7 +187,9 @@ export default function FastMenu() {
           <DialogContent className="max-w-xl">
             <DialogHeader>
               <div className="space-y-1">
-                <p className="text-base font-semibold">{selected?.name ?? 'Menu'}</p>
+                <p className="text-base font-semibold text-foreground">
+                  {selected?.name ?? 'Menu'}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Pilih kategori yang tersedia dari menu ini.
                 </p>
@@ -199,7 +201,7 @@ export default function FastMenu() {
                   <Link
                     key={cat.id}
                     to={`/order/${cat.slug}`}
-                    className="rounded-lg border border-border/70 p-3 flex items-center gap-2 hover:border-primary transition-colors"
+                    className="rounded-lg hover:border hover:border-border/70 p-3 flex items-center gap-2 transition-colors bg-secondary"
                   >
                     <Image
                       src={cat.image_url}

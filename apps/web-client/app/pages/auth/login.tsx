@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { useForm } from 'react-hook-form'
@@ -9,6 +7,7 @@ import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router'
 import { z } from 'zod'
+import { UnderlinedInput } from '~/components/form-fields'
 import { useFormMutation } from '~/hooks/use-form-mutation'
 import { getInstance } from '~/middlewares/i8n'
 import { authTokenAtom } from '~/store/token'
@@ -103,22 +102,20 @@ export default function Login({ loaderData }: Route.ComponentProps) {
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
           method="post"
-          className="max-w-md mx-auto bg-white shadow-md rounded-lg space-y-4 mt-5"
+          className="max-w-md mx-auto space-y-4 mt-5"
         >
           <div>
-            <Label htmlFor="email" className="block mb-2">
-              {t('emailLabel')}
-            </Label>
-            <Input type="email" {...form.register('email')} required />
+            <UnderlinedInput label={t('emailLabel')} type="email" {...form.register('email')} />
             {form.formState.errors.email && (
               <p className="text-red-500 text-xs mt-1">{form.formState.errors.email.message}</p>
             )}
           </div>
           <div>
-            <Label htmlFor="password" className="block mb-2">
-              {t('passwordLabel')}
-            </Label>
-            <Input type="password" {...form.register('password')} required />
+            <UnderlinedInput
+              label={t('passwordLabel')}
+              type="password"
+              {...form.register('password')}
+            />
             {form.formState.errors.password && (
               <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>
             )}
@@ -139,22 +136,14 @@ export default function Login({ loaderData }: Route.ComponentProps) {
         <div>
           <div className="text-center text-sm text-muted-foreground mt-4">
             {t('noAccount')}{' '}
-            <Link
-              to="/auth/register"
-              className="text-primary-foreground font-medium hover:underline"
-            >
+            <Link to="/auth/register" className="text-primary font-medium hover:underline">
               {t('registerLinkText')}
             </Link>
           </div>
 
           <div className="text-center text-sm text-muted-foreground mt-10">{t('orLoginWith')}</div>
           <div className="flex justify-center gap-4 mt-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="rounded-full border-accent border-3"
-              asChild
-            >
+            <Button type="button" variant="outline" className="rounded-full border-border" asChild>
               <Link to="/auth/google">
                 <svg
                   className="size-6"

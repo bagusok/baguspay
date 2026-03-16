@@ -2,7 +2,7 @@ import { Button } from '@repo/ui/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/ui/dialog'
 import { useMutation } from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
-import { ChevronRightIcon, CreditCardIcon } from 'lucide-react'
+import { ChevronRightIcon, CreditCardIcon, WalletMinimalIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -154,9 +154,13 @@ export default function PaymentSection({ products, form }: Props) {
 
   return (
     <div className="rounded-xl shadow-xs border border-gray-200 p-4 dark:border-gray-700 dark:bg-gray-800/50 text-secondary-foreground">
-      <div className="flex items-center gap-2 mb-4">
-        <CreditCardIcon className="w-5 h-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Metode Pembayaran</h2>
+      <div className="inline-flex gap-3 items-center mb-6">
+        <div className="rounded-xl p-2.5 bg-linear-to-br from-primary to-primary/80 shadow-lg shadow-primary/20 text-primary-foreground">
+          <WalletMinimalIcon className="w-5 h-5 text-background" />
+        </div>
+        <div>
+          <h2 className="text-lg font-bold">Metode Pembayaran</h2>
+        </div>
       </div>
 
       {/* Payment Method Display/Selector */}
@@ -202,9 +206,9 @@ export default function PaymentSection({ products, form }: Props) {
           <ChevronRightIcon className="w-4 h-4" />
         </Button>
 
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto dark:bg-foreground">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-foreground">
               <CreditCardIcon className="w-5 h-5" />
               Pilih Metode Pembayaran
             </DialogTitle>

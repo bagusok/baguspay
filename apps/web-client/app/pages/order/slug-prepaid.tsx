@@ -1,16 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@repo/ui/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs'
+import { cn } from '@repo/ui/lib/utils'
 import {
   CheckIcon,
   ContactIcon,
@@ -23,6 +15,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { UnderlinedInput, UnderlinedSelect } from '~/components/form-fields'
 import Image from '~/components/image'
 import VoucherInput from '~/components/voucher-input'
 import { formatPrice } from '~/utils/format'
@@ -86,22 +79,12 @@ export default function OrderSlugPrepaidPage({
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="w-full md:max-w-7xl mx-auto space-y-4">
-        {/* <section id="banner">
-          <div className="w-full overflow-hidden rounded-2xl">
-            <Image
-              src={loaderData.data.banner_url}
-              alt="Order Banner"
-              className="object-cover"
-            />
-          </div>
-        </section> */}
-
         <div className="grid md:grid-cols-5 gap-6">
           <div className="md:col-span-3 space-y-4">
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-start gap-4 rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
               <div className="w-32 rounded-lg overflow-hidden">
                 <Image
-                  src={loaderData.data?.image_url || ''}
+                  src={loaderData.data?.image_url}
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -131,70 +114,84 @@ export default function OrderSlugPrepaidPage({
                 </div>
               </div>
             </div>
-            <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
-              <div className="inline-flex gap-2 items-center">
-                <div className="rounded-full p-2 bg-primary/40">
-                  <KeyRoundIcon className="w-4 h-4" />
+            {/* Input Detail Akun */}
+            <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-6 dark:border-none dark:bg-secondary text-secondary-foreground relative overflow-hidden">
+              <div className="inline-flex gap-3 items-center mb-6">
+                <div className="rounded-xl p-2.5 bg-linear-to-br from-primary to-primary/80 shadow-lg shadow-primary/20 text-primary-foreground">
+                  <KeyRoundIcon className="w-5 h-5 text-background" />
                 </div>
-                <h2 className="text-lg font-semibold">Detail Akun</h2>
+                <div>
+                  <h2 className="text-lg font-bold">Detail Akun</h2>
+                </div>
               </div>
-              <div className="flex gap-2 mt-4">
+
+              <div
+                className={cn('grid grid-cols-1 gap-x-6 gap-y-6', {
+                  'md:grid-cols-2': data.input_fields.length > 1,
+                })}
+              >
                 {data.input_fields.map((input: any, index: number) => {
-                  if (input.type === 'select') {
+                  const isSelect = input.type === 'select'
+
+                  if (isSelect) {
                     return (
-                      <div className="w-full" key={input.title}>
-                        <Label htmlFor={`input_fields.${index}.value`} className="text-xs">
-                          {input.title}
-                        </Label>
-                        <Select
-                          value={form.watch(`input_fields.${index}.value`)}
-                          onValueChange={(value) => {
-                            update(index, { name: input.name, value })
-                          }}
-                        >
-                          <SelectTrigger className="w-full mt-2 rounded-full dark:border-none">
-                            <SelectValue placeholder={input.placeholder} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {input.options.map((option: any) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {form.formState.errors.input_fields?.[index]?.value && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {form.formState.errors.input_fields[index]?.value?.message}
-                          </p>
-                        )}
-                      </div>
-                    )
-                  } else {
-                    return (
-                      <div className="w-full" key={input.title}>
-                        <Label htmlFor={`input_fields.${index}.value`} className="text-xs">
-                          {input.title}
-                        </Label>
-                        <Input
-                          {...form.register(`input_fields.${index}.value`)}
-                          type={input.type}
-                          id={`input_fields.${index}.value`}
-                          className="w-full mt-2 rounded-full dark:border-none"
-                          placeholder={input.placeholder}
-                        />
-                        {form.formState.errors.input_fields?.[index]?.value && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {form.formState.errors.input_fields[index]?.value?.message}
-                          </p>
-                        )}
-                      </div>
+                      <UnderlinedSelect
+                        key={input.name}
+                        id={`input_fields.${index}.value`}
+                        label={input.title}
+                        value={form.watch(`input_fields.${index}.value`)}
+                        onValueChange={(value) => {
+                          update(index, { name: input.name, value })
+                        }}
+                        options={input.options}
+                        placeholder={input.placeholder}
+                        error={form.formState.errors.input_fields?.[index]?.value?.message}
+                      />
                     )
                   }
+
+                  return (
+                    <UnderlinedInput
+                      key={input.name}
+                      id={`input_fields.${index}.value`}
+                      label={input.title}
+                      {...form.register(`input_fields.${index}.value`)}
+                      type={input.type}
+                      placeholder={input.placeholder}
+                      error={form.formState.errors.input_fields?.[index]?.value?.message}
+                    />
+                  )
                 })}
               </div>
-              <p className="text-xs underline italic font-medium mt-2">Bagaimana Menemukan ID?</p>
+
+              <div className="mt-8 pt-4 border-t border-border/50 flex justify-between items-center">
+                <p className="text-xs text-muted-foreground">Butuh bantuan?</p>
+                <button
+                  type="button"
+                  className="text-xs font-semibold text-primary hover:text-primary/80 hover:underline transition-all flex items-center gap-1"
+                >
+                  Bagaimana Menemukan ID?
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-external-link"
+                  >
+                    <path d="M15 3h6v6" />
+                    <path d="M10 14 21 3" />
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  </svg>
+                </button>
+              </div>
             </div>
+
+            {/* Product Section */}
             <div className="rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
               <Tabs defaultValue={data.product_sub_categories[0]?.name ?? ''} className="w-full">
                 <TabsList>
@@ -310,46 +307,34 @@ export default function OrderSlugPrepaidPage({
           <div className="md:col-span-2">
             <div className="space-y-4 md:sticky md:top-24 ">
               <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
-                <div className="inline-flex gap-2 items-center">
-                  <div className="rounded-full p-2 bg-primary/40">
-                    <ContactIcon className="w-4 h-4" />
+                <div className="inline-flex gap-3 items-center mb-2">
+                  <div className="rounded-xl p-2.5 bg-linear-to-br from-primary to-primary/80 shadow-lg shadow-primary/20 text-primary-foreground">
+                    <ContactIcon className="w-5 h-5 text-background" />
                   </div>
-                  <h2 className="text-lg font-semibold">Kontak</h2>
+                  <div>
+                    <h2 className="text-lg font-bold">Kontak</h2>
+                  </div>
                 </div>
                 <div className="w-full mt-4 mb-2">
-                  <Label htmlFor="email" className="text-xs">
-                    Masukkan Email
-                  </Label>
-                  <Input
-                    {...form.register('email')}
-                    type="text"
+                  <UnderlinedInput
+                    label="Masukkan Email"
                     id="email"
-                    className="w-full mt-2 rounded-full dark:border-none"
+                    type="text"
                     placeholder="user@tld.com"
+                    {...form.register('email')}
+                    error={form.formState.errors.email?.message}
                   />
-                  {form.formState.errors.email && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {form.formState.errors.email.message}
-                    </p>
-                  )}
                 </div>
 
                 <div className="w-full mb-2">
-                  <Label htmlFor="phone_number" className="text-xs">
-                    Nomor Telepon
-                  </Label>
-                  <Input
-                    {...form.register('phone_number')}
-                    type="text"
+                  <UnderlinedInput
+                    label="Nomor Telepon"
                     id="phone_number"
-                    className="w-full mt-2 rounded-full dark:border-none"
+                    type="text"
                     placeholder="08123456789"
+                    {...form.register('phone_number')}
+                    error={form.formState.errors.phone_number?.message}
                   />
-                  {form.formState.errors.phone_number && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {form.formState.errors.phone_number.message}
-                    </p>
-                  )}
                 </div>
 
                 {/* Conditional payment phone number field */}

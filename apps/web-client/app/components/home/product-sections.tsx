@@ -101,7 +101,7 @@ export default function HomeProductSections() {
                       ) : null}
                     </div>
 
-                    <div className="px-2 pt-2 pb-6 bg-secondary dark:bg-card flex-1 flex flex-col relative overflow-hidden">
+                    <div className="px-2 pt-2 pb-6 bg-secondary flex-1 flex flex-col relative overflow-hidden">
                       {/* Background Gradient Animation */}
                       <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-all duration-500" />
                       <h3 className="font-semibold text-foreground text-ellipsis line-clamp-1 relative z-10 transition-all duration-300 group-hover:text-primary">

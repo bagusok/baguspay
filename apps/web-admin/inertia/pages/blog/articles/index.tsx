@@ -108,7 +108,7 @@ export default function ArticlesIndex(props: Props) {
 
       <div className="mt-6 flex items-center gap-4">
         <Select value={filterCategory} onValueChange={setFilterCategory}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-50">
             <SelectValue placeholder="Filter Kategori" />
           </SelectTrigger>
           <SelectContent>

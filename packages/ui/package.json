@@ -47,6 +47,7 @@
     "./soft-pop.css": "./src/soft-pop.css",
     "./custom-theme-1.css": "./src/theme/custom-theme-1.css",
     "./custom-theme-2.css": "./src/theme/custom-theme-2.css",
+    "./custom-theme-3.css": "./src/theme/custom-theme-3.css",
     "./lib/*": "./src/lib/*.ts",
     "./hooks/*": [
       "./src/hooks/*.ts",

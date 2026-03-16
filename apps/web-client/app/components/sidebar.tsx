@@ -128,11 +128,11 @@ export default function Sidebar() {
           </div>
         )}
         {user.isSuccess && user.data.role === UserRole.GUEST && (
-          <div className="mt-auto p-4">
-            <Button variant="secondary" className="w-full" asChild>
+          <div className="mt-auto p-4 flex flex-row gap-2 relative justify-end">
+            <Button variant="secondary" className="flex-1" asChild>
               <LinkWithLocale to="/auth/register">Daftar</LinkWithLocale>
             </Button>
-            <Button className="w-full mt-2" asChild>
+            <Button className="flex-1" asChild>
               <LinkWithLocale to="/auth/login">Masuk</LinkWithLocale>
             </Button>
           </div>

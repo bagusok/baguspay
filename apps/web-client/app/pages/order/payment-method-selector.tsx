@@ -139,16 +139,14 @@ export default function PaymentMethodSelector({
   return (
     <div className="space-y-4">
       {/* Balance Payment Section */}
-      <div className="border border-border rounded-lg overflow-hidden">
-        <div className="px-4 py-3 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-primary/20 text-primary shrink-0">
-              <WalletIcon className="w-5 h-5" />
-            </div>
-            <div className="text-left flex-1">
-              <p className="font-medium">Saldo</p>
-              <p className="text-xs text-muted-foreground">Bayar dengan saldo akun Anda</p>
-            </div>
+      <div className="border border-border rounded-xl overflow-hidden bg-card shadow-sm dark:border-border/60">
+        <div className="px-4 py-3 bg-muted/40 border-b border-border flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
+            <WalletIcon className="w-5 h-5" />
+          </div>
+          <div className="text-left flex-1">
+            <p className="font-medium">Saldo</p>
+            <p className="text-xs text-muted-foreground">Bayar dengan saldo akun Anda</p>
           </div>
         </div>
 
@@ -162,18 +160,18 @@ export default function PaymentMethodSelector({
             <div
               onClick={handleBalanceSelect}
               className={`
-                relative p-3 rounded-lg border cursor-pointer transition-all duration-200
+                relative p-3 rounded-xl border cursor-pointer transition-all duration-300
                 ${
                   isBalanceSelected
-                    ? 'border-primary bg-primary/5 shadow-md ring-2 ring-primary/20 dark:bg-primary/10 dark:border-primary/60'
-                    : 'border-slate-400 hover:border-primary/50 dark:hover:border-primary/40'
+                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10 ring-1 ring-primary/20 dark:bg-primary/10 dark:border-primary/50'
+                    : 'border-border dark:border-border hover:border-primary/50 dark:hover:border-primary/40 dark:bg-card hover:shadow-md'
                 }
-                ${!isBalanceSufficient ? 'opacity-60 cursor-not-allowed' : 'hover:shadow-sm'}
+                ${!isBalanceSufficient ? 'opacity-70 cursor-not-allowed' : ''}
               `}
             >
               {!isBalanceSufficient && (
-                <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-lg">
-                  <span className="text-xs bg-gray-800 text-white px-2 py-1 rounded-full">
+                <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center rounded-xl z-10">
+                  <span className="text-xs font-semibold bg-destructive/10 text-destructive border border-destructive/20 px-3 py-1 rounded-full">
                     Saldo Tidak Cukup
                   </span>
                 </div>
@@ -181,13 +179,15 @@ export default function PaymentMethodSelector({
 
               <div className="flex items-center gap-3">
                 <div className="relative shrink-0">
-                  <img
-                    src={balanceData.image_url}
-                    alt={balanceData.name}
-                    className="w-12 object-cover rounded"
-                  />
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                    <StarIcon className="w-2 h-2 text-white" />
+                  <div className="bg-white p-1 rounded-md">
+                    <img
+                      src={balanceData.image_url}
+                      alt={balanceData.name}
+                      className="w-10 h-auto object-contain"
+                    />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center ring-2 ring-background">
+                    <StarIcon className="w-3 h-3 text-white fill-current" />
                   </div>
                 </div>
 
@@ -213,8 +213,8 @@ export default function PaymentMethodSelector({
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3 p-3 rounded-lg border border-dashed border-slate-400 bg-muted/30">
-              <div className="p-2 rounded-full bg-muted text-muted-foreground shrink-0">
+            <div className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-border bg-muted/30">
+              <div className="p-2 rounded-lg bg-muted text-muted-foreground shrink-0 border border-border">
                 <LogInIcon className="w-5 h-5" />
               </div>
               <div className="flex-1">
@@ -249,12 +249,12 @@ export default function PaymentMethodSelector({
             <AccordionItem
               key={method.name}
               value={method.name}
-              className="border border-border dark:border-slate-400 rounded-lg"
+              className="border border-border dark:border-border/60 rounded-xl overflow-hidden bg-card shadow-sm"
               disabled={!hasItems}
             >
-              <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180">
+              <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180 hover:bg-muted/30 transition-colors">
                 <div className="flex items-center gap-3 w-full">
-                  <div className="p-2 rounded-full bg-primary/10 text-primary shrink-0">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0 ring-1 ring-primary/20">
                     {getPaymentIcon(method.name)}
                   </div>
                   <div className="text-left flex-1">
@@ -285,23 +285,19 @@ export default function PaymentMethodSelector({
                           key={item.id}
                           onClick={() => itemAvailable && onSelectPayment(item)}
                           className={`
-                          relative p-3 rounded-lg border cursor-pointer transition-all duration-200 group
+                          relative p-3 rounded-xl border cursor-pointer transition-all duration-300 group
                           ${
                             selectedPayment?.id === item.id
-                              ? 'border-primary bg-primary/5 shadow-md ring-2 ring-primary/20 dark:bg-primary/10 dark:border-primary/60'
-                              : 'border-slate-400 hover:border-primary/50 dark:hover:border-primary/40 dark:hover:opacity-65'
+                              ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10 ring-1 ring-primary/20 dark:bg-primary/10 dark:border-primary/50'
+                              : 'border-border dark:border-border hover:border-primary/50 dark:hover:border-primary/40 dark:bg-card hover:shadow-md'
                           }
-                          ${
-                            !itemAvailable
-                              ? 'opacity-60 cursor-not-allowed grayscale'
-                              : 'hover:shadow-sm'
-                          }
+                          ${!itemAvailable ? 'opacity-60 cursor-not-allowed grayscale' : ''}
                         `}
                         >
                           {/* Unavailable Overlay */}
                           {!itemAvailable && (
-                            <div className="absolute inset-0 bg-black/20 flex items-center justify-center rounded-lg">
-                              <span className="text-xs bg-gray-800 text-white px-2 py-1 rounded-full">
+                            <div className="absolute inset-0 bg-background/50 backdrop-blur-[1px] flex items-center justify-center rounded-xl z-10">
+                              <span className="text-xs font-semibold bg-muted text-muted-foreground px-3 py-1 rounded-full border border-border">
                                 Tidak Tersedia
                               </span>
                             </div>
@@ -309,18 +305,20 @@ export default function PaymentMethodSelector({
 
                           <div className="flex items-center gap-3">
                             <div className="relative shrink-0">
-                              <img
-                                src={
-                                  item.image_url.startsWith('http')
-                                    ? item.image_url
-                                    : `https://is3.cloudhost.id/bagusok${item.image_url}`
-                                }
-                                alt={item.name}
-                                className="w-12 object-cover"
-                              />
+                              <div className="bg-white p-1 rounded-md">
+                                <img
+                                  src={
+                                    item.image_url.startsWith('http')
+                                      ? item.image_url
+                                      : `https://is3.cloudhost.id/bagusok${item.image_url}`
+                                  }
+                                  alt={item.name}
+                                  className="w-10 h-auto object-contain"
+                                />
+                              </div>
                               {item.is_featured && (
-                                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                                  <StarIcon className="w-2 h-2 text-white" />
+                                <div className="absolute -top-2 -right-2 w-5 h-5 bg-yellow-500 rounded-full flex items-center justify-center ring-2 ring-background">
+                                  <StarIcon className="w-3 h-3 text-white fill-current" />
                                 </div>
                               )}
                             </div>

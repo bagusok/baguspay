@@ -1,10 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import { BoltIcon, CheckCircle2Icon, InfoIcon, LoaderCircleIcon, ZapIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import { UnderlinedInput } from '~/components/form-fields'
 import Image from '~/components/image'
 import { useInquiry } from '~/hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
@@ -108,28 +107,21 @@ export default function OrderSlugPlnPostpaidPage({ data }: Props) {
             <div className="space-y-4">
               {/* Dynamic Input Fields */}
               {data.input_fields.map((field, index) => (
-                <div key={field.name} className="space-y-2">
-                  <Label
-                    htmlFor={field.name}
-                    className="text-sm font-medium flex items-center gap-1"
-                  >
-                    {field.title}
-                    {field.is_required && <span className="text-red-500">*</span>}
-                  </Label>
-                  <Input
-                    type={field.type}
-                    id={field.name}
-                    placeholder={field.placeholder}
-                    className="w-full rounded-lg dark:border-none"
-                    {...form.register(`input_fields.${index}.value`)}
-                    disabled={isInquiryLoading}
-                  />
-                  {form.formState.errors.input_fields?.[index]?.value && (
-                    <p className="text-xs text-red-500">
-                      {form.formState.errors.input_fields[index]?.value?.message}
-                    </p>
-                  )}
-                </div>
+                <UnderlinedInput
+                  key={field.name}
+                  id={field.name}
+                  label={
+                    <>
+                      {field.title}
+                      {field.is_required && <span className="text-red-500 ml-0.5">*</span>}
+                    </>
+                  }
+                  type={field.type}
+                  placeholder={field.placeholder}
+                  {...form.register(`input_fields.${index}.value`)}
+                  disabled={isInquiryLoading}
+                  error={form.formState.errors.input_fields?.[index]?.value?.message}
+                />
               ))}
             </div>
           </div>
@@ -140,37 +132,29 @@ export default function OrderSlugPlnPostpaidPage({ data }: Props) {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="email" className="text-sm font-medium">
-                  Email <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="email"
+                <UnderlinedInput
                   id="email"
-                  className="w-full mt-2 rounded-lg dark:border-none"
+                  type="email"
                   placeholder="user@example.com"
                   {...form.register('email')}
+                  label={
+                    <>
+                      Email <span className="text-red-500">*</span>
+                    </>
+                  }
+                  error={form.formState.errors.email?.message}
                 />
-                {form.formState.errors.email && (
-                  <p className="text-xs text-red-500 mt-1">{form.formState.errors.email.message}</p>
-                )}
               </div>
 
               <div>
-                <Label htmlFor="phone_number" className="text-sm font-medium">
-                  Nomor Telepon (Opsional)
-                </Label>
-                <Input
-                  type="text"
+                <UnderlinedInput
                   id="phone_number"
-                  className="w-full mt-2 rounded-lg dark:border-none"
+                  type="text"
                   placeholder="08123456789"
                   {...form.register('phone_number')}
+                  label="Nomor Telepon (Opsional)"
+                  error={form.formState.errors.phone_number?.message}
                 />
-                {form.formState.errors.phone_number && (
-                  <p className="text-xs text-red-500 mt-1">
-                    {form.formState.errors.phone_number.message}
-                  </p>
-                )}
               </div>
 
               {/* Submit Button */}

@@ -1,8 +1,7 @@
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router'
+import { UnderlinedInput } from '~/components/form-fields'
 import { getInstance } from '~/middlewares/i8n'
 import type { Route } from './+types/register'
 
@@ -32,30 +31,22 @@ export default function Register({ loaderData }: Route.ComponentProps) {
           <h1 className="text-2xl font-bold mb-4">{t('title')}</h1>
           <p className="text-muted-foreground text-sm">{t('subtitle')}</p>
         </div>
-        <form action="" className="max-w-md mx-auto bg-white shadow-md rounded-lg space-y-4 mt-5">
+        <form action="" className="max-w-md mx-auto space-y-4 mt-5">
           <div>
-            <Label htmlFor="name" className="block mb-2">
-              {t('nameLabel')}
-            </Label>
-            <Input name="name" />
+            <UnderlinedInput label={t('nameLabel')} name="name" />
           </div>
           <div>
-            <Label htmlFor="email" className="block mb-2">
-              {t('emailLabel')}
-            </Label>
-            <Input name="email" />
+            <UnderlinedInput label={t('emailLabel')} name="email" />
           </div>
           <div>
-            <Label htmlFor="password" className="block mb-2">
-              {t('passwordLabel')}
-            </Label>
-            <Input type="password" name="password" />
+            <UnderlinedInput label={t('passwordLabel')} name="password" type="password" />
           </div>
           <div>
-            <Label htmlFor="password" className="block mb-2">
-              {t('confirmPasswordLabel')}
-            </Label>
-            <Input type="password" name="confirm_password" />
+            <UnderlinedInput
+              label={t('confirmPasswordLabel')}
+              name="confirm_password"
+              type="password"
+            />
           </div>
           <Button type="submit" className="w-full">
             {t('submitButton')}
@@ -64,7 +55,7 @@ export default function Register({ loaderData }: Route.ComponentProps) {
         <div>
           <div className="text-center text-sm text-muted-foreground mt-4">
             {t('alreadyHaveAccount')}{' '}
-            <Link to="/auth/login" className="text-primary-foreground font-medium hover:underline">
+            <Link to="/auth/login" className="text-primary font-medium hover:underline">
               {t('loginLinkText')}
             </Link>
           </div>

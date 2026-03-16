@@ -1,8 +1,6 @@
 import { UserRole } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/ui/dialog'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
 import { useMutation } from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
 import {
@@ -12,12 +10,14 @@ import {
   LogInIcon,
   PercentIcon,
   TagIcon,
+  TicketIcon,
   XCircleIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router'
+import { UnderlinedInput } from '~/components/form-fields'
 import type { InquiryForm } from '~/pages/order/slug'
 import { userAtom } from '~/store/user'
 import { apiClient } from '~/utils/axios'
@@ -147,11 +147,13 @@ export default function VoucherInput({ form, productId, productPrice = 0 }: Vouc
   return (
     <>
       <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
-        <div className="inline-flex gap-2 items-center">
-          <div className="rounded-full p-2 bg-primary/40">
-            <TagIcon className="w-4 h-4" />
+        <div className="inline-flex gap-3 items-center mb-2">
+          <div className="rounded-xl p-2.5 bg-linear-to-br from-primary to-primary/80 shadow-lg shadow-primary/20 text-primary-foreground">
+            <TicketIcon className="w-5 h-5 text-background -rotate-45" />
           </div>
-          <h2 className="text-lg font-semibold">Voucher</h2>
+          <div>
+            <h2 className="text-lg font-bold">Voucher</h2>
+          </div>
         </div>
 
         {appliedVoucher ? (
@@ -231,10 +233,8 @@ export default function VoucherInput({ form, productId, productPrice = 0 }: Vouc
           <div className="space-y-4 mt-4">
             <div className="flex gap-2">
               <div className="flex-1">
-                <Label htmlFor="voucher_code_modal" className="sr-only">
-                  Kode Voucher
-                </Label>
-                <Input
+                <UnderlinedInput
+                  label="Kode Voucher"
                   id="voucher_code_modal"
                   type="text"
                   value={voucherCode}
@@ -243,7 +243,7 @@ export default function VoucherInput({ form, productId, productPrice = 0 }: Vouc
                     setCheckedVoucher(null)
                   }}
                   placeholder="Masukkan kode voucher"
-                  className="uppercase"
+                  className="uppercase tracking-widest font-semibold"
                   disabled={checkVoucher.isPending}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {

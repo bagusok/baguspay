@@ -3,6 +3,7 @@ import { Await, Link, redirect, useLoaderData } from 'react-router'
 import HomeBanner from '~/components/home/banner'
 import FastMenu from '~/components/home/fast-menu'
 import HomeProductSections from '~/components/home/product-sections'
+import Image from '~/components/image'
 import { apiClient } from '~/utils/axios'
 import type { Route } from './+types'
 
@@ -48,12 +49,8 @@ export default function Index(_args: Route.ComponentProps) {
               <Link key={item.slug} to={`/order/${item.slug}`} className="h-full group">
                 <div className="overflow-hidden rounded-xl h-full flex flex-col relative transform transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-2xl group-hover:-translate-y-2">
                   <div className="overflow-hidden relative">
-                    <img
-                      src={
-                        item.image_url.startsWith('http')
-                          ? item.image_url
-                          : `https://is3.cloudhost.id/bagusok${item.image_url}`
-                      }
+                    <Image
+                      src={item.image_url}
                       alt=""
                       className="transition-all duration-500 object-cover w-full aspect-square group-hover:brightness-110"
                     />
@@ -76,7 +73,7 @@ export default function Index(_args: Route.ComponentProps) {
                     )}
                   </div>
 
-                  <div className="px-2 pt-2 pb-6 bg-secondary dark:bg-card flex-1 flex flex-col relative overflow-hidden">
+                  <div className="px-2 pt-2 pb-6 bg-secondary flex-1 flex flex-col relative overflow-hidden">
                     {/* Background Gradient Animation */}
                     <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-all duration-500" />
                     <h3 className="font-semibold text-foreground text-ellipsis line-clamp-1 relative z-10 transition-all duration-300 group-hover:text-primary">

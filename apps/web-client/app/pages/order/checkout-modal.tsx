@@ -264,7 +264,7 @@ export default function CheckoutModal({ data }: Props) {
       aria-labelledby="dialog-title"
       aria-describedby="dialog-description"
     >
-      <DialogContent className="max-w-sm mx-auto p-6 gap-0" showCloseButton={false}>
+      <DialogContent className="max-w-sm mx-auto p-6 gap-0">
         {/* Header */}
         <DialogHeader className="flex-row items-center justify-between">
           <DialogTitle className="text-start">Konfirmasi Pesanan</DialogTitle>

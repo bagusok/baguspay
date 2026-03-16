@@ -1,17 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
-import { Input } from '@repo/ui/components/ui/input'
-import { Label } from '@repo/ui/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@repo/ui/components/ui/select'
 import {
   InfoIcon,
+  KeyRoundIcon,
   LoaderCircleIcon,
   PackageIcon,
   ShieldCheckIcon,
@@ -20,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { UnderlinedInput, UnderlinedSelect } from '~/components/form-fields'
 import Image from '~/components/image'
 import VoucherInput from '~/components/voucher-input'
 import { useInquiry } from '../../hooks/use-inquiry'
@@ -148,70 +141,57 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
           <div className="space-y-4">
             {/* Dynamic Input Fields Section */}
             {data.input_fields && data.input_fields.length > 0 && (
-              <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
-                <h3 className="text-base font-semibold mb-4">Data Pelanggan</h3>
-                <div className="space-y-4">
+              <div className="w-full h-fit rounded-xl shadow-xs border border-gray-200 p-6 dark:border-none dark:bg-secondary/40 text-secondary-foreground relative overflow-hidden">
+                <div className="inline-flex gap-3 items-center mb-6">
+                  <div className="rounded-xl p-2.5 bg-linear-to-br from-primary to-primary/80 shadow-lg shadow-primary/20 text-primary-foreground">
+                    <KeyRoundIcon className="w-5 h-5 text-background" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold">Detail Akun</h2>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
                   {data.input_fields.map((field: InputField, index: number) => {
-                    if (field.type === 'select') {
+                    const isSelect = field.type === 'select'
+
+                    const label = (
+                      <>
+                        {field.title}
+                        {field.is_required && <span className="text-red-500 ml-0.5">*</span>}
+                      </>
+                    )
+
+                    if (isSelect) {
                       return (
-                        <div key={field.name} className="space-y-2">
-                          <Label
-                            htmlFor={field.name}
-                            className="text-sm font-medium flex items-center gap-1"
-                          >
-                            {field.title}
-                            {field.is_required && <span className="text-red-500">*</span>}
-                          </Label>
-                          <Select
-                            value={form.watch(`input_fields.${index}.value`)}
-                            onValueChange={(value) => {
-                              update(index, { name: field.name, value })
-                            }}
-                          >
-                            <SelectTrigger className="w-full rounded-lg dark:border-none">
-                              <SelectValue placeholder={field.placeholder} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {field.options?.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {form.formState.errors.input_fields?.[index]?.value && (
-                            <p className="text-xs text-red-500">
-                              {form.formState.errors.input_fields[index]?.value?.message}
-                            </p>
-                          )}
-                        </div>
-                      )
-                    } else {
-                      return (
-                        <div key={field.name} className="space-y-2">
-                          <Label
-                            htmlFor={field.name}
-                            className="text-sm font-medium flex items-center gap-1"
-                          >
-                            {field.title}
-                            {field.is_required && <span className="text-red-500">*</span>}
-                          </Label>
-                          <Input
-                            type={field.type}
-                            id={field.name}
-                            placeholder={field.placeholder}
-                            className="w-full rounded-lg dark:border-none"
-                            {...form.register(`input_fields.${index}.value`)}
-                            disabled={isInquiryLoading}
-                          />
-                          {form.formState.errors.input_fields?.[index]?.value && (
-                            <p className="text-xs text-red-500">
-                              {form.formState.errors.input_fields[index]?.value?.message}
-                            </p>
-                          )}
-                        </div>
+                        <UnderlinedSelect
+                          key={field.name}
+                          id={field.name}
+                          label={label}
+                          value={form.watch(`input_fields.${index}.value`)}
+                          onValueChange={(value) => {
+                            update(index, { name: field.name, value })
+                          }}
+                          options={field.options || []}
+                          placeholder={field.placeholder}
+                          error={form.formState.errors.input_fields?.[index]?.value?.message}
+                          disabled={isInquiryLoading}
+                        />
                       )
                     }
+
+                    return (
+                      <UnderlinedInput
+                        key={field.name}
+                        id={field.name}
+                        label={label}
+                        type={field.type}
+                        placeholder={field.placeholder}
+                        {...form.register(`input_fields.${index}.value`)}
+                        error={form.formState.errors.input_fields?.[index]?.value?.message}
+                        disabled={isInquiryLoading}
+                      />
+                    )
                   })}
                 </div>
               </div>
@@ -223,10 +203,12 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
               <div className="space-y-4">
                 {/* Subcategory Select */}
                 <div className="space-y-2">
-                  <Label htmlFor="subcategory" className="text-sm font-medium">
-                    Kategori <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
+                  <UnderlinedSelect
+                    label={
+                      <>
+                        Kategori <span className="text-red-500">*</span>
+                      </>
+                    }
                     value={selectedSubCategory}
                     onValueChange={(value) => {
                       setSelectedSubCategory(value)
@@ -235,26 +217,24 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
                         setSelectedProduct(subCat.products[0])
                       }
                     }}
-                  >
-                    <SelectTrigger className="w-full rounded-lg dark:border-none">
-                      <SelectValue placeholder="Pilih kategori" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data?.product_sub_categories.map((subCategory) => (
-                        <SelectItem key={subCategory.name} value={subCategory.name}>
-                          {subCategory.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Pilih kategori"
+                    options={
+                      data?.product_sub_categories.map((subCategory) => ({
+                        label: subCategory.name,
+                        value: subCategory.name,
+                      })) || []
+                    }
+                  />
                 </div>
 
                 {/* Product Select */}
                 <div className="space-y-2">
-                  <Label htmlFor="product" className="text-sm font-medium">
-                    Produk <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
+                  <UnderlinedSelect
+                    label={
+                      <>
+                        Produk <span className="text-red-500">*</span>
+                      </>
+                    }
                     value={selectedProduct?.id || ''}
                     onValueChange={(value) => {
                       const product = currentSubCategory?.products.find((p) => p.id === value)
@@ -262,18 +242,14 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
                         setSelectedProduct(product)
                       }
                     }}
-                  >
-                    <SelectTrigger className="w-full rounded-lg dark:border-none">
-                      <SelectValue placeholder="Pilih produk" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {currentSubCategory?.products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Pilih produk"
+                    options={
+                      currentSubCategory?.products.map((product) => ({
+                        label: product.name,
+                        value: product.id,
+                      })) || []
+                    }
+                  />
                 </div>
               </div>
             </div>
@@ -292,39 +268,29 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
 
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="email" className="text-sm font-medium">
-                    Email <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="email"
+                  <UnderlinedInput
                     id="email"
-                    className="w-full mt-2 rounded-lg dark:border-none"
+                    type="email"
                     placeholder="user@example.com"
                     {...form.register('email')}
+                    label={
+                      <>
+                        Email <span className="text-red-500">*</span>
+                      </>
+                    }
+                    error={form.formState.errors.email?.message}
                   />
-                  {form.formState.errors.email && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {form.formState.errors.email.message}
-                    </p>
-                  )}
                 </div>
 
                 <div>
-                  <Label htmlFor="phone_number" className="text-sm font-medium">
-                    Nomor Telepon (Opsional)
-                  </Label>
-                  <Input
-                    type="text"
+                  <UnderlinedInput
                     id="phone_number"
-                    className="w-full mt-2 rounded-lg dark:border-none"
+                    type="text"
                     placeholder="08123456789"
                     {...form.register('phone_number')}
+                    label="Nomor Telepon (Opsional)"
+                    error={form.formState.errors.phone_number?.message}
                   />
-                  {form.formState.errors.phone_number && (
-                    <p className="text-xs text-red-500 mt-1">
-                      {form.formState.errors.phone_number.message}
-                    </p>
-                  )}
                 </div>
 
                 <Button
