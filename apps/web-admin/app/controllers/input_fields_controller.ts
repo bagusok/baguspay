@@ -43,7 +43,7 @@ export default class InputFieldsController {
       success: 'Input field created successfully.',
     })
 
-    return ctx.response.redirect().toRoute('inputFields.index')
+    return ctx.response.redirect('/admin/input-fields')
   }
 
   async postUpdate(ctx: HttpContext) {
@@ -65,7 +65,7 @@ export default class InputFieldsController {
       success: 'Input field updated successfully.',
     })
 
-    return ctx.response.redirect().toRoute('inputFields.index')
+    return ctx.response.redirect('/admin/input-fields')
   }
 
   async postDelete(ctx: HttpContext) {
@@ -79,7 +79,7 @@ export default class InputFieldsController {
       success: 'Input field deleted successfully.',
     })
 
-    return ctx.response.redirect().toRoute('inputFields.index')
+    return ctx.response.redirect('/admin/input-fields')
   }
 
   async getAllInputFields(ctx: HttpContext) {
@@ -108,7 +108,7 @@ export default class InputFieldsController {
       ctx.session.flash({
         error: 'Input field is already connected to this product category.',
       })
-      return ctx.response.redirect().toRoute('inputFields.index')
+      return ctx.response.redirect('/admin/input-fields')
     }
 
     await db.insert(tb.inputOnProductCategory).values({
@@ -135,7 +135,7 @@ export default class InputFieldsController {
       ctx.session.flash({
         error: 'Connection not found.',
       })
-      return ctx.response.redirect().toRoute('inputFields.index')
+      return ctx.response.redirect('/admin/input-fields')
     }
 
     await db.delete(tb.inputOnProductCategory).where(eq(tb.inputOnProductCategory.id, data.id))

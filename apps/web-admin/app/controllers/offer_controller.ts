@@ -94,7 +94,7 @@ export default class OfferController {
   }
 
   async createVoucher(ctx: HttpContext) {
-    return ctx.inertia.render('offers/voucher/create')
+    return ctx.inertia.render('offers/voucher/create', {})
   }
 
   async editVoucher(ctx: HttpContext) {
@@ -202,7 +202,7 @@ export default class OfferController {
   }
 
   async createDiscount(ctx: HttpContext) {
-    return ctx.inertia.render('offers/discount/create')
+    return ctx.inertia.render('offers/discount/create', {})
   }
 
   async editDiscount(ctx: HttpContext) {
@@ -310,7 +310,7 @@ export default class OfferController {
   }
 
   async createFlashSale(ctx: HttpContext) {
-    return ctx.inertia.render('offers/flash-sale/create')
+    return ctx.inertia.render('offers/flash-sale/create', {})
   }
 
   async editFlashSale(ctx: HttpContext) {

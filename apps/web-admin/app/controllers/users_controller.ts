@@ -101,7 +101,7 @@ export default class UsersController {
     })
 
     session.flash('success', 'User created successfully.')
-    return response.redirect().toRoute('users.index')
+    return response.redirect('/admin/users')
   }
 
   public async postDelete({ request, response, session }: HttpContext) {
@@ -123,7 +123,7 @@ export default class UsersController {
     await db.delete(tb.users).where(eq(tb.users.id, data.id))
 
     session.flash('success', 'User deleted successfully.')
-    return response.redirect().toRoute('users.index')
+    return response.redirect('/admin/users')
   }
 
   public async postUpdate({ request, response, session }: HttpContext) {
@@ -156,7 +156,7 @@ export default class UsersController {
     await db.update(tb.users).set(updatedData).where(eq(tb.users.id, id))
 
     session.flash('success', 'User updated successfully.')
-    return response.redirect().toRoute('users.index')
+    return response.redirect('/admin/users')
   }
 
   public async me(ctx: HttpContext) {

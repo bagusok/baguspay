@@ -8,7 +8,7 @@ export default class RoleMiddleware {
     const user = ctx.auth.user
 
     if (!user) {
-      return ctx.response.redirect().toRoute('auth.login')
+      return ctx.response.redirect('/auth/login')
     }
 
     if (!roles.includes(user?.role)) {

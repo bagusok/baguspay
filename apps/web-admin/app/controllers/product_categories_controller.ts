@@ -164,10 +164,7 @@ export default class ProductsCategoriesController {
       .returning()
 
     session.flash('success', 'Product category created successfully')
-    return response.redirect().toRoute('productCategories.detail', {
-      type: data.type,
-      id: productCategory[0].id,
-    })
+    return response.redirect(`/admin/product-categories/${data.type}/${productCategory[0].id}`)
   }
 
   public async detail({ inertia, request, response }: HttpContext) {

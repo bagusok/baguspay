@@ -45,7 +45,7 @@ export default class ArticlesController {
     })
 
     if (!article) {
-      return inertia.render('errors/not-found', {
+      return inertia.render('errors/not_found', {
         message: 'Article not found',
       })
     }
