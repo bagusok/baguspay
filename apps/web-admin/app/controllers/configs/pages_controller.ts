@@ -29,7 +29,7 @@ export default class PagesController {
     })
 
     if (!page) {
-      return inertia.render('errors/not-found', {
+      return inertia.render('errors/not_found', {
         message: 'Page not found',
       })
     }

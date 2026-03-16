@@ -50,7 +50,7 @@ export default class AuthController {
     }
 
     ctx.session.flashMessages.set('success', 'User registered successfully. You can now log in.')
-    return ctx.response.redirect().toRoute('auth.login')
+    return ctx.response.redirect('/auth/login')
   }
 
   public async login({ inertia }: HttpContext) {
@@ -89,13 +89,13 @@ export default class AuthController {
     // console.log('Authenticated User:', a)
 
     ctx.session.flashMessages.set('success', 'You have been logged in successfully.')
-    return ctx.response.redirect().toRoute('home.index')
+    return ctx.response.redirect('/admin')
   }
 
   public async logout(ctx: HttpContext) {
     ctx.auth.use('web').logout()
 
     ctx.session.flashMessages.set('success', 'You have been logged out successfully.')
-    return ctx.response.redirect().toRoute('auth.login')
+    return ctx.response.redirect('/auth/login')
   }
 }
