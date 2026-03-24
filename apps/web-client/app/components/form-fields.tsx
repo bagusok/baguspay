@@ -40,7 +40,7 @@ export const UnderlinedInput = React.forwardRef<HTMLInputElement, UnderlinedInpu
         </div>
         {error && (
           <p className="text-destructive text-xs mt-1.5 font-medium flex items-center gap-1 animate-in slide-in-from-top-1 fade-in">
-            <span className="inline-block w-1 h-1 rounded-full bg-destructive mb-0.5" />
+            <span className="inline-block w-1 h-1 rounded-full bg-destructive mb-0.5 text-red-500" />
             {error}
           </p>
         )}

@@ -28,9 +28,11 @@ export default [
 
     ...prefix('blog', [
       index('pages/blog/index.tsx'),
-      route('offers', 'pages/blog/offers/index.tsx'),
-      route('offers/:slug', 'pages/blog/offers/detail.tsx'),
-      route(':slug', 'pages/blog/detail.tsx'),
+      route(':category/:slug', 'pages/blog/detail.tsx'),
+    ]),
+    ...prefix('offers', [
+      index('pages/offers/index.tsx'),
+      route(':category/:slug', 'pages/offers/detail.tsx'),
     ]),
 
     // prootected routes
@@ -42,6 +44,8 @@ export default [
         route('orders', 'pages/protected/user/order-history.tsx'),
         route('deposit/history', 'pages/protected/user/deposit/history.tsx'),
         route('deposit/history/:id', 'pages/protected/user/deposit/detail.tsx'),
+        route('settings', 'pages/protected/user/settings/index.tsx'),
+        route('sessions', 'pages/protected/user/sessions.tsx'),
       ]),
     ]),
 

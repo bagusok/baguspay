@@ -16,6 +16,7 @@ import {
   UserIcon,
   XIcon,
 } from 'lucide-react'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { apiClient } from '~/utils/axios'
 import { formatDate, formatPrice } from '~/utils/format'
 import type { Route } from './+types/profile'
@@ -34,6 +35,21 @@ export default function UserProfile({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="space-y-6">
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'User',
+            href: '/user',
+          },
+          {
+            label: 'Profil',
+          },
+        ]}
+      />
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">Profil Pengguna</h1>

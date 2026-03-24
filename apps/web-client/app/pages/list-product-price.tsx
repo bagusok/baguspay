@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
 import { LayoutList } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import Image from '~/components/image'
 import { apiClient } from '~/utils/axios'
 import { formatPrice } from '~/utils/format'
@@ -166,8 +167,19 @@ export default function ListProductPricePage() {
 
   return (
     <div className="md:max-w-7xl mx-auto">
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'Daftar Harga',
+          },
+        ]}
+      />
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
+      <section className="mt-6 relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
         <div className="relative z-10">
           <p className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             <LayoutList className="size-4" />

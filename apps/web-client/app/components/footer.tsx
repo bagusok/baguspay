@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 export default function FooterSection() {
   return (
     <footer className="bg-secondary mt-16 p-4">
@@ -41,24 +43,24 @@ export default function FooterSection() {
                 <h2 className="font-semibold text-foreground">Menu</h2>
                 <ul>
                   <li>
-                    <a href="/about" className="text-sm text-muted-foreground">
+                    <Link to="/about" className="text-sm text-muted-foreground">
                       Tentang Kami
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/contact" className="text-sm text-muted-foreground">
+                    <Link to="/contact" className="text-sm text-muted-foreground">
                       Kontak
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/privacy-policy" className="text-sm text-muted-foreground">
+                    <Link to="/privacy-policy" className="text-sm text-muted-foreground">
                       Kebijakan Privasi
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/terms-of-service" className="text-sm text-muted-foreground">
+                    <Link to="/terms-of-service" className="text-sm text-muted-foreground">
                       Syarat dan Ketentuan
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -66,24 +68,24 @@ export default function FooterSection() {
                 <h2 className="font-semibold md:mt-4 text-foreground">Lainnya</h2>
                 <ul>
                   <li>
-                    <a href="/faq" className="text-sm text-muted-foreground">
+                    <Link to="/faq" className="text-sm text-muted-foreground">
                       FAQ
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/support" className="text-sm text-muted-foreground">
+                    <Link to="/support" className="text-sm text-muted-foreground">
                       Dukungan
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/blog" className="text-sm text-muted-foreground">
+                    <Link to="/blog" className="text-sm text-muted-foreground">
                       Blog
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/careers" className="text-sm text-muted-foreground">
+                    <Link to="/careers" className="text-sm text-muted-foreground">
                       Karir
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -95,14 +97,14 @@ export default function FooterSection() {
                 <h2 className="font-semibold text-foreground">Hubungi Kami</h2>
                 <ul>
                   <li>
-                    <a href="/about" className="text-sm text-muted-foreground">
+                    <Link to="/about" className="text-sm text-muted-foreground">
                       Masalah Transaksi
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/contact" className="text-sm text-muted-foreground">
+                    <Link to="/contact" className="text-sm text-muted-foreground">
                       Gabung Reseller
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -110,24 +112,24 @@ export default function FooterSection() {
                 <h2 className="font-semibold md:mt-4 text-foreground">Social Media</h2>
                 <ul>
                   <li>
-                    <a href="/faq" className="text-sm text-muted-foreground">
+                    <Link to="/faq" className="text-sm text-muted-foreground">
                       Instagram
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/support" className="text-sm text-muted-foreground">
+                    <Link to="/support" className="text-sm text-muted-foreground">
                       Facebook
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/blog" className="text-sm text-muted-foreground">
+                    <Link to="/blog" className="text-sm text-muted-foreground">
                       Tiktok
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a href="/careers" className="text-sm text-muted-foreground">
+                    <Link to="/careers" className="text-sm text-muted-foreground">
                       Twitter
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>

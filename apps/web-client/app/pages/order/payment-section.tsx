@@ -230,66 +230,6 @@ export default function PaymentSection({ products, form }: Props) {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Selected Payment Summary */}
-      {selectedPayment && (
-        <div className="mt-4 space-y-4">
-          {/* Order Summary */}
-          {products && (
-            <div className="p-3 bg-muted/30 border border-muted rounded-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <CreditCardIcon className="w-4 h-4 text-muted-foreground" />
-                <p className="text-sm font-medium text-muted-foreground">Rincian Pesanan</p>
-              </div>
-
-              <div className="flex items-center gap-3 mb-3">
-                <img
-                  src={
-                    products.image_url?.startsWith('http')
-                      ? products.image_url
-                      : `https://is3.cloudhost.id/bagusok${products.image_url}`
-                  }
-                  alt={products.name}
-                  className="w-12 h-12 rounded-lg object-cover border border-border"
-                />
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{products.name}</p>
-                  {products.sub_name && (
-                    <p className="text-xs text-muted-foreground">{products.sub_name}</p>
-                  )}
-                  {products.sku_code && (
-                    <p className="text-xs text-muted-foreground">SKU: {products.sku_code}</p>
-                  )}
-                </div>
-                <div className="text-right">
-                  <p className="font-medium text-sm">{formatPrice(products.price)}</p>
-                  <p className="text-xs text-muted-foreground">Qty: 1</p>
-                </div>
-              </div>
-
-              {/* Price Breakdown */}
-              <div className="space-y-2 pt-3 border-t border-muted">
-                <div className="flex justify-between text-sm">
-                  <span>Harga Produk</span>
-                  <span>{formatPrice(products.price)}</span>
-                </div>
-
-                {selectedPayment.total_fee > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span>Biaya Admin</span>
-                    <span>{formatPrice(selectedPayment.total_fee)}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between text-base font-bold pt-2 border-t border-muted">
-                  <span>Total Pembayaran</span>
-                  <span className="text-primary">{formatPrice(selectedPayment.total_price)}</span>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }

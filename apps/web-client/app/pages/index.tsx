@@ -1,5 +1,6 @@
 import { Suspense, useId } from 'react'
 import { Await, Link, redirect, useLoaderData } from 'react-router'
+import BottomNavMobile from '~/components/bottom-nav.mobile'
 import HomeBanner from '~/components/home/banner'
 import FastMenu from '~/components/home/fast-menu'
 import HomeProductSections from '~/components/home/product-sections'
@@ -89,6 +90,8 @@ export default function Index(_args: Route.ComponentProps) {
           </div>
         </section>
       ))}
+
+      <BottomNavMobile />
     </div>
   )
 }

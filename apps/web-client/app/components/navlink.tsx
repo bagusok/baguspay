@@ -1,16 +1,16 @@
+import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router'
-import { useLocale } from 'remix-i18next/react'
 
 export default function NavLinkWithLocale(props: React.ComponentPropsWithoutRef<typeof NavLink>) {
-  const locale = useLocale()
+  const { i18n } = useTranslation()
   const { to, ...rest } = props
 
   // Pastikan to selalu diawali dengan /<locale>
   const toWithLocale =
     typeof to === 'string'
-      ? to.startsWith(`/${locale}`)
+      ? to.startsWith(`/${i18n.language}`)
         ? to
-        : `/${locale}${to.startsWith('/') ? to : `/${to}`}`
+        : `/${i18n.language}${to.startsWith('/') ? to : `/${to}`}`
       : to
 
   return <NavLink to={toWithLocale} {...rest} />

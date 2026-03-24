@@ -7,8 +7,9 @@ import { Loader2, Zap } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
-import { useLocale } from 'remix-i18next/react'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import PaymentMethodModal from '~/components/payment-method-modal'
 import { useFormMutation } from '~/hooks/use-form-mutation'
 import { apiClient } from '~/utils/axios'
@@ -30,7 +31,7 @@ export default function UserDeposit() {
     null,
   )
   const navigate = useNavigate()
-  const locale = useLocale()
+  const { i18n } = useTranslation()
 
   const form = useForm<DepositFormData>({
     defaultValues: {
@@ -76,7 +77,7 @@ export default function UserDeposit() {
         }),
     onSuccess(data) {
       toast.success(data.message || 'Deposit created successfully')
-      navigate(`/${locale}/user/deposit/history/${data.data.deposit_id}`)
+      navigate(`/${i18n.language}/user/deposit/history/${data.data.deposit_id}`)
     },
   })
 
@@ -143,7 +144,7 @@ export default function UserDeposit() {
 
   if (paymentMethods.isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     )
@@ -151,7 +152,7 @@ export default function UserDeposit() {
 
   if (paymentMethods.isError) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <p className="text-destructive">Error loading payment methods</p>
       </div>
     )
@@ -177,6 +178,21 @@ export default function UserDeposit() {
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-6 rounded-2xl lg:border border-border lg:p-6 bg-card"
     >
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'User',
+            href: '/user',
+          },
+          {
+            label: 'Deposit',
+          },
+        ]}
+      />
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Deposit</h1>
         <p className="text-gray-600 dark:text-gray-400">Top up your account balance</p>

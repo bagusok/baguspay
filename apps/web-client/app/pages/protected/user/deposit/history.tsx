@@ -1,5 +1,6 @@
-import type { DepositStatus, PaymentMethodType } from '@repo/db/types'
+import { DepositStatus, type PaymentMethodType } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
+import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
 import { Calendar } from '@repo/ui/components/ui/calendar'
 import { Input } from '@repo/ui/components/ui/input'
@@ -13,9 +14,10 @@ import {
 } from '@repo/ui/components/ui/select'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
-import { CalendarIcon, EyeIcon } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { useNavigate } from 'react-router'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { apiClient } from '~/utils/axios'
 import { formatDate, formatPrice } from '~/utils/format'
 
@@ -25,15 +27,9 @@ const columns: ColumnDef<DepositHistoryData>[] = [
     header: 'ID Deposit',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <code className="px-2 py-1 bg-muted rounded text-xs font-mono">
+        <code className="px-2.5 py-1 bg-secondary text-secondary-foreground rounded-md text-xs font-mono font-medium border border-border">
           {row.original.deposit_id}
         </code>
-        <Link
-          to={`/user/deposit/history/${row.original.deposit_id}`}
-          className="text-primary hover:text-primary/80"
-        >
-          <EyeIcon className="w-4 h-4" />
-        </Link>
       </div>
     ),
   },
@@ -41,53 +37,41 @@ const columns: ColumnDef<DepositHistoryData>[] = [
     accessorKey: 'amount_pay',
     header: 'Jumlah Bayar',
     cell: ({ row }) => (
-      <span className="font-semibold">{formatPrice(row.original.amount_pay)}</span>
+      <span className="font-bold text-primary">{formatPrice(row.original.amount_pay)}</span>
     ),
   },
   {
     accessorKey: 'status',
     header: 'Status',
     cell: ({ row }) => {
-      const status = row.original.status
-      const statusConfig: Record<string, string> = {
-        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
-        success: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
-        completed: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
-        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
-        expired: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
+      switch (row.original.status) {
+        case DepositStatus.PENDING:
+          return <Badge variant="soft-yellow">Pending</Badge>
+        case DepositStatus.COMPLETED:
+          return <Badge variant="soft-green">Completed</Badge>
+        case DepositStatus.FAILED:
+          return <Badge variant="soft-red">Failed</Badge>
+        default:
+          return (
+            <Badge variant="outline" className="capitalize text-[11px]">
+              {row.original.status.toLowerCase()}
+            </Badge>
+          )
       }
-
-      return (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig[status] || statusConfig.failed}`}
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-      )
     },
-  },
-  {
-    accessorKey: 'payment_method.name',
-    header: 'Metode Pembayaran',
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <span className="text-sm">{row.original.payment_method.name}</span>
-        <span className="text-xs text-muted-foreground bg-muted px-1 py-0.5 rounded">
-          {row.original.payment_method.type.replace('_', ' ').toUpperCase()}
-        </span>
-      </div>
-    ),
   },
   {
     accessorKey: 'created_at',
     header: 'Tanggal Dibuat',
-    cell: ({ row }) => <span className="text-sm">{formatDate(row.original.created_at)}</span>,
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">{formatDate(row.original.created_at)}</span>
+    ),
   },
   {
     accessorKey: 'expired_at',
     header: 'Tanggal Kadaluarsa',
     cell: ({ row }) => (
-      <span className="text-sm">
+      <span className="text-xs text-muted-foreground">
         {row.original.expired_at ? formatDate(row.original.expired_at) : '-'}
       </span>
     ),
@@ -95,6 +79,7 @@ const columns: ColumnDef<DepositHistoryData>[] = [
 ]
 
 export default function DepositHistory() {
+  const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [filter, setFilter] = useState<{
@@ -133,6 +118,21 @@ export default function DepositHistory() {
 
   return (
     <>
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'User',
+            href: '/user',
+          },
+          {
+            label: 'Riwayat Deposit',
+          },
+        ]}
+      />
       <section id="header">
         <div className="md:text-left">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Detail Deposit</h1>
@@ -223,32 +223,40 @@ export default function DepositHistory() {
 
         {depositHistory.isSuccess && (
           <div className="grid mt-4">
-            <DataTable columns={columns} data={depositHistory.data?.data} />
+            <DataTable
+              columns={columns}
+              data={depositHistory.data?.data}
+              onRowClick={(row) => navigate(`/user/deposit/history/${row.deposit_id}`)}
+            />
           </div>
         )}
 
-        <div className="flex justify-between gap-4 mt-4">
-          <div>
-            <p className="text-sm">
-              Page {depositHistory.data?.meta.pagination.page} of{' '}
-              {depositHistory.data?.meta.pagination.total_pages}
-            </p>
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4 mt-6 mb-8">
+          <div className="text-sm text-muted-foreground flex items-center justify-center h-9">
+            Halaman{' '}
+            <span className="font-semibold text-foreground mx-1">
+              {depositHistory.data?.meta.pagination.page || 1}
+            </span>{' '}
+            dari{' '}
+            <span className="font-semibold text-foreground ml-1">
+              {depositHistory.data?.meta.pagination.total_pages || 1}
+            </span>
           </div>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center bg-card border border-border p-1 rounded-lg">
             <Button
               size="sm"
-              variant="outline"
-              className="border-border"
+              variant="ghost"
+              className="h-8 px-4 font-medium text-xs rounded-md"
               disabled={page <= 1}
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             >
-              Previous
+              Sebelumnya
             </Button>
-            <span className="font-bold">{depositHistory.data?.meta.pagination.page}</span>
+            <div className="w-px h-4 bg-border mx-1"></div>
             <Button
               size="sm"
-              variant="outline"
-              className="border-border"
+              variant="ghost"
+              className="h-8 px-4 font-medium text-xs rounded-md"
               disabled={page >= (depositHistory.data?.meta.pagination.total_pages ?? 1)}
               onClick={() =>
                 setPage((prev) =>
@@ -256,7 +264,7 @@ export default function DepositHistory() {
                 )
               }
             >
-              Next
+              Berikutnya
             </Button>
           </div>
         </div>

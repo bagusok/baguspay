@@ -3,6 +3,7 @@ import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs'
 import { cn } from '@repo/ui/lib/utils'
+import { useAtomValue } from 'jotai'
 import {
   CheckIcon,
   ContactIcon,
@@ -15,9 +16,12 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { useParams } from 'react-router'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { UnderlinedInput, UnderlinedSelect } from '~/components/form-fields'
 import Image from '~/components/image'
 import VoucherInput from '~/components/voucher-input'
+import { userAtom } from '~/store/user'
 import { formatPrice } from '~/utils/format'
 import { useInquiry } from '../../hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
@@ -37,11 +41,14 @@ export default function OrderSlugPrepaidPage({
   data: ProductCategoryData
   loaderData: LoaderData
 }) {
+  const user = useAtomValue(userAtom)
+  const params = useParams()
+
   const form = useForm<InquiryForm>({
     defaultValues: {
       product_id: data.product_sub_categories[0]?.products[0]?.id || '',
-      phone_number: '',
-      email: '',
+      phone_number: user?.data?.phone || '',
+      email: user?.data?.email || '',
       payment_method_id: '',
       input_fields:
         data.input_fields?.map((field: any) => ({
@@ -79,6 +86,18 @@ export default function OrderSlugPrepaidPage({
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="w-full md:max-w-7xl mx-auto space-y-4">
+        <BreadcrumbBasic
+          items={[
+            {
+              label: 'Home',
+              href: '/',
+            },
+            {
+              label: data.name,
+              href: `/order/${params.slug}`,
+            },
+          ]}
+        />
         <div className="grid md:grid-cols-5 gap-6">
           <div className="md:col-span-3 space-y-4">
             <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-start gap-4 rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
@@ -331,7 +350,7 @@ export default function OrderSlugPrepaidPage({
                     label="Nomor Telepon"
                     id="phone_number"
                     type="text"
-                    placeholder="08123456789"
+                    placeholder="628123456789"
                     {...form.register('phone_number')}
                     error={form.formState.errors.phone_number?.message}
                   />

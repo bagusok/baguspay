@@ -3,7 +3,7 @@ import { ApiParam, ApiSecurity } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/guards/jwt.guard'
 import { User } from 'src/common/decorators/user.decorator'
 import type { TUser } from 'src/common/types/meta.type'
-import type { CreateDeposit, DepositHistoryQuery, DepositParams } from './deposit.dto'
+import { CreateDeposit, DepositHistoryQuery, DepositParams } from './deposit.dto'
 import { DepositService } from './deposit.service'
 
 @ApiSecurity('access-token')
@@ -24,6 +24,7 @@ export class DepositController {
 
   @Post('/create')
   async createDeposit(@Body() data: CreateDeposit, @User() user: TUser) {
+    console.log('Creating deposit with data:', data, 'for user:', user.id)
     return this.depositService.createDeposit(data, user)
   }
 

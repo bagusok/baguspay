@@ -1,7 +1,16 @@
-import { DepositStatus } from '@repo/db/types'
+import { DepositStatus, PaymentMethodType } from '@repo/db/types'
 import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
-import { useQuery } from '@tanstack/react-query'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogTitle,
+  DialogTrigger,
+} from '@repo/ui/components/ui/dialog'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import {
   AlertCircleIcon,
   CheckCircleIcon,
@@ -11,19 +20,20 @@ import {
   MailIcon,
   MessageCircleIcon,
   PhoneIcon,
-  ReceiptIcon,
   RefreshCwIcon,
   WalletIcon,
   XCircleIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { apiClient } from '~/utils/axios'
-import { formatPrice } from '~/utils/format'
+import { formatDate, formatPrice } from '~/utils/format'
 import type { Route } from './+types/detail'
 
 export default function DepositDetail({ params }: Route.ComponentProps) {
   const [_copiedField, setCopiedField] = useState<string | null>(null)
+  const [isOpenCancelDialog, setIsOpenCancelDialog] = useState(false)
 
   const depositDetail = useQuery({
     queryKey: ['depositDetail', params.id],
@@ -35,6 +45,26 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
           throw error.response?.data
         }),
     retry: false,
+  })
+
+  const cancelDeposit = useMutation({
+    mutationKey: ['cancelDeposit', params.id],
+    mutationFn: async () =>
+      apiClient
+        .post(`/deposit/${params.id}/cancel`)
+        .then((res) => res.data)
+        .catch((error) => {
+          throw error.response?.data
+        }),
+    onSuccess: () => {
+      toast.success('Deposit berhasil dibatalkan')
+      depositDetail.refetch()
+      setIsOpenCancelDialog(false)
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Gagal membatalkan deposit')
+      setIsOpenCancelDialog(false)
+    },
   })
 
   const copyToClipboard = (text: string, fieldName: string) => {
@@ -58,35 +88,35 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
     switch (normalizedStatus) {
       case DepositStatus.PENDING:
         return (
-          <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400">
+          <Badge variant="soft-yellow">
             <ClockIcon className="w-3 h-3 mr-1" />
             Menunggu Pembayaran
           </Badge>
         )
       case DepositStatus.COMPLETED:
         return (
-          <Badge className="bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400">
+          <Badge variant="soft-green">
             <CheckCircleIcon className="w-3 h-3 mr-1" />
             Berhasil
           </Badge>
         )
       case DepositStatus.FAILED:
         return (
-          <Badge className="bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400">
+          <Badge variant="soft-red">
             <XCircleIcon className="w-3 h-3 mr-1" />
             Gagal
           </Badge>
         )
       case DepositStatus.EXPIRED:
         return (
-          <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400">
+          <Badge variant="soft-gray">
             <ClockIcon className="w-3 h-3 mr-1" />
             Kadaluarsa
           </Badge>
         )
       case DepositStatus.CANCELED:
         return (
-          <Badge className="bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400">
+          <Badge variant="soft-gray">
             <XCircleIcon className="w-3 h-3 mr-1" />
             Dibatalkan
           </Badge>
@@ -133,6 +163,26 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
 
   return (
     <div className="space-y-4">
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'User',
+            href: '/user',
+          },
+          {
+            label: 'Deposit',
+            href: '/user/deposit',
+          },
+          {
+            label: params.id,
+          },
+        ]}
+      />
+
       {/* Header Section */}
       <section id="header">
         <div className="md:text-left">
@@ -141,7 +191,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
         </div>
       </section>
 
-      {data.expired_at && data.status === 'pending' && (
+      {data.status === DepositStatus.PENDING && (
         <section id="payment-countdown">
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-800/30 dark:bg-orange-800/10">
             <div className="flex items-center gap-2 mb-2">
@@ -151,7 +201,7 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
               </h3>
             </div>
             <p className="text-sm text-orange-700 dark:text-orange-300">
-              Batas waktu pembayaran: {new Date(data.expired_at).toLocaleString('id-ID')}
+              Batas waktu pembayaran: {formatDate(data.expired_at)}
             </p>
           </div>
         </section>
@@ -204,19 +254,12 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
               {/* Payment Method Display */}
               <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                 <img
-                  src={
-                    data.payment_method.image_url?.startsWith('http')
-                      ? data.payment_method.image_url
-                      : `https://is3.cloudhost.id/bagusok${data.payment_method.image_url}`
-                  }
+                  src={data.payment_method.image_url}
                   alt={data.payment_method.name}
-                  className="w-12 h-12 object-contain rounded"
+                  className="w-12 h-auto max-h-12 object-contain rounded"
                 />
                 <div className="flex-1">
                   <p className="font-semibold">{data.payment_method.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {data.payment_method.type.replace('_', ' ').toUpperCase()}
-                  </p>
                 </div>
               </div>
 
@@ -241,54 +284,49 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
               </div>
 
               {/* Payment Details */}
-              {(data.pay_code || data.pay_url || data.qr_code) && (
-                <div className="space-y-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800/30">
-                  <h4 className="font-semibold text-blue-800 dark:text-blue-400">
-                    Detail Pembayaran
-                  </h4>
 
-                  {data.pay_code && (
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">Kode Pembayaran</p>
-                      <div className="flex items-center gap-2">
-                        <code className="px-3 py-2 bg-white dark:bg-gray-800 rounded text-lg font-mono flex-1 border">
-                          {data.pay_code}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(data.pay_code, 'Kode Pembayaran')}
-                          className="p-2 h-auto"
-                        >
-                          <CopyIcon className="w-4 h-4" />
-                        </Button>
-                      </div>
+              <div className="space-y-3 p-3 bg-slate-100 dark:bg-blue-900/20 rounded-lg border border-slate-200 dark:border-blue-800/30">
+                {data.payment_method.type === PaymentMethodType.QR_CODE && (
+                  <div className="text-center">
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Scan QR Code untuk membayar
+                    </p>
+                    <div className="inline-block p-2 bg-white rounded-lg">
+                      <img
+                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_code)}`}
+                        alt="QR Code"
+                        className="w-48 h-48 mx-auto"
+                      />
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {data.pay_url && (
-                    <div>
-                      <Button
-                        onClick={() => window.open(data.pay_url, '_blank')}
-                        className="w-full"
+                {(data.payment_method.type === PaymentMethodType.VIRTUAL_ACCOUNT ||
+                  data.payment_method.type === PaymentMethodType.BANK_TRANSFER ||
+                  data.payment_method.type === PaymentMethodType.RETAIL) && (
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1 text-center">
+                      Kode Pembayaran
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <code
+                        onClick={() => copyToClipboard(data.pay_code, 'Kode Pembayaran')}
+                        className="hover:opacity-70 cursor-pointer text-center px-3 py-2 bg-white dark:bg-gray-800 rounded-md text-lg font-mono flex-1"
                       >
-                        Lanjutkan Pembayaran
-                      </Button>
+                        {data.pay_code}
+                      </code>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {data.qr_code && (
-                    <div className="text-center">
-                      <p className="text-xs text-muted-foreground mb-2">
-                        Scan QR Code untuk membayar
-                      </p>
-                      <div className="inline-block p-2 bg-white rounded-lg">
-                        <img src={data.qr_code} alt="QR Code" className="w-48 h-48 mx-auto" />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                {data.payment_method.type === PaymentMethodType.LINK_PAYMENT && (
+                  <div>
+                    <Button onClick={() => window.open(data.pay_url, '_blank')} className="w-full">
+                      Lanjutkan Pembayaran
+                    </Button>
+                  </div>
+                )}
+              </div>
 
               {/* Instructions */}
               {data.payment_method.instruction && (
@@ -374,38 +412,42 @@ export default function DepositDetail({ params }: Route.ComponentProps) {
             {/* Action Buttons */}
             <div className="space-y-4">
               {/* Secondary Actions */}
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex gap-2">
                 <Button
-                  onClick={() => depositDetail.refetch()}
+                  onClick={handleChatCS}
                   variant="outline"
                   size="sm"
-                  className="gap-2 border-primary/50 text-foreground dark:border-primary/50"
-                  disabled={depositDetail.isLoading}
+                  className="flex-1 w-full gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-400 dark:border-green-800/30"
                 >
-                  <RefreshCwIcon className="w-4 h-4" />
-                  Refresh
+                  <MessageCircleIcon className="w-4 h-4" />
+                  Butuh Bantuan?
                 </Button>
-
-                <Button
-                  onClick={() => window.print()}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 border-primary/50 text-foreground dark:border-primary/50"
-                >
-                  <ReceiptIcon className="w-4 h-4" />
-                  Cetak
-                </Button>
+                {data.status === DepositStatus.PENDING && (
+                  <Dialog open={isOpenCancelDialog} onOpenChange={setIsOpenCancelDialog}>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="destructive" className="flex-1">
+                        Batalkan Deposit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogTitle>Apakah Anda yakin ingin membatalkan deposit ini?</DialogTitle>
+                      <DialogDescription>
+                        Jika Anda yakin ingin membatalkan deposit, silakan klik tombol konfirmasi di
+                        bawah. Jika tidak, Anda dapat menutup dialog ini dan melanjutkan dengan
+                        pembayaran.
+                      </DialogDescription>
+                      <DialogFooter>
+                        <DialogClose>
+                          <Button variant="destructive">Batal</Button>
+                        </DialogClose>
+                        <Button onClick={() => cancelDeposit.mutateAsync()} variant="secondary">
+                          {cancelDeposit.isPending ? 'Membatalkan...' : 'Konfirmasi Batalkan'}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                )}
               </div>
-
-              {/* Support Action */}
-              <Button
-                onClick={handleChatCS}
-                variant="outline"
-                className="w-full gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-400 dark:border-green-800/30"
-              >
-                <MessageCircleIcon className="w-4 h-4" />
-                Butuh Bantuan? Chat CS
-              </Button>
             </div>
           </div>
         </div>

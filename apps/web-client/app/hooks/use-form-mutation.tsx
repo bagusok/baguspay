@@ -38,7 +38,7 @@ export function useFormMutation<
 
   return useMutation<TData, TError, TVariables>({
     ...restOptions,
-    onError: (error, variables, context) => {
+    onError: (error, variables, context, _mutation) => {
       // Sekarang 'error' memiliki tipe yang benar (TError)
       if (isAxiosError<ServerErrorResponse>(error)) {
         const res = error.response
@@ -77,7 +77,7 @@ export function useFormMutation<
       }
 
       // Jalankan callback onError original jika ada
-      restOptions?.onError?.(error, variables, context)
+      restOptions?.onError?.(error, variables, context, _mutation)
     },
   })
 }
