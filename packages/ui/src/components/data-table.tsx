@@ -6,9 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onRowClick?: (data: TData) => void
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  onRowClick,
+}: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
@@ -16,14 +21,20 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
   })
 
   return (
-    <div className="rounded-md border border-border overflow-x-auto">
+    <div className="rounded-xl border border-border bg-card shadow-sm overflow-x-auto">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow className="border-border" key={headerGroup.id}>
+            <TableRow
+              className="border-border hover:bg-transparent bg-muted/50 border-b"
+              key={headerGroup.id}
+            >
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    className="h-11 font-semibold text-muted-foreground text-xs whitespace-nowrap"
+                    key={header.id}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -37,12 +48,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                className="border-border"
+                className={`border-b border-border/50 transition-colors ${onRowClick ? 'cursor-pointer hover:bg-muted/50' : 'hover:bg-muted/30'}`}
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
+                onClick={() => onRowClick?.(row.original)}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell className="py-3 align-middle" key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
@@ -50,7 +62,10 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
+              <TableCell
+                colSpan={columns.length}
+                className="h-32 text-center text-sm text-muted-foreground"
+              >
                 No results.
               </TableCell>
             </TableRow>

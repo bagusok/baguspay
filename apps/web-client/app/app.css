@@ -4,7 +4,7 @@ body {
   font-family: var(--font-sans);
 }
 
-p,
+/* p,
 h1,
 h2,
 h3,
@@ -14,4 +14,4 @@ h6,
 span,
 div {
   color: var(--color-foreground);
-}
+} */

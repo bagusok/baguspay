@@ -4,7 +4,7 @@ import { Provider, useAtom, useSetAtom } from 'jotai'
 import { useHydrateAtoms } from 'jotai/utils'
 import { queryClientAtom } from 'jotai-tanstack-query'
 import { useEffect } from 'react'
-import { Outlet, redirect } from 'react-router'
+import { Outlet, useNavigate } from 'react-router'
 import UserLayout from '~/components/layout/user-layout'
 import { queryClient, store } from '~/store/store'
 import { authTokenAtom } from '~/store/token'
@@ -36,13 +36,14 @@ export default function Locale(_args: Route.ComponentProps) {
   useHydrateAtoms([[queryClientAtom, queryClient]])
   const setAuthToken = useSetAtom(authTokenAtom)
   const [user] = useAtom(userAtom)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (user.isError) {
       setAuthToken(null)
-      redirect('/auth/login')
+      navigate('/auth/login')
     }
-  }, [user])
+  }, [user.isError, navigate, setAuthToken])
 
   if (user.isLoading) {
     return (
@@ -58,7 +59,9 @@ export default function Locale(_args: Route.ComponentProps) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-red-100">
         <h2 className="text-xl font-semibold text-red-700 mb-2">Error</h2>
-        <p className="text-red-500">Failed to load user data. Please Refresh</p>
+        <p className="text-red-500">
+          Failed to load user data. Please Refresh, {user.error.toString()}
+        </p>
       </div>
     )
   }

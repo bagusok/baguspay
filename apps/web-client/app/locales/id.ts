@@ -21,6 +21,8 @@ export default {
       termsOfService: 'Syarat Layanan',
       privacyPolicy: 'Kebijakan Privasi',
       news: 'Berita',
+      blog: 'Blog',
+      offers: 'Promo',
     },
   },
   login: {

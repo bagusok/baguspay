@@ -1,14 +1,49 @@
+import { isAxiosError } from 'axios'
 import { Facebook, Link as LinkIcon, MessageCircle, Send, Share2, Twitter } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { data, Link, useParams } from 'react-router'
+import { apiClient } from '~/utils/axios'
+import type { Route } from './+types'
 
-export default function BlogDetail() {
+export async function loader(args: Route.LoaderArgs) {
+  try {
+    const params = args.params as Record<string, string | undefined>
+    const { category, slug } = params
+
+    const response = await apiClient.get(`/blog/posts/${category}/${slug}`).catch((err) => {
+      throw new Error(err.response?.data?.message || 'Gagal memuat data')
+    })
+    return data({
+      success: true,
+      data: response.data,
+    })
+  } catch (error) {
+    if (isAxiosError(error)) {
+      return data({
+        success: false,
+        message: error.response?.data?.message || 'Gagal memuat data',
+      })
+    }
+    return data({
+      success: false,
+      message: 'Gagal memuat data',
+    })
+  }
+}
+
+export default function BlogDetail({ loaderData }: Route.ComponentProps) {
+  const routeData = loaderData as unknown as { success: boolean; data?: any; message?: string }
+  const success = routeData?.success
+  const post = success ? routeData?.data?.data : null
+
   const params = useParams<{ slug: string }>()
   const slug = params.slug ?? 'dummy-post'
-  const title = slug
-    .split('-')
-    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-    .join(' ')
+  const title =
+    post?.title ||
+    slug
+      .split('-')
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join(' ')
 
   const contentRef = useRef<HTMLDivElement | null>(null)
   const [toc, setToc] = useState<Array<{ id: string; text: string; level: number }>>([])
@@ -22,6 +57,25 @@ export default function BlogDetail() {
   useEffect(() => {
     if (!contentRef.current) return
     const container = contentRef.current
+
+    if (!post?.content) {
+      container.innerHTML = ''
+      setToc([])
+      setReadingTime(0)
+      return
+    }
+
+    // Hydrate HTML content from server
+    container.innerHTML = post.content
+
+    // Process content to make images responsive if they aren't already
+    const images = container.querySelectorAll('img')
+    images.forEach((img) => {
+      if (!img.className.includes('w-full') && !img.className.includes('max-w-full')) {
+        img.className += ' max-w-full h-auto rounded-lg mx-auto object-cover'
+      }
+    })
+
     const headings = Array.from(container.querySelectorAll<HTMLHeadingElement>('h2, h3'))
     const items: Array<{ id: string; text: string; level: number }> = []
     const slugify = (str: string) =>
@@ -42,7 +96,26 @@ export default function BlogDetail() {
 
     const words = (container.innerText || '').trim().split(/\s+/).length
     setReadingTime(Math.max(1, Math.round(words / 200)))
-  }, [])
+  }, [post?.content])
+
+  if (!success || !post) {
+    return (
+      <div className="md:max-w-4xl mx-auto text-center space-y-4 py-10">
+        <p className="text-lg font-semibold text-foreground">
+          {routeData?.message || 'Artikel tidak ditemukan.'}
+        </p>
+        <p className="text-muted-foreground">
+          Silakan kembali ke halaman blog untuk melihat artikel lain.
+        </p>
+        <Link
+          to="/blog"
+          className="inline-flex items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+        >
+          Kembali ke Blog
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="md:max-w-7xl mx-auto">
@@ -56,48 +129,33 @@ export default function BlogDetail() {
       <h1 className="text-3xl md:text-4xl font-bold text-foreground">{title}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Dipublikasikan pada{' '}
-        {new Date().toLocaleDateString('id-ID', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric',
-        })}
+        {new Date(post?.created_at || post?.published_at || Date.now()).toLocaleDateString(
+          'id-ID',
+          {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric',
+          },
+        )}
         {readingTime ? ` • ${readingTime} menit baca` : null}
       </p>
 
       <SocialShare title={title} url={currentUrl} />
-      <img
-        src={`https://picsum.photos/seed/${encodeURIComponent(slug)}/800/450`}
-        srcSet={`https://picsum.photos/seed/${encodeURIComponent(slug)}/800/450 800w, https://picsum.photos/seed/${encodeURIComponent(slug)}/1200/675 1200w, https://picsum.photos/seed/${encodeURIComponent(slug)}/1600/900 1600w`}
-        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 1200px"
-        alt={title}
-        className="mt-4 w-full h-auto rounded-xl"
-      />
+      {post?.image_url ? (
+        <img
+          src={post.image_url}
+          alt={title}
+          className="mt-6 w-full h-auto rounded-xl object-cover max-h-125"
+        />
+      ) : null}
 
-      <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-9">
-          <div ref={contentRef} className="prose dark:prose-invert prose-sm md:prose-base">
-            <p>
-              Ini adalah artikel dummy untuk menampilkan halaman detail blog. Gunakan halaman ini
-              sebagai template untuk menampilkan konten sebenarnya dari API/CMS Anda.
-            </p>
-            <p>
-              Baguspay menyediakan layanan topup game dan PPOB yang cepat, aman, dan harga
-              bersahabat. Anda dapat menambahkan tips, panduan, dan pengumuman promo di blog ini
-              untuk membantu pengguna.
-            </p>
-            <h2>Subjudul Contoh</h2>
-            <p>Beberapa praktik terbaik saat menulis di blog:</p>
-            <ul>
-              <li>Gunakan gambar ilustrasi dari Picsum Photos.</li>
-              <li>Tulis ringkas dan informatif.</li>
-              <li>Tambahkan CTA ke produk/fitur terkait.</li>
-            </ul>
-            <h3>Tips Tambahan</h3>
-            <p>Pastikan struktur heading rapi agar daftar isi terbentuk otomatis.</p>
-            <p>
-              Terima kasih telah membaca. Kembali ke <Link to="/blog">daftar artikel</Link> untuk
-              melihat tulisan lainnya.
-            </p>
+          <div
+            ref={contentRef}
+            className="prose dark:prose-invert prose-sm md:prose-base max-w-none"
+          >
+            {!post?.content ? <p>Konten tidak tersedia.</p> : null}
           </div>
         </div>
         <aside className="lg:col-span-3">

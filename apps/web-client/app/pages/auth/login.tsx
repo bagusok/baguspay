@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@repo/ui/components/ui/button'
-import { useQueryClient } from '@tanstack/react-query'
 import { useAtom } from 'jotai'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -10,6 +9,7 @@ import { z } from 'zod'
 import { UnderlinedInput } from '~/components/form-fields'
 import { useFormMutation } from '~/hooks/use-form-mutation'
 import { getInstance } from '~/middlewares/i8n'
+import { queryClient } from '~/store/store'
 import { authTokenAtom } from '~/store/token'
 import { apiClient } from '~/utils/axios'
 import type { Route } from './+types/login'
@@ -42,8 +42,6 @@ export async function loader({ context }: Route.LoaderArgs) {
 export default function Login({ loaderData }: Route.ComponentProps) {
   const { t, i18n } = useTranslation('login')
   const navigate = useNavigate()
-
-  const queryClient = useQueryClient()
 
   const [, setAuthToken] = useAtom(authTokenAtom)
 
@@ -105,25 +103,23 @@ export default function Login({ loaderData }: Route.ComponentProps) {
           className="max-w-md mx-auto space-y-4 mt-5"
         >
           <div>
-            <UnderlinedInput label={t('emailLabel')} type="email" {...form.register('email')} />
-            {form.formState.errors.email && (
-              <p className="text-red-500 text-xs mt-1">{form.formState.errors.email.message}</p>
-            )}
+            <UnderlinedInput
+              label={t('emailLabel')}
+              type="email"
+              {...form.register('email')}
+              error={form.formState.errors.email?.message}
+            />
           </div>
           <div>
             <UnderlinedInput
               label={t('passwordLabel')}
               type="password"
               {...form.register('password')}
+              error={form.formState.errors.password?.message}
             />
-            {form.formState.errors.password && (
-              <p className="text-red-500 text-xs mt-1">{form.formState.errors.password.message}</p>
-            )}
+
             <div className="text-end">
-              <Link
-                to="/auth/forgot-password"
-                className="text-xs mt-1 hover:text-primary-foreground"
-              >
+              <Link to="/auth/forgot-password" className="text-xs mt-1 hover:text-primary">
                 {t('forgotPassword')}
               </Link>
             </div>

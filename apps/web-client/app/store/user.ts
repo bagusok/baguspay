@@ -15,7 +15,7 @@ export const userAtom = atomWithQuery<UserMe>((_) => {
               cause: error,
             })
           } else {
-            throw new Error('Failed to fetch user data', {
+            throw new Error(`Failed to fetch user data: ${error.message}`, {
               cause: error,
             })
           }

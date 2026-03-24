@@ -19,6 +19,8 @@ export default {
       termsOfService: 'Terms of Service',
       privacyPolicy: 'Privacy Policy',
       news: 'News',
+      blog: 'Blog',
+      offers: 'Offers',
     },
   },
   login: {

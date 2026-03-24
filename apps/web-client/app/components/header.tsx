@@ -3,6 +3,7 @@ import { Button } from '@repo/ui/components/ui/button'
 import { cn } from '@repo/ui/lib/utils'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import {
+  GiftIcon,
   HistoryIcon,
   HomeIcon,
   MenuIcon,
@@ -10,6 +11,7 @@ import {
   NewspaperIcon,
   SettingsIcon,
   ShoppingBagIcon,
+  Smartphone,
   SunIcon,
   TablePropertiesIcon,
   UserIcon,
@@ -26,7 +28,7 @@ import NavLinkWithLocale from './navlink'
 export type LocalLabel =
   | 'navbar.home'
   | 'navbar.priceList'
-  | 'navbar.news'
+  | 'navbar.blog'
   | 'loading'
   | 'error'
   | 'notFound'
@@ -35,6 +37,8 @@ export type LocalLabel =
   | 'navbar.register'
   | 'navbar.about'
   | 'navbar.contact'
+  | 'navbar.offers'
+  | 'navbar.checkTransaction'
 
 export const navData = {
   navMain: {
@@ -58,10 +62,16 @@ export const navData = {
         local_label: 'navbar.priceList',
       },
       {
-        label: 'Berita',
-        href: '/news',
+        label: 'Blog',
+        href: '/blog',
         icon: <NewspaperIcon className="h-4 w-4" />,
-        local_label: 'navbar.news',
+        local_label: 'navbar.blog',
+      },
+      {
+        label: 'Promo',
+        href: '/offers',
+        icon: <GiftIcon className="h-4 w-4" />,
+        local_label: 'navbar.offers',
       },
     ],
   },
@@ -91,6 +101,11 @@ export const navData = {
         label: 'Settings',
         href: '/user/settings',
         icon: <SettingsIcon className="h-4 w-4" />,
+      },
+      {
+        label: 'Riwayat Sesi',
+        href: '/user/sessions',
+        icon: <Smartphone className="h-4 w-4" />,
       },
     ],
   },

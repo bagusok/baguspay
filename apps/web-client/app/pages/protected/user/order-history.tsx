@@ -1,5 +1,6 @@
 import type { OrderStatus, PaymentStatus, RefundStatus } from '@repo/db/types'
 import { DataTable } from '@repo/ui/components/data-table'
+import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
 import { Calendar } from '@repo/ui/components/ui/calendar'
 import {
@@ -23,9 +24,11 @@ import {
 } from '@repo/ui/components/ui/select'
 import { useQuery } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
-import { CalendarIcon, EyeIcon, Filter, Search, X } from 'lucide-react'
+import { CalendarIcon, Filter, Search, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
+import { useNavigate } from 'react-router'
+import BottomNavMobile from '~/components/bottom-nav.mobile'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { apiClient } from '~/utils/axios'
 import { formatDate, formatPrice } from '~/utils/format'
 
@@ -35,15 +38,18 @@ const columns: ColumnDef<OrederHistoryData>[] = [
     header: 'ID Order',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
-        <code className="px-2 py-1 bg-muted rounded text-xs font-mono">
+        <code className="px-2.5 py-1 bg-secondary text-secondary-foreground rounded-md text-xs font-mono font-medium border border-border">
           {row.original.order_id}
         </code>
-        <Link
-          to={`/order/detail/${row.original.order_id}`}
-          className="text-primary hover:text-primary/80"
-        >
-          <EyeIcon className="w-4 h-4" />
-        </Link>
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'product.name',
+    header: 'Product',
+    cell: ({ row }) => (
+      <div className="font-medium max-w-50 md:max-w-xs truncate" title={row.original.product.name}>
+        {row.original.product.name}
       </div>
     ),
   },
@@ -51,89 +57,76 @@ const columns: ColumnDef<OrederHistoryData>[] = [
     accessorKey: 'total_price',
     header: 'Total Harga',
     cell: ({ row }) => (
-      <span className="font-semibold">{formatPrice(row.original.total_price)}</span>
+      <span className="font-bold text-primary">{formatPrice(row.original.total_price)}</span>
     ),
   },
   {
     accessorKey: 'payment_status',
-    header: 'Status Pembayaran',
+    header: 'Pembayaran',
     cell: ({ row }) => {
-      const status = row.original.payment_status
-      const statusConfig: Record<string, string> = {
-        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
-        success: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
-        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
-        expired: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
-        cancelled: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
-      }
+      const status = row.original.payment_status?.toLowerCase() || ''
 
-      return (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig[status] || statusConfig.failed}`}
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-      )
+      switch (status) {
+        case 'pending':
+          return <Badge variant="soft-yellow">Pending</Badge>
+        case 'success':
+          return <Badge variant="soft-green">Success</Badge>
+        case 'failed':
+        case 'cancelled':
+          return (
+            <Badge variant="soft-red">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>
+          )
+        case 'expired':
+          return <Badge variant="secondary">Expired</Badge>
+        default:
+          return (
+            <Badge variant="outline" className="capitalize text-[11px]">
+              {status}
+            </Badge>
+          )
+      }
     },
   },
   {
     accessorKey: 'order_status',
     header: 'Status Order',
     cell: ({ row }) => {
-      const status = row.original.order_status
-      const statusConfig: Record<string, string> = {
-        none: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
-        pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
-        completed: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
-        cancelled: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
-        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+      const status = row.original.order_status?.toLowerCase() || ''
+
+      if (status === 'none') {
+        return <span className="text-muted-foreground text-xs">-</span>
       }
 
-      return (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig[status] || statusConfig.failed}`}
-        >
-          {status === 'none' ? 'None' : status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-      )
-    },
-  },
-  {
-    accessorKey: 'refund_status',
-    header: 'Status Refund',
-    cell: ({ row }) => {
-      const status = row.original.refund_status
-      if (!status) return <span className="text-muted-foreground">-</span>
-
-      const statusConfig: Record<string, string> = {
-        none: 'bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400',
-        processing: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800/30 dark:text-yellow-400',
-        completed: 'bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-400',
-        failed: 'bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-400',
+      switch (status) {
+        case 'pending':
+          return <Badge variant="soft-yellow">Pending</Badge>
+        case 'completed':
+          return <Badge variant="soft-green">Completed</Badge>
+        case 'failed':
+        case 'cancelled':
+          return (
+            <Badge variant="soft-red">{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>
+          )
+        default:
+          return (
+            <Badge variant="outline" className="capitalize text-[11px]">
+              {status}
+            </Badge>
+          )
       }
-
-      return (
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-semibold ${statusConfig[status] || statusConfig.failed}`}
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-      )
     },
   },
   {
     accessorKey: 'created_at',
     header: 'Tanggal Dibuat',
-    cell: ({ row }) => <span className="text-sm">{formatDate(row.original.created_at)}</span>,
-  },
-  {
-    accessorKey: 'updated_at',
-    header: 'Tanggal Update',
-    cell: ({ row }) => <span className="text-sm">{formatDate(row.original.updated_at)}</span>,
+    cell: ({ row }) => (
+      <span className="text-xs text-muted-foreground">{formatDate(row.original.created_at)}</span>
+    ),
   },
 ]
 
 export default function OrderHistoryPage() {
+  const navigate = useNavigate()
   const [page, setPage] = useState(1)
   const [limit, setLimit] = useState(10)
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
@@ -260,6 +253,21 @@ export default function OrderHistoryPage() {
 
   return (
     <>
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'User',
+            href: '/user',
+          },
+          {
+            label: 'Riwayat Order',
+          },
+        ]}
+      />
       <section id="header">
         <div className="md:text-left">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Riwayat Orderan</h1>
@@ -482,7 +490,7 @@ export default function OrderHistoryPage() {
 
           {/* Limit Selection */}
           <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-35">
               <SelectValue>{limit} per halaman</SelectValue>
             </SelectTrigger>
             <SelectContent>
@@ -508,32 +516,40 @@ export default function OrderHistoryPage() {
 
         {orderHistory.isSuccess && (
           <div className="grid mt-4">
-            <DataTable columns={columns} data={orderHistory.data?.data || []} />
+            <DataTable
+              columns={columns}
+              data={orderHistory.data?.data || []}
+              onRowClick={(row) => navigate(`/order/detail/${row.order_id}`)}
+            />
           </div>
         )}
 
-        <div className="flex justify-between gap-4 mt-4">
-          <div>
-            <p className="text-sm">
-              Page {orderHistory.data?.meta.pagination.page || 1} of{' '}
+        <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4 mt-6 mb-8">
+          <div className="text-sm text-muted-foreground flex items-center justify-center h-9">
+            Halaman{' '}
+            <span className="font-semibold text-foreground mx-1">
+              {orderHistory.data?.meta.pagination.page || 1}
+            </span>{' '}
+            dari{' '}
+            <span className="font-semibold text-foreground ml-1">
               {orderHistory.data?.meta.pagination.total_pages || 1}
-            </p>
+            </span>
           </div>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-2 items-center bg-card border border-border p-1 rounded-lg">
             <Button
               size="sm"
-              variant="outline"
-              className="border-border"
+              variant="ghost"
+              className="h-8 px-4 font-medium text-xs rounded-md"
               disabled={page <= 1}
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             >
-              Previous
+              Sebelumnya
             </Button>
-            <span className="font-bold">{orderHistory.data?.meta.pagination.page || 1}</span>
+            <div className="w-px h-4 bg-border mx-1"></div>
             <Button
               size="sm"
-              variant="outline"
-              className="border-border"
+              variant="ghost"
+              className="h-8 px-4 font-medium text-xs rounded-md"
               disabled={page >= (orderHistory.data?.meta.pagination.total_pages ?? 1)}
               onClick={() =>
                 setPage((prev) =>
@@ -541,11 +557,12 @@ export default function OrderHistoryPage() {
                 )
               }
             >
-              Next
+              Berikutnya
             </Button>
           </div>
         </div>
       </section>
+      <BottomNavMobile />
     </>
   )
 }
@@ -566,6 +583,9 @@ export interface OrederHistoryData {
   refund_status: RefundStatus
   created_at: string
   updated_at: string
+  product: {
+    name: string
+  }
 }
 
 export interface Meta {

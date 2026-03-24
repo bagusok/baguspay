@@ -545,6 +545,9 @@ importers:
       react-server-dom-webpack:
         specifier: ^19.2.3
         version: 19.2.3(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(webpack@5.103.0)
+      react-to-print:
+        specifier: ^3.3.0
+        version: 3.3.0(react@19.2.3)
       remix-auth:
         specifier: ^4.2.0
         version: 4.2.0
@@ -8510,6 +8513,11 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  react-to-print@3.3.0:
+    resolution: {integrity: sha512-7j9GIeNZA9glZlbv9mIbIHDOOx+WYfRMbJzh04NiSKjdaeGkxJuKjJQrtRuNKtt5AvEVVjrLCPokZ9yJX51Fvg==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ~19
 
   react-transition-group@4.4.5:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
@@ -18245,6 +18253,10 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.2.7
+
+  react-to-print@3.3.0(react@19.2.3):
+    dependencies:
+      react: 19.2.3
 
   react-transition-group@4.4.5(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:

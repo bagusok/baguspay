@@ -13,6 +13,7 @@ import {
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { Link } from 'react-router'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 
 export default function Contact() {
   const SUPPORT_EMAIL = 'hunagus433@gmail.com' // TODO: ganti dengan email resmi
@@ -50,8 +51,19 @@ export default function Contact() {
 
   return (
     <div className="md:max-w-7xl mx-auto">
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'Kontak',
+          },
+        ]}
+      />
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
+      <section className="mt-6 relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
         <div className="relative z-10">
           <p className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             <HelpCircle className="size-4" />

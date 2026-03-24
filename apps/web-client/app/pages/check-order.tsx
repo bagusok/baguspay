@@ -4,6 +4,7 @@ import { isAxiosError } from 'axios'
 import { ClockIcon, Loader2Icon, SearchIcon, TicketCheckIcon } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { UnderlinedInput } from '~/components/form-fields'
 import LinkWithLocale from '~/components/link'
 import { apiClient } from '~/utils/axios'
@@ -29,8 +30,20 @@ export default function CheckOrderPage() {
 
   return (
     <div className="md:max-w-7xl mx-auto">
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          {
+            label: 'Cek Order',
+          },
+        ]}
+      />
+
       {/* Hero */}
-      <section className="text-center relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
+      <section className="mt-6 text-center relative overflow-hidden rounded-2xl bg-linear-to-br from-primary/10 via-secondary/10 to-transparent p-6 md:p-10 border border-border">
         <div className="relative z-10">
           <p className="inline-flex items-center gap-2 text-xs md:text-sm text-primary font-medium bg-primary/10 px-3 py-1 rounded-full">
             Cek Status Order

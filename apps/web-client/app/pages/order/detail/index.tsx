@@ -1,5 +1,8 @@
+import { OrderStatus, PaymentStatus, RefundStatus, UserRole } from '@repo/db/types'
 import { Button } from '@repo/ui/components/ui/button'
-import { useQuery } from '@tanstack/react-query'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@repo/ui/components/ui/dialog'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useAtomValue } from 'jotai'
 import {
   AlertCircleIcon,
   CopyIcon,
@@ -9,6 +12,7 @@ import {
   MailIcon,
   MessageCircleIcon,
   PhoneIcon,
+  Printer,
   ReceiptIcon,
   RefreshCwIcon,
   TagIcon,
@@ -16,18 +20,23 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
+import { userAtom } from '~/store/user'
 import { apiClient } from '~/utils/axios'
 import { formatPrice } from '~/utils/format'
 import type { Route } from './+types'
 import CancelTransactionModal from './cancel-transaction-modal'
 import PaymentCountdown from './payment-countdown'
 import PaymentMethodDisplay from './payment-method-display'
+import PrintStruk from './print-struk'
 import StatusBadge from './status-badge'
 
 export default function OrderDetailPage({ params }: Route.ComponentProps) {
   const [, setCopiedField] = useState<string | null>(null)
   const [isCanceling] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
+  const [showPrintModal, setShowPrintModal] = useState(false)
+  const user = useAtomValue(userAtom)
 
   const orderDetail = useQuery({
     queryKey: ['orderDetail', params.id],
@@ -41,16 +50,32 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
     retry: false,
   })
 
+  const cancelOrder = useMutation({
+    mutationKey: ['cancelOrder', params.id],
+    mutationFn: async () =>
+      apiClient
+        .delete(`/order/${params.id}`)
+        .then((res) => res.data)
+        .catch((error) => {
+          throw error.response?.data
+        }),
+    onSuccess: () => {
+      toast.success('Transaksi berhasil dibatalkan')
+      orderDetail.refetch()
+      setShowCancelModal(false)
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || 'Gagal membatalkan transaksi')
+      setShowCancelModal(false)
+    },
+  })
+
   const copyToClipboard = (text: string, fieldName: string) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopiedField(fieldName)
       toast.success(`${fieldName} disalin ke clipboard`)
       setTimeout(() => setCopiedField(null), 2000)
     })
-  }
-
-  const handleCancelTransaction = async () => {
-    if (!data) return
   }
 
   const handleChatCS = () => {
@@ -96,19 +121,47 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
 
   return (
     <div className="w-full md:max-w-7xl mx-auto space-y-4">
+      <BreadcrumbBasic
+        items={[
+          {
+            label: 'Home',
+            href: '/',
+          },
+          ...(user.data?.role !== UserRole.GUEST
+            ? [
+                {
+                  label: 'User',
+                  href: '/user',
+                },
+              ]
+            : []),
+          {
+            label: 'Order',
+            href: '/user/orders',
+          },
+          {
+            label: params.id,
+          },
+        ]}
+      />
       {/* Header Section */}
-      <section id="header">
-        <div className="text-center md:text-left">
+      <section id="header" className="flex gap-4 items-center justify-between ">
+        <div className="">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">Detail Pesanan</h1>
           <p className="text-muted-foreground">Informasi lengkap tentang pesanan Anda</p>
         </div>
+        {orderDetail.data?.data.order_status === OrderStatus.COMPLETED && (
+          <Button size="icon" variant="link" onClick={() => setShowPrintModal(true)}>
+            <Printer className="w-4 h-4" />
+          </Button>
+        )}
       </section>
 
       {/* Payment Countdown - Priority Display */}
       {data.payment.expired_at &&
-        (data.payment_status === 'pending' ||
-          data.payment_status === 'expired' ||
-          data.payment_status === 'failed') && (
+        (data.payment_status === PaymentStatus.PENDING ||
+          data.payment_status === PaymentStatus.EXPIRED ||
+          data.payment_status === PaymentStatus.FAILED) && (
           <section id="payment-countdown">
             <PaymentCountdown
               expiredAt={data.payment.expired_at}
@@ -148,8 +201,16 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <StatusBadge type="order" status={data.order_status} />
-                <StatusBadge type="payment" status={data.payment_status} />
+                {data.payment_status !== PaymentStatus.SUCCESS && (
+                  <StatusBadge type="payment" status={data.payment_status} />
+                )}
+                {data.payment_status === PaymentStatus.SUCCESS && (
+                  <StatusBadge type="order" status={data.order_status} />
+                )}
+
+                {data.refund_status !== RefundStatus.NONE && (
+                  <StatusBadge type="refund" status={data.refund_status} />
+                )}
               </div>
             </div>
           </div>
@@ -342,53 +403,28 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="space-y-4">
-              {data.payment_status === 'pending' && (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleChatCS}
+                variant="outline"
+                className="flex-1 gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-400 dark:border-green-800/30"
+              >
+                <MessageCircleIcon className="w-4 h-4" />
+                Butuh Bantuan?
+              </Button>
+              {data.payment_status === PaymentStatus.PENDING && (
                 <Button
+                  size="sm"
                   onClick={() => setShowCancelModal(true)}
                   variant="destructive"
-                  className="w-full gap-2"
+                  className="flex-1 w-full gap-2"
                   disabled={isCanceling}
                 >
                   <XCircleIcon className="w-4 h-4" />
                   {isCanceling ? 'Membatalkan...' : 'Batalkan Transaksi'}
                 </Button>
               )}
-
-              {/* Secondary Actions */}
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  onClick={() => orderDetail.refetch()}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 border-primary/50 text-foreground dark:border-primary/50"
-                  disabled={orderDetail.isLoading}
-                >
-                  <RefreshCwIcon className="w-4 h-4" />
-                  Refresh
-                </Button>
-
-                <Button
-                  onClick={() => window.print()}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 border-primary/50 text-foreground dark:border-primary/50"
-                >
-                  <ReceiptIcon className="w-4 h-4" />
-                  Cetak
-                </Button>
-              </div>
-
-              {/* Support Action */}
-              <Button
-                onClick={handleChatCS}
-                variant="outline"
-                className="w-full gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 dark:text-green-400 dark:border-green-800/30"
-              >
-                <MessageCircleIcon className="w-4 h-4" />
-                Butuh Bantuan? Chat CS
-              </Button>
             </div>
           </div>
         </div>
@@ -398,10 +434,34 @@ export default function OrderDetailPage({ params }: Route.ComponentProps) {
       <CancelTransactionModal
         open={showCancelModal}
         onOpenChange={setShowCancelModal}
-        onConfirm={handleCancelTransaction}
-        isLoading={isCanceling}
+        onConfirm={cancelOrder.mutate}
+        isLoading={cancelOrder.isPending}
         orderId={data.order_id}
       />
+
+      {/* Print Struk Confirmation Modal */}
+      <Dialog open={showPrintModal} onOpenChange={setShowPrintModal}>
+        <DialogContent className="max-w-4xl border-gray-200 dark:border-zinc-800 bg-background sm:p-6 overflow-y-auto max-h-[90vh]">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-xl font-bold">Cetak Struk Transaksi</DialogTitle>
+          </DialogHeader>
+          <div className="py-2">
+            <PrintStruk
+              data={{
+                trxId: data.order_id,
+                date: new Date(data.created_at).toLocaleString('id-ID', {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }),
+                productName: data.product.name,
+                customerTarget: data.customer_input,
+                sn: data.sn_number || '-',
+                basePrice: data.total_price,
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

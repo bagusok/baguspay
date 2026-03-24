@@ -64,13 +64,23 @@ export class SettingsService {
       throw new NotFoundException('User not found')
     }
 
-    const existingPhone = await this.userRepository.findPhoneNumber(data.phone)
+    const verifyPassword = await bcrypt.compare(data.password, user.password)
+    if (!verifyPassword) {
+      throw new BadRequestException('Invalid password')
+    }
+
+    const existingPhone = await this.userRepository.findPhoneNumber(data.new_phone)
 
     if (existingPhone && existingPhone.id !== _user.id) {
       throw new BadRequestException('Phone number already in use')
     }
 
-    await this.userRepository.updateUser({ phone: data.phone }, _user.id)
+    const isSamePhone = user.phone === data.new_phone
+    if (isSamePhone) {
+      throw new BadRequestException('New phone number cannot be the same as the old phone number')
+    }
+
+    await this.userRepository.updateUser({ phone: data.new_phone }, _user.id)
     return SendResponse.success({
       message: 'Phone number updated successfully',
     })
@@ -83,12 +93,21 @@ export class SettingsService {
       throw new NotFoundException('User not found')
     }
 
-    const existingEmail = await this.userRepository.findEmail(data.email)
+    const verifyPassword = await bcrypt.compare(data.password, user.password)
+    if (!verifyPassword) {
+      throw new BadRequestException('Invalid password')
+    }
+
+    const existingEmail = await this.userRepository.findEmail(data.new_email)
     if (existingEmail && existingEmail.id !== _user.id) {
       throw new BadRequestException('Email already in use')
     }
 
-    await this.userRepository.updateUser({ email: data.email }, _user.id)
+    if (user.email === data.new_email) {
+      throw new BadRequestException('New email cannot be the same as the old email')
+    }
+
+    await this.userRepository.updateUser({ email: data.new_email }, _user.id)
     return SendResponse.success({
       message: 'Email updated successfully',
     })

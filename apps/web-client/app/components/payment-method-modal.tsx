@@ -113,13 +113,13 @@ export default function PaymentMethodModal({
         </DialogHeader>
 
         <div className="overflow-y-auto max-h-[60vh] pr-2">
-          <Accordion type="multiple" className="w-full space-y-2">
+          <Accordion type="single" collapsible className="w-full space-y-2">
             {paymentData
               .filter((category) => category.payment_methods.length > 0)
-              .map((category) => (
+              .map((category, index) => (
                 <AccordionItem
-                  key={category.id}
-                  value={category.id}
+                  key={category.id || index}
+                  value={String(category.id || category.name || index)}
                   className="border border-gray-200 dark:border-gray-700 rounded-lg"
                 >
                   <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]>svg]:rotate-180">

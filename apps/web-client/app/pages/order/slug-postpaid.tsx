@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Badge } from '@repo/ui/components/ui/badge'
 import { Button } from '@repo/ui/components/ui/button'
+import { useAtomValue } from 'jotai'
 import {
   InfoIcon,
   KeyRoundIcon,
@@ -12,9 +13,12 @@ import {
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
+import { useParams } from 'react-router'
+import BreadcrumbBasic from '~/components/breadcrumb-basic'
 import { UnderlinedInput, UnderlinedSelect } from '~/components/form-fields'
 import Image from '~/components/image'
 import VoucherInput from '~/components/voucher-input'
+import { userAtom } from '~/store/user'
 import { useInquiry } from '../../hooks/use-inquiry'
 import CheckoutModal from './checkout-modal'
 import {
@@ -37,11 +41,14 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
     data?.product_sub_categories[0]?.products[0] || null,
   )
 
+  const params = useParams()
+  const user = useAtomValue(userAtom)
+
   const form = useForm<InquiryForm>({
     defaultValues: {
       product_id: selectedProduct?.id || '',
-      phone_number: '',
-      email: '',
+      phone_number: user?.data?.phone || '',
+      email: user?.data?.email || '',
       payment_method_id: '',
       input_fields:
         data?.input_fields?.map((field) => ({
@@ -95,6 +102,19 @@ export default function OrderSlugPostpaidPage({ data }: Props) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <div className="w-full md:max-w-7xl mx-auto space-y-4">
+        <BreadcrumbBasic
+          items={[
+            {
+              label: 'Home',
+              href: '/',
+            },
+            {
+              label: data.name,
+              href: `/order/${params.slug}`,
+            },
+          ]}
+        />
+
         {/* Header Info */}
         <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-start gap-4 rounded-xl shadow-xs border border-gray-200 p-4 dark:border-none dark:bg-secondary text-secondary-foreground">
           <div className="w-32 rounded-lg overflow-hidden">

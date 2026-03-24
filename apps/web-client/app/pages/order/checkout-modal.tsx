@@ -56,6 +56,7 @@ export default function CheckoutModal({ data }: Props) {
   const [selectedPayment, setSelectedPayment] = useState<PaymentItem | null>(null)
   const [paymentPhoneNumber, setPaymentPhoneNumber] = useState('')
   const [isPaymentSelectorOpen, setIsPaymentSelectorOpen] = useState(false)
+  const [showBillDetails, setShowBillDetails] = useState(false)
 
   const randId = useId()
 
@@ -264,7 +265,11 @@ export default function CheckoutModal({ data }: Props) {
       aria-labelledby="dialog-title"
       aria-describedby="dialog-description"
     >
-      <DialogContent className="max-w-sm mx-auto p-6 gap-0">
+      <DialogContent
+        className="max-w-sm mx-auto p-6 gap-0"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         {/* Header */}
         <DialogHeader className="flex-row items-center justify-between">
           <DialogTitle className="text-start">Konfirmasi Pesanan</DialogTitle>
@@ -294,56 +299,26 @@ export default function CheckoutModal({ data }: Props) {
             {/* Bills Detail - for postpaid products */}
             {data.bills && (
               <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 space-y-2">
-                <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-                  Detail Tagihan
-                </h4>
+                <div className="flex justify-between items-center">
+                  <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Detail Tagihan
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => setShowBillDetails(true)}
+                    className="text-xs text-primary font-medium hover:underline"
+                  >
+                    Lihat Detail
+                  </button>
+                </div>
 
-                {data.bills.customer_name && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-slate-600 dark:text-slate-400">Nama Pelanggan:</span>
-                    <span className="font-medium">{data.bills.customer_name}</span>
-                  </div>
-                )}
-
-                {(data.bills.tarif || data.bills.daya) && (
-                  <div className="flex justify-between text-xs">
-                    <span className="text-slate-600 dark:text-slate-400">Tarif / Daya:</span>
-                    <span className="font-medium">
-                      {data.bills.tarif}
-                      {data.bills.daya && ` - ${data.bills.daya} VA`}
-                    </span>
-                  </div>
-                )}
-
-                {/* Bill Period Details */}
-                {data.bills.detail && data.bills.detail.length > 0 && (
-                  <div className="mt-2 pt-2 border-t dark:border-slate-700">
-                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">
-                      Periode ({data.bills.lembar_tagihan} Lembar):
-                    </p>
-                    <div className="space-y-1">
-                      {data.bills.detail.map((bill) => (
-                        <div
-                          key={randId}
-                          className="bg-white dark:bg-slate-800 rounded px-2 py-1.5 text-xs"
-                        >
-                          <div className="flex justify-between items-center">
-                            <span className="font-medium">{bill.periode}</span>
-                            <span>{formatPrice(Number(bill.nilai_tagihan))}</span>
-                          </div>
-                          {Number(bill.denda) > 0 && (
-                            <div className="flex justify-between text-red-600 dark:text-red-400 mt-0.5">
-                              <span>Denda</span>
-                              <span>{formatPrice(Number(bill.denda))}</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                <div className="space-y-1">
+                  {data.bills.customer_name && (
+                    <div className="flex justify-between text-xs">
+                      <span className="text-slate-600 dark:text-slate-400">Nama Pelanggan:</span>
+                      <span className="font-medium">{data.bills.customer_name}</span>
                     </div>
-                  </div>
-                )}
-
-                <div className="mt-2 pt-2 border-t dark:border-slate-700 space-y-1">
+                  )}
                   <div className="flex justify-between text-xs">
                     <span className="text-slate-600 dark:text-slate-400">Jumlah Tagihan:</span>
                     <span className="font-medium">{formatPrice(data.bills.jumlah_tagihan)}</span>
@@ -355,6 +330,96 @@ export default function CheckoutModal({ data }: Props) {
                     </div>
                   )}
                 </div>
+
+                {/* Details Modal */}
+                <Dialog open={showBillDetails} onOpenChange={setShowBillDetails}>
+                  <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto p-6">
+                    <DialogHeader>
+                      <DialogTitle>Detail Tagihan Lengkap</DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-2 space-y-2">
+                      {Object.entries(data.bills).map(([key, value]) => {
+                        if (key === 'jumlah_tagihan' || key === 'fee' || key === 'customer_name')
+                          return null
+
+                        const formattedKey = key
+                          .replace(/_/g, ' ')
+                          .replace(/\b\w/g, (c) => c.toUpperCase())
+
+                        if (Array.isArray(value)) {
+                          return (
+                            <div key={key} className="pt-2">
+                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block border-b pb-1 dark:border-slate-700">
+                                {formattedKey}
+                              </span>
+                              <div className="space-y-2">
+                                {value.map((item) => (
+                                  <div
+                                    key={randId}
+                                    className="bg-slate-50 dark:bg-slate-800/50 rounded-md p-3 text-sm border dark:border-slate-800"
+                                  >
+                                    {Object.entries(item).map(([iKey, iValue]) => (
+                                      <div
+                                        key={iKey}
+                                        className="flex justify-between items-center py-1"
+                                      >
+                                        <span className="text-slate-600 dark:text-slate-400 capitalize">
+                                          {iKey.replace(/_/g, ' ')}
+                                        </span>
+                                        <span className="font-medium text-right max-w-[60%] wrap-break-word">
+                                          {String(iValue)}
+                                        </span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        }
+
+                        if (typeof value === 'object' && value !== null) {
+                          return (
+                            <div key={key} className="pt-2">
+                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block border-b pb-1 dark:border-slate-700">
+                                {formattedKey}
+                              </span>
+                              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-md p-3 text-sm border dark:border-slate-800 space-y-2">
+                                {Object.entries(value).map(([oKey, oValue]) => (
+                                  <div
+                                    key={oKey}
+                                    className="flex justify-between items-center pt-1"
+                                  >
+                                    <span className="text-slate-600 dark:text-slate-400 capitalize">
+                                      {oKey.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="font-medium text-right max-w-[60%] wrap-break-word">
+                                      {String(oValue)}
+                                    </span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )
+                        }
+
+                        return (
+                          <div
+                            key={key}
+                            className="flex justify-between text-sm items-start py-1.5 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                          >
+                            <span className="text-slate-600 dark:text-slate-400 mr-2 mt-0.5 whitespace-nowrap">
+                              {formattedKey}
+                            </span>
+                            <span className="font-medium text-right max-w-[60%] wrap-break-word">
+                              {String(value)}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             )}
 
@@ -408,13 +473,10 @@ export default function CheckoutModal({ data }: Props) {
                           : `https://is3.cloudhost.id/bagusok${selectedPayment.image_url}`
                       }
                       alt={selectedPayment.name}
-                      className="w-8 h-8 rounded object-cover"
+                      className="w-10 h-auto max-h-12 rounded object-cover"
                     />
                     <div className="text-left">
                       <p className="text-xs font-medium">{selectedPayment.name}</p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {formatPrice(selectedPayment.total_price)}
-                      </p>
                     </div>
                   </div>
                   <ChevronRightIcon className="w-4 h-4" />
@@ -430,22 +492,20 @@ export default function CheckoutModal({ data }: Props) {
                       </DialogTitle>
                     </DialogHeader>
 
-                    <div className="space-y-3 mt-4">
-                      <PaymentMethodSelector
-                        paymentMethods={paymentMethods.data.data}
-                        selectedPayment={selectedPayment}
-                        onSelectPayment={(item) => {
-                          setSelectedPayment(item)
-                          setIsPaymentSelectorOpen(false)
-                        }}
-                        isLoading={false}
-                        isError={false}
-                        balanceData={balancePaymentMethod.data?.data}
-                        balanceMessage={balancePaymentMethod.data?.message}
-                        isBalanceLoading={balancePaymentMethod.isPending}
-                        productPrice={data.total_price}
-                      />
-                    </div>
+                    <PaymentMethodSelector
+                      paymentMethods={paymentMethods.data.data}
+                      selectedPayment={selectedPayment}
+                      onSelectPayment={(item) => {
+                        setSelectedPayment(item)
+                        setIsPaymentSelectorOpen(false)
+                      }}
+                      isLoading={false}
+                      isError={false}
+                      balanceData={balancePaymentMethod.data?.data}
+                      balanceMessage={balancePaymentMethod.data?.message}
+                      isBalanceLoading={balancePaymentMethod.isPending}
+                      productPrice={data.total_price}
+                    />
                   </DialogContent>
                 </Dialog>
               </>
@@ -511,9 +571,15 @@ export default function CheckoutModal({ data }: Props) {
             </div>
           </div>
         </div>
-        <DialogFooter className="mt-4 grid grid-cols-2">
+        <DialogFooter className="mt-4 grid grid-cols-2 gap-4">
           <DialogClose asChild>
-            <Button type="button" className="w-full" variant="destructive" size="sm">
+            <Button
+              type="button"
+              className="w-full"
+              variant="destructive"
+              size="sm"
+              disabled={checkout.isPending}
+            >
               <XIcon /> Batalkan
             </Button>
           </DialogClose>
