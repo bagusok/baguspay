@@ -9,6 +9,7 @@ import {
   IsPhoneNumber,
   IsString,
   IsUUID,
+  Matches,
   Max,
   Min,
   Validate,
@@ -17,6 +18,7 @@ import {
   ValidatorConstraint,
   type ValidatorConstraintInterface,
 } from 'class-validator'
+import { PaymentAuthType } from 'src/payments/payment-auth.type'
 
 @ValidatorConstraint({ name: 'StartsWith62', async: false })
 export class StartsWith62Constraint implements ValidatorConstraintInterface {
@@ -133,6 +135,11 @@ export class CheckoutPrepaidDto {
   @ApiProperty()
   @IsString()
   checkout_token: string
+
+  @ApiProperty({ required: false, description: '6-digit PIN for balance payments' })
+  @IsOptional()
+  @Matches(/^\d{6}$/)
+  pin?: string
 }
 
 export class GetOrderHistoryQueryDto {
@@ -217,4 +224,18 @@ export class CheckoutDto {
   @ApiProperty()
   @IsString()
   checkout_token: string
+
+  @ApiProperty({ required: false, description: '6-digit PIN for balance payments' })
+  @IsOptional()
+  @Matches(/^\d{6}$/)
+  pin?: string
+
+  @ApiProperty({ required: false, enum: PaymentAuthType, description: 'Payment auth method' })
+  @IsOptional()
+  @IsEnum(PaymentAuthType)
+  payment_auth_type?: PaymentAuthType
+
+  @ApiProperty({ required: false, description: 'Passkey assertion payload when using PASSKEY' })
+  @IsOptional()
+  passkey_assertion?: Record<string, any>
 }

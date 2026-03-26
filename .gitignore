@@ -73,4 +73,8 @@ ehthumbs.db
 # Session files
 .sisyphus/
 nul
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 .adonisjs

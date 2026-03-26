@@ -113,6 +113,13 @@
       "when": 1769581330407,
       "tag": "0015_goofy_ulik",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1774337355734,
+      "tag": "0016_sticky_madame_masque",
+      "breakpoints": true
     }
   ]
 }

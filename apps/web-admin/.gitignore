@@ -23,4 +23,8 @@ yarn-error.log
 
 # Platform specific
 .DS_Store
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 .adonisjs

@@ -15,10 +15,11 @@ import { UnderlinedInput } from '~/components/form-fields'
 import { useFormMutation } from '~/hooks/use-form-mutation'
 import { userAtom } from '~/store/user'
 import { apiClient } from '~/utils/axios'
+import type { ModalType } from './index'
 
 type Props = {
-  activeModal: 'password' | 'email' | 'phone' | null
-  setActiveModal: (modal: 'password' | 'email' | 'phone' | null) => void
+  activeModal: ModalType
+  setActiveModal: (modal: ModalType) => void
 }
 
 const schema = z.object({

@@ -17,7 +17,11 @@ import type { TUser } from 'src/common/types/meta.type'
 import { SendResponse } from 'src/common/utils/response'
 import { DatabaseService } from 'src/database/database.service'
 import { StorageService } from 'src/storage/storage.service'
+import { ChangePinDto, PaymentAuthDto, ResetPinDto, SetPinDto } from './dto/pin.dto'
+import { PaymentAuthService } from './payment-auth.service'
+import { PaymentAuthType } from './payment-auth.type'
 import { PaymentsRepository } from './payments.repository'
+import { PinService } from './pin.service'
 
 @Injectable()
 export class PaymentsService {
@@ -25,6 +29,8 @@ export class PaymentsService {
     private readonly databaseService: DatabaseService,
     private readonly storageService: StorageService,
     private readonly paymentRepository: PaymentsRepository,
+    private readonly pinService: PinService,
+    private readonly paymentAuthService: PaymentAuthService,
   ) {}
 
   async getAllPayments() {
@@ -138,15 +144,25 @@ export class PaymentsService {
     }
 
     // Special case: balance payment
-    if (
+    const isBalancePayment =
       paymentMethod.type === PaymentMethodType.BALANCE ||
       paymentMethod.provider_name === PaymentMethodProvider.BALANCE
-    ) {
+
+    if (isBalancePayment) {
       if (!user) {
         throw new NotAcceptableException(
           'Payment method balance is only available for registered users.',
         )
       }
+
+      if (!user.pin_hash) {
+        throw new NotAcceptableException('Please set your PIN to use balance payment.')
+      }
+
+      if (user.pin_locked_until && user.pin_locked_until > new Date()) {
+        throw new NotAcceptableException('Your PIN is locked. Please reset or try again later.')
+      }
+
       if (user.balance < total_price) {
         throw new HttpException({ statusCode: 402, message: 'Insufficient balance.' }, 402)
       }
@@ -191,6 +207,51 @@ export class PaymentsService {
       is_available: getBalancePaymentMethod.is_available,
       image_url: this.storageService.getFileUrl(getBalancePaymentMethod.image_url),
       user_balance: getUserBalance,
+      pin_required: true,
+      pin_is_set: !!user.pin_hash,
+      pin_locked_until: user.pin_locked_until ?? null,
+      pin_attempts_left:
+        user.pin_locked_until && user.pin_locked_until > new Date()
+          ? 0
+          : Math.max(0, this.pinService.maxAttempts - (user.pin_attempts ?? 0)),
+      pin_lock_minutes: this.pinService.lockMinutes,
+      supported_auth_methods: this.paymentAuthService.getSupportedMethods(),
+    })
+  }
+
+  async setPin(user: TUser, payload: SetPinDto) {
+    if (payload.pin !== payload.pin_confirm) {
+      throw new BadRequestException('PIN confirmation does not match.')
+    }
+
+    await this.pinService.setPin(user.id, payload.pin)
+    return SendResponse.success(null, 'PIN set successfully')
+  }
+
+  async changePin(user: TUser, payload: ChangePinDto) {
+    if (payload.new_pin !== payload.new_pin_confirm) {
+      throw new BadRequestException('New PIN confirmation does not match.')
+    }
+
+    await this.pinService.changePin(user.id, payload.current_pin, payload.new_pin)
+    return SendResponse.success(null, 'PIN changed successfully')
+  }
+
+  async resetPin(user: TUser, payload: ResetPinDto) {
+    if (payload.new_pin !== payload.new_pin_confirm) {
+      throw new BadRequestException('New PIN confirmation does not match.')
+    }
+
+    await this.pinService.setPin(user.id, payload.new_pin)
+    return SendResponse.success(null, 'PIN reset successfully')
+  }
+
+  async verifyPaymentAuth(user: TUser, payload: PaymentAuthDto) {
+    await this.paymentAuthService.verifyBalanceAuth({
+      userId: user.id,
+      authType: payload.payment_auth_type ?? PaymentAuthType.PIN,
+      pin: (payload as any).pin, // backward compatibility if provided
+      passkeyAssertion: payload.passkey_assertion,
     })
   }
 

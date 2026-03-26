@@ -21,6 +21,11 @@ export const users = pgTable('users', {
   role: userRoleEnum('role').notNull().default(UserRole.USER),
   balance: integer('balance').notNull().default(0),
 
+  pin_hash: varchar('pin_hash', { length: 255 }),
+  pin_attempts: integer('pin_attempts').notNull().default(0),
+  pin_locked_until: timestamp('pin_locked_until', { withTimezone: true }),
+  pin_set_at: timestamp('pin_set_at', { withTimezone: true }),
+
   is_banned: boolean('is_banned').notNull().default(false),
   is_email_verified: boolean('is_email_verified').notNull().default(false),
   is_deleted: boolean('is_deleted').notNull().default(false),

@@ -6,6 +6,7 @@ import { queryClientAtom } from 'jotai-tanstack-query'
 import { useEffect } from 'react'
 import { Outlet, useNavigate } from 'react-router'
 import UserLayout from '~/components/layout/user-layout'
+import SetPinWrapper from '~/components/set-pin-wrapper'
 import { queryClient, store } from '~/store/store'
 import { authTokenAtom } from '~/store/token'
 import { userAtom } from '~/store/user'
@@ -69,11 +70,12 @@ export default function Locale(_args: Route.ComponentProps) {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <UserLayout>
-          <Outlet />
-        </UserLayout>
+        <SetPinWrapper>
+          <UserLayout>
+            <Outlet />
+          </UserLayout>
+        </SetPinWrapper>
         <ReactQueryDevtools initialIsOpen={false} />
-        {/* <NProgressBar /> */}
       </Provider>
     </QueryClientProvider>
   )

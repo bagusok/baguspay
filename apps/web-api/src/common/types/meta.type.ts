@@ -21,4 +21,8 @@ export interface TUser {
   phone: string | null
   is_banned: boolean
   image_url: string | null
+  pin_hash?: string | null
+  pin_attempts?: number
+  pin_locked_until?: Date | null
+  pin_set_at?: Date | null
 }

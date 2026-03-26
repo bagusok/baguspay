@@ -7,6 +7,7 @@
     ".": "./global.css"
   },
   "devDependencies": {
-    "tailwindcss": "^4.1.5"
+    "tailwindcss": "^4.1.5",
+    "tsup": "^8.5.1"
   }
 }
