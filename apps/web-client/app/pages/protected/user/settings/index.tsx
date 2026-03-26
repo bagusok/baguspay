@@ -1,11 +1,17 @@
-import { ChevronRightIcon, LockIcon, MailIcon, PhoneIcon } from 'lucide-react'
+import { Badge } from '@repo/ui/components/ui/badge'
+import { useAtomValue } from 'jotai'
+import { ChevronRightIcon, KeyRoundIcon, LockIcon, MailIcon, PhoneIcon } from 'lucide-react'
 import { useState } from 'react'
 import BreadcrumbBasic from '~/components/breadcrumb-basic'
+import { userSecurityAtom } from '~/store/user'
 import ChangeEmailModal from './_change-email-modal'
 import ChangePasswordModal from './_change-password-modal'
 import ChangePhoneModal from './_change-phone-modal'
+import ChangePinModal from './_change-pin-modal'
+import SetPinModal from './_set-pin-modal'
 
-type ModalType = 'password' | 'email' | 'phone' | null
+type ModalType = 'password' | 'email' | 'phone' | 'pin-add' | 'pin-change' | null
+export type { ModalType }
 
 const SETTINGS_MENUS: {
   title: string
@@ -35,6 +41,7 @@ const SETTINGS_MENUS: {
 
 export default function UserSettings() {
   const [activeModal, setActiveModal] = useState<ModalType>(null)
+  const securityInfo = useAtomValue(userSecurityAtom)
 
   // Handlers for form submissions (nanti diganti dengan integasi API Endpoint)
 
@@ -65,7 +72,17 @@ export default function UserSettings() {
 
       <div className="rounded-xl border border-border bg-card text-card-foreground shadow-sm overflow-hidden md:max-w-2xl">
         <div className="divide-y divide-border">
-          {SETTINGS_MENUS.map((menu) => {
+          {[
+            ...SETTINGS_MENUS,
+            {
+              title: 'PIN Keamanan',
+              description: securityInfo?.data?.has_pin
+                ? 'Ubah PIN untuk menjaga keamanan transaksi saldo'
+                : 'Tambahkan PIN agar transaksi saldo lebih aman',
+              icon: KeyRoundIcon,
+              type: securityInfo?.data?.has_pin ? 'pin-change' : ('pin-add' as ModalType),
+            },
+          ].map((menu) => {
             const Icon = menu.icon
             return (
               <button
@@ -82,6 +99,14 @@ export default function UserSettings() {
                   </h3>
                   <p className="text-sm text-muted-foreground">{menu.description}</p>
                 </div>
+                {menu.type === 'pin-add' || menu.type === 'pin-change' ? (
+                  <Badge
+                    variant={securityInfo?.data?.has_pin ? 'outline' : 'secondary'}
+                    className="text-xs"
+                  >
+                    {securityInfo?.data?.has_pin ? 'Aktif' : 'Belum diset'}
+                  </Badge>
+                ) : null}
                 <ChevronRightIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
               </button>
             )
@@ -99,6 +124,12 @@ export default function UserSettings() {
 
       {/* 3. Modal Ubah Nomor Telepon */}
       <ChangePhoneModal activeModal={activeModal} setActiveModal={setActiveModal} />
+
+      {/* 4. Modal Set PIN */}
+      <SetPinModal activeModal={activeModal} setActiveModal={setActiveModal} />
+
+      {/* 5. Modal Ubah PIN */}
+      <ChangePinModal activeModal={activeModal} setActiveModal={setActiveModal} />
     </div>
   )
 }

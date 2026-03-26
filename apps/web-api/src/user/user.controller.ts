@@ -50,6 +50,12 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/security-info')
+  async getSecurityInfo(@User() user: TUser) {
+    return await this.userService.getSecurityInfo(user.id)
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/dashboard')
   async dashboard(@User() user: TUser) {
     return await this.userService.dashboard(user)

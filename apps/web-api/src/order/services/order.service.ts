@@ -27,6 +27,8 @@ import type { DigiflazzCekTagihanResponse } from 'src/integrations/h2h/digiflazz
 import { PaymentGatewayService } from 'src/integrations/payment-gateway/payment-gateway.service'
 import { OffersRepository } from 'src/offers/offers.repository'
 import { OffersService } from 'src/offers/offers.service'
+import { PaymentAuthService } from 'src/payments/payment-auth.service'
+import { PaymentAuthType } from 'src/payments/payment-auth.type'
 import { ProductRepository } from 'src/products/product.repository'
 import { QueueService } from 'src/queue/queue.service'
 import { InquiryUniversalDto } from '../dto/inquiry.universal.dto'
@@ -40,6 +42,7 @@ export class OrderService {
     private readonly databaseService: DatabaseService,
     private readonly configService: ConfigService,
     private readonly pgService: PaymentGatewayService,
+    private readonly paymentAuthService: PaymentAuthService,
     private readonly queueService: QueueService,
     private readonly offerService: OffersService,
     private readonly offerRepository: OffersRepository,
@@ -411,6 +414,19 @@ export class OrderService {
         paymentMethod.provider_name === PaymentMethodProvider.BALANCE)
     ) {
       throw new BadRequestException('Guests are not allowed to use balance as a payment method.')
+    }
+
+    const isBalancePayment =
+      paymentMethod.type === PaymentMethodType.BALANCE ||
+      paymentMethod.provider_name === PaymentMethodProvider.BALANCE
+
+    if (isBalancePayment) {
+      await this.paymentAuthService.verifyBalanceAuth({
+        userId: user.id,
+        authType: data.payment_auth_type ?? PaymentAuthType.PIN,
+        pin: data.pin,
+        passkeyAssertion: data.passkey_assertion,
+      })
     }
 
     const checkoutTokenData = {

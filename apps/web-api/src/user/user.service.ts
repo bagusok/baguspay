@@ -172,6 +172,31 @@ export class UserService {
     })
   }
 
+  /**
+   * Return lightweight security flags for global state (PIN/KYC/passkey, extensible later).
+   * Currently only PIN exists in schema (pin_hash/pin_set_at). Other flags default to false.
+   */
+  async getSecurityInfo(userId: string) {
+    const user = await this.userRepository.findUserById(userId)
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`)
+    }
+
+    const hasPin = Boolean(user.pin_hash ?? user.pin_set_at)
+    const isKyc = false // no KYC column yet; keep for future expansion
+    const hasPasskey = false // no passkey column yet
+
+    return SendResponse.success(
+      {
+        has_pin: hasPin,
+        is_kyc: isKyc,
+        has_passkey: hasPasskey,
+      },
+      'User security info retrieved successfully',
+    )
+  }
+
   // Session
   async getAllSessions(user: TUser, currentAccessToken?: string) {
     const sessions = await this.userRepository.findAllSessionByUserId(user.id)

@@ -61,7 +61,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
-    "tsup": "^8.5.0"
+    "tsup": "^8.5.1"
   },
   "types": "dist/index.d.ts",
   "sideEffects": [
