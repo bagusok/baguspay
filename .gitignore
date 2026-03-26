@@ -73,3 +73,4 @@ ehthumbs.db
 # Session files
 .sisyphus/
 nul
+.adonisjs
